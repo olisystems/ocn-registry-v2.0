@@ -18,6 +18,7 @@ export const networkExtraConfig: networkConfigInfo = {
 export const developmentChains = ["hardhat", "localhost", "ganache"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
+export const cpoOperatorPk = "379a602e6068f313de54bf118d38071b22ed15caf854d1050c3fed455ab75f50";
 
 // Governor Values
 export const QUORUM_PERCENTAGE = 4; // Need 4% of voters to pass

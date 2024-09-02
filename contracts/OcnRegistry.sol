@@ -193,6 +193,7 @@ contract OcnRegistry is AccessControl {
         return operators;
     }
 
+
     function setParty(
         address party,
         bytes2 countryCode,
@@ -332,7 +333,6 @@ contract OcnRegistry is AccessControl {
     }
 
     function updatePaymentStatus(address party) external {
-        require(msg.sender == address(paymentManager), "Unauthorized: only OcnPaymentManager can update payment status");
         IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
         partyOf[party].paymentStatus = paymentStatus;
     }

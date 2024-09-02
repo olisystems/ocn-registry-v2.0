@@ -400,6 +400,11 @@
         "type": "uint8[]"
       },
       {
+        "internalType": "enum IOcnPaymentManager.PaymentStatus",
+        "name": "paymentStatus",
+        "type": "uint8"
+      },
+      {
         "internalType": "address",
         "name": "operatorAddress",
         "type": "address"
