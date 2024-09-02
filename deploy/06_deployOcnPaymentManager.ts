@@ -22,7 +22,7 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   console.log(`Transferring ownership of ${contractName} to TimeLock...`);
   const timelockContract: any = await ethers.getContract("Timelock", deployer);
-  const deployedContract = await ethers.getContract(contractName, deployer);
+  const deployedContract: any = await ethers.getContract(contractName, deployer);
   const transferTx = await deployedContract.transferOwnership(await timelockContract.getAddress());
   await transferTx.wait(1);
 };

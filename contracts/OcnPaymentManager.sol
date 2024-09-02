@@ -25,6 +25,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
 
     uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals    
     IERC20 public euroStablecoin; // ERC20 token contract address
+    address public withdrawalWallet;
 
     mapping(address => uint256) public stakedFunds;
     mapping(address => uint256) public lastPaymentTime;
@@ -55,7 +56,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     // TODO remove for upgradebles
     constructor(address _euroStablecoin) {
         euroStablecoin = IERC20(_euroStablecoin);
-        fundingYearlyAmount = 100 * 1e18; // 100 EUR
+        fundingYearlyAmount = 30 * 1e18; // 100 EUR
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
     
@@ -95,6 +96,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     /**
      * @notice Allows an operator to withdraw their staked funds gradually.
      */
+    
     function withdraw() external {
         require(stakedFunds[msg.sender] > 0, "No funds staked");
 
@@ -109,6 +111,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
         
         emit Withdrawal(msg.sender, allowableWithdrawal);
     }
+    
 
     /**
      * @notice Returns the payment status of a given operator.
@@ -124,11 +127,11 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     }
 
     function setFundingYearlyAmount(uint256 _fundingYearlyAmount) external {
-        fundingYearlyAmount = _fundingYearlyAmount;
+        fundingYearlyAmount = _fundingYearlyAmount * 1e18;
     }
 
     function getFundingYearlyAmount() external view returns (uint256) {
-        return fundingYearlyAmount;
+        return fundingYearlyAmount / 1e18;
     }
 
     // To be used on deploy to transfer ownership from the deployer address to the Timelock Contract address

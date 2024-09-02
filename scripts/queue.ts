@@ -2,19 +2,19 @@ import { ethers, network } from "hardhat";
 import { FUNC, NEW_STORE_VALUE, PROPOSAL_DESCRIPTION, MIN_DELAY, developmentChains } from "../helper-hardhat-config";
 import { moveBlocks } from "../helper/moveBlocks";
 import { moveTime } from "../helper/moveTime";
-import { Box, OcnGovernor } from "../typechain";
+import { OcnGovernor } from "../typechain";
 
 export async function queueAndExecute() {
   const args = [NEW_STORE_VALUE];
   const functionToCall = FUNC;
-  const box: any = await ethers.getContract("Box");
-  const encodedFunctionCall = box.interface.encodeFunctionData(functionToCall, args);
+  const ocnPaymentManager: any = await ethers.getContract("OcnPaymentManager");
+  const encodedFunctionCall = ocnPaymentManager.interface.encodeFunctionData(functionToCall, args);
   const descriptionHash = ethers.id(PROPOSAL_DESCRIPTION);
   console.log(descriptionHash);
 
   const governor: any = await ethers.getContract("OcnGovernor");
   console.log("Queueing...");
-  const queueTx = await governor.queue([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash);
+  const queueTx = await governor.queue([await ocnPaymentManager.getAddress()], [0], [encodedFunctionCall], descriptionHash);
   await queueTx.wait(1);
 
   if (developmentChains.includes(network.name)) {
@@ -22,7 +22,8 @@ export async function queueAndExecute() {
     await moveBlocks(1);
   }
 
-  console.log(`Box value: ${await box.retrieve()}`);
+  const currrentValue = await ocnPaymentManager.getFundingYearlyAmount();
+  console.log(`Current Funding Yearly Amount Value: ${currrentValue} at ${await ocnPaymentManager.getAddress()}`);
 }
 
 queueAndExecute()

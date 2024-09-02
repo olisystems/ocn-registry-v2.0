@@ -11,6 +11,6 @@
     "outDir": "./dist",
   }
   ,
-  "include": ["**/*.ts"],
+  "include": ["./scripts", "./test", "./tasks", "./deploy", "./hardhat.config.ts"],
   "exclude": ["node_modules"]
 }

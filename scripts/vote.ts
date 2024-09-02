@@ -10,7 +10,7 @@ async function main() {
   const proposalId = proposals[network.name].at(-1);
   // 0 = Against, 1 = For, 2 = Abstain for this example
   const voteWay = 1;
-  const reason = "I lika do da cha cha";
+  const reason = "OCN Node costs increased";
   await vote(proposalId, voteWay, reason);
 }
 

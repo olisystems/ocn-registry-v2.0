@@ -8,8 +8,9 @@ export async function queueAndExecute() {
   const contractName = "OcnPaymentManager";
   const args = [NEW_STORE_VALUE];
   const functionToCall = FUNC;
-  const ocnRegistry: any = await ethers.getContract(contractName);
-  const encodedFunctionCall = ocnRegistry.interface.encodeFunctionData(functionToCall, args);
+  // TODO fix types generation and replace any by OcnPaymentManager
+  const ocnPaymentManager: any = await ethers.getContract(contractName);
+  const encodedFunctionCall = ocnPaymentManager.interface.encodeFunctionData(functionToCall, args);
   const descriptionHash = ethers.id(PROPOSAL_DESCRIPTION);
   console.log(descriptionHash);
 
@@ -17,9 +18,9 @@ export async function queueAndExecute() {
 
   console.log("Executing...");
   // this will fail on a testnet because you need to wait for the MIN_DELAY!
-  const executeTx = await governor.execute([await ocnRegistry.getAddress()], [0], [encodedFunctionCall], descriptionHash);
+  const executeTx = await governor.execute([await ocnPaymentManager.getAddress()], [0], [encodedFunctionCall], descriptionHash);
   await executeTx.wait(1);
-  console.log(`Box value: ${await ocnRegistry.retrieve()}`);
+  console.log(`Current Funding Yearly Amount: ${await ocnPaymentManager.getFundingYearlyAmount()}`);
 }
 
 queueAndExecute()
