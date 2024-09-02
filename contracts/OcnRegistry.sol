@@ -2,21 +2,42 @@
 pragma solidity ^0.8.0;
 
 import "./IOcnPaymentManager.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
+
+// TODO uncoment to transform in upgradebles
+// import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+// import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+// import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+// TODO remove to transrom in upgradeble
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+
+// TODO uncoment to transform in upgradebles
+//contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
+
+// TODO remove to transform in upgradeble
+contract OcnRegistry is AccessControl { 
+   
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
 
     //storage reserve for future variables
-    uint256[50] __gap;
-    bytes32 public UPGRADER_ROLE;
-    uint public version;
-    address currentBaseContract;
+     // TODO uncoment to transform in upgradebles
+    // uint256[50] __gap;
+    // bytes32 public UPGRADER_ROLE;
+    // uint public version;
+    // address currentBaseContract;
     string private prefix;
+
+   
+
+    /// TODO uncoment for upgradebles
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    // constructor() {
+    //     _disableInitializers();
+    // }
+
 
     // OCN Node Operator Listings
     mapping(address => string) private nodeOf;
@@ -28,10 +49,6 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
     enum Role { CPO, EMSP, HUB, NAP, NSP, OTHER, SCSP }
     enum Module { cdrs, chargingprofiles, commands, locations, sessions, tariffs, tokens }
 
-    struct PartyModules {
-        Module[] sender;
-        Module[] receiver;
-    }
 
     enum VcStatus { NOT_VERIFIED, APPROVED, FAILED }
 
@@ -39,7 +56,6 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
         bytes2 countryCode;
         bytes3 partyId;
         Role[] roles;
-        PartyModules modules;
         string name;
         string url;
         IOcnPaymentManager.PaymentStatus paymentStatus;
@@ -65,8 +81,6 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
         bytes3 partyId,
         address indexed partyAddress,
         Role[] roles,
-        Module[] modulesSender,
-        Module[] modulesReceiver,
         address indexed operatorAddress
     );
 
@@ -74,29 +88,38 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
     /*          INITIALIZER               */
     /* ********************************** */
     // used as constructor in upgradeble contracts
-    function initialize(address _paymentManager) public initializer {
+    // TOEO uncoment for upgradebles
+    // function initialize(address _paymentManager) public initializer {
+    //     prefix = "\u0019Ethereum Signed Message:\n32";
+    //     paymentManager = IOcnPaymentManager(_paymentManager);
+    //     UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+
+    //     __AccessControl_init();
+    //     __UUPSUpgradeable_init();
+
+    //     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    //     _grantRole(UPGRADER_ROLE, msg.sender);
+    // }
+
+     // TODO remove for upgradebles
+    constructor (address _paymentManager){
         prefix = "\u0019Ethereum Signed Message:\n32";
         paymentManager = IOcnPaymentManager(_paymentManager);
-        UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-
-        __AccessControl_init();
-        __UUPSUpgradeable_init();
-
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(UPGRADER_ROLE, msg.sender);
     }
     
     /**
      * Called when Base Contract upgrades: iterate version   
      */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyRole(UPGRADER_ROLE)
-        override
-    {
-        currentBaseContract = newImplementation;
-        version++;
-    }
+     // TODO uncoment for upgradebles
+    // function _authorizeUpgrade(address newImplementation)
+    //     internal
+    //     onlyRole(UPGRADER_ROLE)
+    //     override
+    // {
+    //     currentBaseContract = newImplementation;
+    //     version++;
+    // }
 
     /* ********************************** */
     /*            FUNCTIONS               */
@@ -199,13 +222,12 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
 
         uniquePartyAddresses[party] = true;
 
-        PartyModules memory modules;
         IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
 
-        partyOf[party] = PartyDetails(countryCode, partyId, roles, modules, name, url, paymentStatus, VcStatus.NOT_VERIFIED, true);
+        partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, VcStatus.NOT_VERIFIED, true);
         operatorOf[party] = operator;
 
-        emit PartyUpdate(countryCode, partyId, party, roles, modules.sender, modules.receiver, operator);
+        emit PartyUpdate(countryCode, partyId, party, roles, operator);
     }
 
     function setParty(
@@ -237,36 +259,6 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
         setParty(signer, countryCode, partyId, roles, operator, name, url);
     }
 
-    function setPartyModules(address party, Module[] memory sender, Module[] memory receiver) private {
-        address operator = operatorOf[party];
-
-        require(operator != address(0), "Party not registered. Use setParty method first.");
-        partyOf[party].modules.sender = sender;
-        partyOf[party].modules.receiver = receiver;
-
-        PartyDetails memory details = partyOf[party];
-        emit PartyUpdate(details.countryCode, details.partyId, party, details.roles, sender, receiver, operator);
-    }
-
-    function setPartyModules(Module[] memory sender, Module[] memory receiver) public {
-        setPartyModules(msg.sender, sender, receiver);
-    }
-
-    function setPartyModulesRaw(
-        address party,
-        Module[] memory sender,
-        Module[] memory receiver,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public {
-        bytes32 paramHash = keccak256(abi.encodePacked(party, sender, receiver));
-        address signer = ecrecover(keccak256(abi.encodePacked(prefix,
-        paramHash)), v, r, s);
-        require(signer == party, "Signer and provided party address different.");
-        setPartyModules(signer, sender, receiver);
-    }
-
     function deleteParty(address party) private {
         require(operatorOf[party] != address(0), "Cannot delete party that does not exist. No operator found for given party.");
         delete operatorOf[party];
@@ -275,8 +267,7 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
         delete partyOf[party];
 
         Role[] memory emptyRoles;
-        Module[] memory emptyModules;
-        emit PartyUpdate(details.countryCode, details.partyId, party, emptyRoles, emptyModules, emptyModules, address(0));
+        emit PartyUpdate(details.countryCode, details.partyId, party, emptyRoles, address(0));
     }
 
     function deleteParty() public {
@@ -309,8 +300,6 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
     function getPartyDetailsByAddress(address partyAddress) public view returns (
         bytes2 countryCode,
         bytes3 partyId,
-        Module[] memory modulesSender,
-        Module[] memory modulesReceiver,
         Role[] memory roles,
         address operatorAddress,
         string memory operatorDomain
@@ -319,8 +308,6 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
         countryCode = details.countryCode;
         partyId = details.partyId;
         roles = details.roles;
-        modulesSender = details.modules.sender;
-        modulesReceiver = details.modules.receiver;
         operatorAddress = operatorOf[partyAddress];
         operatorDomain = nodeOf[operatorAddress];
     }
@@ -328,16 +315,12 @@ contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable
     function getPartyDetailsByOcpi(bytes2 countryCode, bytes3 partyId) public view returns (
         address partyAddress,
         Role[] memory roles,
-        Module[] memory modulesSender,
-        Module[] memory modulesReceiver,
         address operatorAddress,
         string memory operatorDomain
     ) {
         partyAddress = uniqueParties[countryCode][partyId];
         PartyDetails memory details = partyOf[partyAddress];
         roles = details.roles;
-        modulesSender = details.modules.sender;
-        modulesReceiver = details.modules.receiver;
         operatorAddress = operatorOf[partyAddress];
         operatorDomain = nodeOf[operatorAddress];
     }

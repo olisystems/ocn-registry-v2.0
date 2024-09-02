@@ -1,10 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { storeProxyAddress } from "../helper/storeJson";
 import verify from "../helper-functions";
-import { networkExtraConfig, proxiesFile } from "../helper-hardhat-config";
-import { ethers, upgrades } from "hardhat";
-import fs from "fs";
+import { networkExtraConfig, developmentChains } from "../helper-hardhat-config";
+import { ethers } from "hardhat";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "OcnPaymentManager";
@@ -15,14 +13,19 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   log("----------------------------------------------------");
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
   const euroStableCoinDeplyedContract = await ethers.getContract("EuroStableCoin", deployer);
+  await deploy(contractName, {
+    from: deployer,
+    args: [euroStableCoinDeplyedContract.target],
+    log: true,
+    waitConfirmations: networkExtraConfig[network.name].blockConfirmations || 1,
+  });
 
-  const ocnPaymentManagerContract = await ethers.getContractFactory(contractName);
-  const ocnPaymentManagerDeployedContract = await upgrades.deployProxy(ocnPaymentManagerContract, [euroStableCoinDeplyedContract.target]);
-  await ocnPaymentManagerDeployedContract.waitForDeployment();
-  console.log(`${contractName} deployed at: ${await ocnPaymentManagerDeployedContract.getAddress()}`);
-
-  storeProxyAddress(await ocnPaymentManagerDeployedContract.getAddress(), contractName);
+  console.log(`Transferring ownership of ${contractName} to TimeLock...`);
+  const timelockContract: any = await ethers.getContract("Timelock", deployer);
+  const deployedContract = await ethers.getContract(contractName, deployer);
+  const transferTx = await deployedContract.transferOwnership(await timelockContract.getAddress());
+  await transferTx.wait(1);
 };
 
 export default deployVoteToken;
-deployVoteToken.tags = ["all", "payment-deploy"];
+deployVoteToken.tags = ["all", "payment"];

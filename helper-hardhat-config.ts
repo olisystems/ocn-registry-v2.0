@@ -28,6 +28,6 @@ export const VOTING_DELAY = 1; // 1 Block - How many blocks till a proposal vote
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 // export const NEW_STORE_VALUE = Math.floor(Math.random() * Math.pow(2, 16));
-export const NEW_STORE_VALUE = 6;
-export const FUNC = "store";
+export const NEW_STORE_VALUE = 50;
+export const FUNC = "setFundingYearlyAmount";
 export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_STORE_VALUE + " in the Box!";

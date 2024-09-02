@@ -1,63 +1,76 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "./IOcnPaymentManager.sol";
+// TODO uncoment for upgradebles
+// import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+// import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+// import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 
-contract OcnPaymentManager is IOcnPaymentManager, Initializable, AccessControlUpgradeable, UUPSUpgradeable {
+contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
 
     //storage reserve for future variables
-    uint256[50] __gap;
-    bytes32 public UPGRADER_ROLE;
-    uint public version;
-    address currentBaseContract;
+    // TODO uncoment for upgradebles
+    // uint256[50] __gap;
+    // bytes32 public UPGRADER_ROLE;
+    // uint public version;
+    // address currentBaseContract;
 
-    uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals
-    
+    uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals    
     IERC20 public euroStablecoin; // ERC20 token contract address
 
     mapping(address => uint256) public stakedFunds;
     mapping(address => uint256) public lastPaymentTime;
 
    
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
     /* ********************************** */
     /*          INITIALIZER               */
     /* ********************************** */
     // used as constructor in upgradeble contracts
-    function initialize(address _euroStablecoin) public initializer {
-        UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+    // TODO uncoment for upgradebles
+    // function initialize(address _euroStablecoin) public initializer {
+    //     UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+    //     euroStablecoin = IERC20(_euroStablecoin);
+    //     fundingYearlyAmount = 100 * 1e18; // 100 EUR
+    //     __AccessControl_init();
+    //     __UUPSUpgradeable_init();
+
+    //     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    //     _grantRole(UPGRADER_ROLE, msg.sender);
+    // }
+
+    // TODO uncoment for upgradebles
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    // constructor() {
+    //     _disableInitializers();
+    // }
+
+    // TODO remove for upgradebles
+    constructor(address _euroStablecoin) {
         euroStablecoin = IERC20(_euroStablecoin);
         fundingYearlyAmount = 100 * 1e18; // 100 EUR
-        __AccessControl_init();
-        __UUPSUpgradeable_init();
-
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(UPGRADER_ROLE, msg.sender);
     }
     
     /**
      * Called when Base Contract upgrades: iterate version   
      */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyRole(UPGRADER_ROLE)
-        override
-    {
-        currentBaseContract = newImplementation;
-        version++;
-    }
+     // TODO uncoment for upgradebles
+    // function _authorizeUpgrade(address newImplementation)
+    //     internal
+    //     onlyRole(UPGRADER_ROLE)
+    //     override
+    // {
+    //     currentBaseContract = newImplementation;
+    //     version++;
+    // }
 
 
     /* ********************************** */
@@ -110,7 +123,24 @@ contract OcnPaymentManager is IOcnPaymentManager, Initializable, AccessControlUp
         }
     }
 
-    function getCurrentBaseContract() external view returns (address){
-        return currentBaseContract;
+    function setFundingYearlyAmount(uint256 _fundingYearlyAmount) external {
+        fundingYearlyAmount = _fundingYearlyAmount;
     }
+
+    function getFundingYearlyAmount() external view returns (uint256) {
+        return fundingYearlyAmount;
+    }
+
+    // To be used on deploy to transfer ownership from the deployer address to the Timelock Contract address
+    function transferOwnership(address newOwner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        // Grant DEFAULT_ADMIN_ROLE to new owner
+        grantRole(DEFAULT_ADMIN_ROLE, newOwner);
+        // Revoke DEFAULT_ADMIN_ROLE from current owner
+        revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+    // TODO uncoment for upgradebles
+    // function getCurrentBaseContract() external view returns (address){
+    //     return currentBaseContract;
+    // }
 }

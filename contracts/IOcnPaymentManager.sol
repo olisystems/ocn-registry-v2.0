@@ -25,7 +25,8 @@ interface IOcnPaymentManager {
      * @notice Initializes the contract with the given Euro stablecoin address.
      * @param _euroStablecoin The address of the ERC20 Euro stablecoin contract.
      */
-    function initialize(address _euroStablecoin) external;
+     // TODO uncoment for upgradebles
+    // function initialize(address _euroStablecoin) external;
 
     /**
      * @notice Allows an operator to make a payment.
@@ -52,6 +53,7 @@ interface IOcnPaymentManager {
     function euroStablecoin() external view returns (IERC20);
     function stakedFunds(address operator) external view returns (uint256);
     function lastPaymentTime(address operator) external view returns (uint256);
-    function getCurrentBaseContract() external view returns (address);
-    function version() external view returns (uint);
+    // TODO uncoment for upgradebles
+    // function getCurrentBaseContract() external view returns (address);
+    // function version() external view returns (uint);
 }

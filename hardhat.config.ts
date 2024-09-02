@@ -3,6 +3,7 @@ import "@nomicfoundation/hardhat-toolbox-viem";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
+import "hardhat-abi-exporter";
 import dotenv from "dotenv";
 dotenv.config();
 
