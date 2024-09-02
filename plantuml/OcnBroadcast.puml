@@ -1,0 +1,49 @@
+@startuml
+
+title Broadcast Workflow
+
+participant CPO
+participant OCN1
+participant EMSP1
+participant OCN2
+participant EMSP2
+participant EMSP3
+database Blockchain
+
+== Pre condition ==
+CPO  -> OCN1: Handshaked
+EMSP1 -> OCN1: Handshaked
+EMSP2 -> OCN2: Handshaked
+EMSP3 -> OCN2: Handshaked
+note right
+-  All parties registered in blockchain 
+end note
+
+== Broadcast Request from CPO (Tariff Example) ==
+CPO -> OCN1: Call Broadcast Request \n POST Tariff (Target role: EMSP)
+note left
+-  Set a limit of Broadcasts 
+   per party per day to avoid 
+   overloading the network
+end note
+
+OCN1-> OCN1: Call Broadcast Receive \n POST Tariff (Target role: EMSP)
+
+OCN1->OCN1: Query local database \nEMSPs connected to OCN1
+
+OCN1-> EMSP1: Send \nPUT Tariff
+
+OCN1-> Blockchain: Query Blockchain \nAll registered OCN Nodes 
+
+OCN1-> OCN2: Call Broadcast Receive \nPOST Tariff (Target role: EMSP)
+
+OCN2->OCN2: Query database \nEMSPs connected to OCN2
+
+OCN2-> EMSP2: Send \nPUT Tariff
+
+OCN2-> EMSP3: Send \nPUT Tariff
+
+
+
+
+@enduml
