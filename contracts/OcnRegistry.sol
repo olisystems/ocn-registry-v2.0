@@ -301,6 +301,7 @@ contract OcnRegistry is AccessControl {
         bytes2 countryCode,
         bytes3 partyId,
         Role[] memory roles,
+        IOcnPaymentManager.PaymentStatus paymentStatus,
         address operatorAddress,
         string memory operatorDomain
     ) {
@@ -308,6 +309,7 @@ contract OcnRegistry is AccessControl {
         countryCode = details.countryCode;
         partyId = details.partyId;
         roles = details.roles;
+        paymentStatus = details.paymentStatus;
         operatorAddress = operatorOf[partyAddress];
         operatorDomain = nodeOf[operatorAddress];
     }
