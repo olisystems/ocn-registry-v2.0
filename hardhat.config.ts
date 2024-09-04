@@ -1,14 +1,17 @@
 import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
-import "hardhat-deploy";
+
 import "@nomiclabs/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
 import "hardhat-abi-exporter";
+import "@typechain/hardhat";
+import "hardhat-deploy";
 import dotenv from "dotenv";
 dotenv.config();
 
 const walletPrivateKey: string = process.env.WALLET_PRIVATE_KEY || "";
 const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
+const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
 
 const config = {
   sourcify: {
@@ -23,6 +26,10 @@ const config = {
         runs: 200, // Low runs value to reduce contract size
       },
     },
+  },
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v6",
   },
   networks: {
     amoy: {
@@ -39,15 +46,24 @@ const config = {
     },
     ganache: {
       url: `http://127.0.0.1:8544`,
-      // TODO to be removed
-      accounts: [walletPrivateKey, "379a602e6068f313de54bf118d38071b22ed15caf854d1050c3fed455ab75f50"],
+      accounts: [walletPrivateKey, cpoPrivateKey],
       chainId: 1337,
     },
     hardhat: {
+      accounts: [
+        { privateKey: walletPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: cpoPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+      ],
       chainId: 31337,
+      live: false,
+      saveDeployments: false,
     },
     localhost: {
       chainId: 31337,
+      live: false,
+      saveDeployments: true,
+      tags: ["test"],
+      accounts: [walletPrivateKey, cpoPrivateKey],
     },
   },
   abiExporter: {

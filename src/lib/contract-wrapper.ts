@@ -31,17 +31,13 @@ export class ContractWrapper {
    */
   public mode: "r" | "r+w";
 
-  constructor(type: string, environment: string, signer?: string, overrides?: Partial<Network>) {
+  constructor(contract: Contract, environment: string, signer?: string, overrides?: Partial<Network>) {
     if (!networks[environment]) {
       throw new Error(`Option \"${environment}\" not found in configured networks.`);
     }
     const provider: Provider = {
       ...networks[environment].provider,
       ...overrides?.provider,
-    };
-    const contract: Contract = {
-      ...networks[environment].contracts[type],
-      ...overrides?.contracts?.[type],
     };
 
     console.log(`connecting to ${provider.protocol}://${provider.host}:${provider.port}`);
@@ -54,8 +50,8 @@ export class ContractWrapper {
     } else {
       this.mode = "r";
     }
-    // TODO get abi from deployments folder
-    this.contract = new ethers.Contract(contract.address, "abi", this.wallet || this.provider);
+
+    this.contract = new ethers.Contract(contract.address, contract.abi, this.wallet || this.provider);
   }
 
   protected verifyAddress(address: string): void {
@@ -75,6 +71,14 @@ export class ContractWrapper {
   protected verifyStringLen(str: string, len: number): void {
     if (str.length !== len) {
       throw Error(`Invalid string length. Wanted ${len}, got "${str}" (${str.length})`);
+    }
+  }
+
+  protected verifyUrl(url: string) {
+    try {
+      new URL(url);
+    } catch (err) {
+      throw Error(`Invalid URL. Expected valid URL, got "${url}".`);
     }
   }
 

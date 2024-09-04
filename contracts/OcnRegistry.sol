@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import "./IOcnPaymentManager.sol";
 
@@ -304,7 +304,9 @@ contract OcnRegistry is AccessControl {
         Role[] memory roles,
         IOcnPaymentManager.PaymentStatus paymentStatus,
         address operatorAddress,
-        string memory operatorDomain
+        string memory operatorDomain,
+        string memory name,
+        string memory url
     ) {
         PartyDetails memory details = partyOf[partyAddress];
         countryCode = details.countryCode;
@@ -313,19 +315,25 @@ contract OcnRegistry is AccessControl {
         paymentStatus = details.paymentStatus;
         operatorAddress = operatorOf[partyAddress];
         operatorDomain = nodeOf[operatorAddress];
+        name = details.name;
+        url = details.url;
     }
 
     function getPartyDetailsByOcpi(bytes2 countryCode, bytes3 partyId) public view returns (
         address partyAddress,
         Role[] memory roles,
         address operatorAddress,
-        string memory operatorDomain
+        string memory operatorDomain,
+        string memory name,
+        string memory url
     ) {
         partyAddress = uniqueParties[countryCode][partyId];
         PartyDetails memory details = partyOf[partyAddress];
         roles = details.roles;
         operatorAddress = operatorOf[partyAddress];
         operatorDomain = nodeOf[operatorAddress];
+        name = details.name;
+        url = details.url;
     }
 
     function getParties() public view returns (address[] memory) {

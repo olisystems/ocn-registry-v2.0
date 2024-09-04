@@ -1,6 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 export interface networkConfigItem {
   ethUsdPriceFeed?: string;
   blockConfirmations?: number;
+  mainPrivateKey?: string;
 }
 
 export interface networkConfigInfo {
@@ -8,9 +12,9 @@ export interface networkConfigInfo {
 }
 
 export const networkExtraConfig: networkConfigInfo = {
-  localhost: {},
-  hardhat: {},
-  ganache: {},
+  localhost: { mainPrivateKey: process.env.HARDHAT_WALLET_PRIVATE_KEY || "" },
+  hardhat: { mainPrivateKey: process.env.HARDHAT_WALLET_PRIVATE_KEY || "" },
+  ganache: { mainPrivateKey: process.env.GANACHE_WALLET_PRIVATE_KEY || "" },
   amoy: {},
   volta: {},
 };
@@ -18,7 +22,10 @@ export const networkExtraConfig: networkConfigInfo = {
 export const developmentChains = ["hardhat", "localhost", "ganache"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
-export const cpoOperatorPk = "379a602e6068f313de54bf118d38071b22ed15caf854d1050c3fed455ab75f50";
+export const cpoOperatorPk = process.env.CPO_PRIVATE_KEY || "";
+export const cpoWalletAdress = process.env.CPO_WALLET_ADDRESS || "";
+export const nodeWalletAddress = process.env.WALLET_ADDRESS || "";
+export const defaultAmountToSend: string = "2.0";
 
 // Governor Values
 export const QUORUM_PERCENTAGE = 4; // Need 4% of voters to pass
@@ -29,6 +36,6 @@ export const VOTING_DELAY = 0; // 1 Block - How many blocks till a proposal vote
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 // export const NEW_STORE_VALUE = Math.floor(Math.random() * Math.pow(2, 16));
-export const NEW_STORE_VALUE = 53;
+export const NEW_STORE_VALUE = 100;
 export const FUNC = "setFundingYearlyAmount";
 export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_STORE_VALUE + " in the Box!";

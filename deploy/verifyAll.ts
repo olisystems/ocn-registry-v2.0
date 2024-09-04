@@ -33,26 +33,22 @@ const deployFunction: DeployFunction = async function (hre: HardhatRuntimeEnviro
       if (!contractName || contractName === "OcnGovernor") {
         log("Verifying OcnGovernor contract...");
         const governorContract: OcnGovernor = await ethers.getContract("OcnGovernor", deployer);
-        const governorArgs = [
-          await ethers.getContract("OcnVoteToken", deployer).then((c) => c.getAddress()),
-          await ethers.getContract("Timelock", deployer).then((c) => c.getAddress()),
-          QUORUM_PERCENTAGE,
-          VOTING_PERIOD,
-          VOTING_DELAY,
-        ];
+        const governorArgs = [await ethers.getContract("OcnVoteToken", deployer).then((c) => c.getAddress()), await ethers.getContract("Timelock", deployer).then((c) => c.getAddress()), QUORUM_PERCENTAGE, VOTING_PERIOD, VOTING_DELAY];
         await verify(await governorContract.getAddress(), governorArgs);
-      }
-      if (!contractName || contractName === "Box") {
-        log("Verifying Box contract...");
-        const boxContract: Box = await ethers.getContract("Box", deployer);
-        const boxArgs: any = [deployer];
-        await verify(await boxContract.getAddress(), boxArgs);
       }
       if (!contractName || contractName === "OcnPaymentManager") {
         log("Verifying OcnPaymentManager contract...");
-        const ocnPaymentManagerContract: any = await ethers.getContract(contractName as string, deployer);
-        const ocnPaymentManagerContractArgs: any = [];
+        const ocnPaymentManagerContract: any = await ethers.getContract("OcnPaymentManager" as string, deployer);
+        const euroStableCoinDeplyedContract = await ethers.getContract("EuroStableCoin", deployer);
+        const ocnPaymentManagerContractArgs: any = [euroStableCoinDeplyedContract.target];
         await verify(await ocnPaymentManagerContract.getAddress(), ocnPaymentManagerContractArgs);
+      }
+      if (!contractName || contractName === "OcnRegistry") {
+        log("Verifying OcnRegistry contract...");
+        const ocnRegistry: any = await ethers.getContract("OcnRegistry" as string, deployer);
+        const ocnPaymentContract = await ethers.getContract("OcnPaymentManager", deployer);
+        const ocnRegistryArgs: any = [ocnPaymentContract.target];
+        await verify(await ocnRegistry.getAddress(), ocnRegistryArgs);
       }
     } else {
       log("Etherscan API key not found");

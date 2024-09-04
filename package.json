@@ -13,6 +13,7 @@
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.2.1",
     "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.2.0",
     "@types/chai-as-promised": "^7.1.6",
     "@types/mocha": ">=9.1.0",
@@ -43,6 +44,6 @@
   "scripts": {
     "debug-deploy": "node --inspect node_modules/.bin/hardhat deploy",
     "lint": "solhint 'contracts/*.sol'",
-    "typechain": "typechain --target ethers-v6 --out-dir typechain './deployments/**/*.json'"
+    "debug-cli": "node --inspect -r ts-node/register  src/cli "
   }
 }

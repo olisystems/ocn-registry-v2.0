@@ -18,14 +18,8 @@ import * as yargs from "yargs";
 
 export const getPartyBuilder = (context: yargs.Argv) => {
   context
-    .example(
-      "get-party -a 0x9bC11...bfeB4",
-      "Get a party by its wallet address"
-    )
-    .example(
-      "get-party -c DE CPO",
-      "Get a party by its OCPI country_code and party_id"
-    )
+    .example("get-party -a 0x9bC11...bfeB4", "Get a party by its wallet address")
+    .example("get-party -c DE CPO", "Get a party by its OCPI country_code and party_id")
     .option("address", {
       alias: "a",
       string: true,
@@ -69,43 +63,7 @@ export const setPartyBuilder = (context: yargs.Argv) => {
       string: true,
       required: true,
       describe: "Wallet address of operator of OCN Node used by OCPI party",
-    });
-};
-
-export const setPartyModulesBuilder = (context: yargs.Argv) => {
-  context
-    .option("sender-interface", {
-      alias: "si",
-      array: true,
-      choices: [
-        "cdrs",
-        "chargingprofiles",
-        "commands",
-        "locations",
-        "sessions",
-        "tariffs",
-        "tokens",
-      ],
-      describe: "OCPI module sender interface implementations.",
     })
-    .option("receiver-interface", {
-      alias: "ri",
-      array: true,
-      choices: [
-        "cdrs",
-        "chargingprofiles",
-        "commands",
-        "locations",
-        "sessions",
-        "tariffs",
-        "tokens",
-      ],
-      describe: "OCPI module receiver interface implementations.",
-    });
-};
-
-export const setServiceBuilder = (context: yargs.Argv) => {
-  context
     .option("name", {
       string: true,
       default: "",
@@ -116,30 +74,22 @@ export const setServiceBuilder = (context: yargs.Argv) => {
       string: true,
       default: "",
       describe: "Public URL where users can find further information.",
-    })
-    .option("permissions", {
-      alias: "p",
+    });
+};
+
+export const setPartyModulesBuilder = (context: yargs.Argv) => {
+  context
+    .option("sender-interface", {
+      alias: "si",
       array: true,
-      choices: [
-        "FORWARD_ALL",
-        "FORWARD_ALL_SENDER",
-        "FORWARD_ALL_RECEIVER",
-        "FORWARD_MODULE_LOCATIONS_SENDER",
-        "FORWARD_MODULE_LOCATIONS_RECEIVER",
-        "FORWARD_MODULE_SESSIONS_SENDER",
-        "FORWARD_MODULE_SESSIONS_RECEIVER",
-        "FORWARD_MODULE_CDRS_SENDER",
-        "FORWARD_MODULE_CDRS_RECEIVER",
-        "FORWARD_MODULE_TARIFFS_SENDER",
-        "FORWARD_MODULE_TARIFFS_RECEIVER",
-        "FORWARD_MODULE_TOKENS_SENDER",
-        "FORWARD_MODULE_TOKENS_RECEIVER",
-        "FORWARD_MODULE_COMMANDS_SENDER",
-        "FORWARD_MODULE_COMMANDS_RECEIVER",
-        "FORWARD_MODULE_CHARGINGPROFILES_SENDER",
-        "FORWARD_MODULE_CHARGINGPROFILES_RECEIVER",
-      ],
-      describe: "List of required permissions that the Service needs.",
+      choices: ["cdrs", "chargingprofiles", "commands", "locations", "sessions", "tariffs", "tokens"],
+      describe: "OCPI module sender interface implementations.",
+    })
+    .option("receiver-interface", {
+      alias: "ri",
+      array: true,
+      choices: ["cdrs", "chargingprofiles", "commands", "locations", "sessions", "tariffs", "tokens"],
+      describe: "OCPI module receiver interface implementations.",
     });
 };
 

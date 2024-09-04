@@ -18,11 +18,10 @@
 
 import yargs from "yargs";
 import { Registry } from "./lib/registry";
-import { getPartyBuilder, setPartyBuilder, setPartyModulesBuilder, setServiceBuilder, providerBuilder } from "./cli/builders";
-import { PartyDetails, Role, Module, Permission, Service } from "./lib/types";
+import { getPartyBuilder, setPartyBuilder, setPartyModulesBuilder, providerBuilder } from "./cli/builders";
+import { PartyDetails, Role } from "./lib/types";
 import { networks } from "./networks";
-import { Permissions } from "./lib/permissions";
-import { getOverrides } from "./lib/helpers";
+import { getOverrides, bigIntToString } from "./lib/helpers";
 
 yargs
   .option("network", {
@@ -125,7 +124,7 @@ yargs
       const [countryCode, partyId] = args.credentials as string[];
       result = await registry.getPartyByOcpi(countryCode, partyId);
     }
-    console.log(result ? JSON.stringify(result, null, 2) : "OCPI Party not listed in registry.");
+    console.log(result ? JSON.stringify(result, bigIntToString, 2) : "OCPI Party not listed in registry.");
   })
   .command(
     "list-parties",
@@ -135,7 +134,7 @@ yargs
       console.log("############ I M HERE list-parties");
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
       const result = await registry.getAllParties();
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(result, bigIntToString, 2));
     },
   )
   .command("set-party", "Create or update OCPI party entry", setPartyBuilder, async (args) => {
@@ -144,7 +143,9 @@ yargs
     const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
     const [countryCode, partyId] = args.credentials as string[];
     const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
-    const result = await registry.setParty(countryCode, partyId, roles, args.operator as string);
+    const name: string = args.name as string;
+    const url: string = args.url as string;
+    const result = await registry.setParty(countryCode, partyId, roles, args.operator as string, name, url);
     console.log(result);
   })
   .command("set-party-raw", "Create or update OCPI party entry using raw transaction", setPartyBuilder, async (args) => {
@@ -154,23 +155,6 @@ yargs
     const [countryCode, partyId] = args.credentials as string[];
     const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
     const result = await registry.setPartyRaw(countryCode, partyId, roles, args.operator as string, signer as string);
-    console.log(result);
-  })
-  .command(["set-party-modules", "set-modules"], "Set OCPI module implementations for an OCPI party", setPartyModulesBuilder, async (args) => {
-    const signer = process.env.SIGNER || args.signer;
-    const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
-    const sender: Module[] = Array.from(new Set((args.si as string[]) || [])).map((mod) => Module[mod as keyof typeof Module]);
-    const receiver: Module[] = Array.from(new Set((args.ri as string[]) || [])).map((mod) => Module[mod as keyof typeof Module]);
-    const result = await registry.setPartyModules(sender, receiver);
-    console.log(result);
-  })
-  .command(["set-party-modules-raw", "set-modules-raw"], "Set OCPI module implementations for an OCPI party using raw transaction", setPartyModulesBuilder, async (args) => {
-    const signer = process.env.SIGNER || args.signer;
-    const spender = process.env.SPENDER || args.spender;
-    const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
-    const sender: Module[] = Array.from(new Set((args.si as string[]) || [])).map((mod) => Module[mod as keyof typeof Module]);
-    const receiver: Module[] = Array.from(new Set((args.ri as string[]) || [])).map((mod) => Module[mod as keyof typeof Module]);
-    const result = await registry.setPartyModulesRaw(sender, receiver, signer as string);
     console.log(result);
   })
   .command(
@@ -196,106 +180,7 @@ yargs
       console.log(result);
     },
   )
-  .command("get-service <provider>", "Retrieve service details and required permissions", providerBuilder, async (args) => {
-    const permissions = new Permissions(args.network, undefined, getOverrides(args["network-file"]));
-    const result = await permissions.getService(args.provider as string);
-    console.log(result ? JSON.stringify(result, null, 2) : "Provider has no Service listed");
-  })
-  .command(
-    "list-services",
-    "List all registered services",
-    () => {},
-    async (args) => {
-      const permissions = new Permissions(args.network, undefined, getOverrides(args["network-file"]));
-      const result = await permissions.getAllServices();
-      console.log(JSON.stringify(result, null, 2));
-    },
-  )
-  .command("set-service", "Add or update an OCN Service's details", setServiceBuilder, async (args) => {
-    const signer = process.env.SIGNER || args.signer;
-    const permissions = new Permissions(args.network, signer, getOverrides(args["network-file"]));
-    const needs: Permission[] = Array.from(new Set(args.permissions as string[])).map((permission) => Permission[permission as keyof typeof Permission]);
-    const result = await permissions.setService(args.name as string, args.url as string, needs);
-    console.log(result);
-  })
-  .command("set-service-raw", "Add or update an OCN Service's details via raw transaction", setServiceBuilder, async (args) => {
-    const signer = process.env.SIGNER || args.signer;
-    const spender = process.env.SPENDER || args.spender;
-    const permissions = new Permissions(args.network, spender, getOverrides(args["network-file"]));
-    const needs: Permission[] = Array.from(new Set(args.permissions as string[])).map((permission) => Permission[permission as keyof typeof Permission]);
-    const result = await permissions.setServiceRaw(args.name as string, args.url as string, needs, signer as string);
-    console.log(result);
-  })
-  .command(
-    "delete-service",
-    "Delete OCN Service's details",
-    () => {},
-    async (args) => {
-      const signer = process.env.SIGNER || args.signer;
-      const permissions = new Permissions(args.network, signer, getOverrides(args["network-file"]));
-      const result = await permissions.deleteService();
-      console.log(result);
-    },
-  )
-  .command(
-    "delete-service-raw",
-    "Detele OCN Service's details via raw transaction",
-    () => {},
-    async (args) => {
-      const signer = process.env.SIGNER || args.signer;
-      const spender = process.env.SPENDER || args.spender;
-      const permissions = new Permissions(args.network, spender, getOverrides(args["network-file"]));
-      const result = await permissions.deleteServiceRaw(signer as string);
-      console.log(result);
-    },
-  )
-  .command("get-agreements", "Lists the services used by a given user", getPartyBuilder, async (args) => {
-    const permissions = new Permissions(args.network, undefined, getOverrides(args["network-file"]));
-    let result: Service[];
-    if (args.address) {
-      result = await permissions.getUserAgreementsByAddress(args.address as string);
-    } else {
-      const [countryCode, partyId] = args.credentials as string[];
-      result = await permissions.getUserAgreementsByOcpi(countryCode, partyId);
-    }
-    console.log(JSON.stringify(result, null, 2));
-  })
-  .command("set-agreement <provider>", "Create an agreement with a particular service provider", providerBuilder, async (args) => {
-    const signer = process.env.SIGNER || args.signer;
-    const permissions = new Permissions(args.network, signer, getOverrides(args["network-file"]));
-    const result = await permissions.createAgreement(args.provider as string);
-    console.log(result);
-  })
-  .command("set-agreement-raw <provider>", "Create an agreement with a particular service provider via raw transaction", providerBuilder, async (args) => {
-    const signer = process.env.SIGNER || args.signer;
-    const spender = process.env.SPENDER || args.spender;
-    const permissions = new Permissions(args.network, spender, getOverrides(args["network-file"]));
-    const result = await permissions.createAgreementRaw(args.provider as string, signer as string);
-    console.log(result);
-  })
-  .command(
-    "revoke-agreement <provider>",
-    "Revoke an agreement with a particular service provider",
-    () => {},
-    async (args) => {
-      const signer = process.env.SIGNER || args.signer;
-      const permissions = new Permissions(args.network, signer, getOverrides(args["network-file"]));
-      const result = await permissions.revokeAgreement(args.provider as string);
-      console.log(result);
-    },
-  )
-  .command(
-    "revoke-agreement-raw <provider>",
-    "Revoke an agreement with a particular service provider via raw transaction",
-    () => {},
-    async (args) => {
-      const signer = process.env.SIGNER || args.signer;
-      const spender = process.env.SPENDER || args.spender;
-      const permissions = new Permissions(args.network, spender, getOverrides(args["network-file"]));
-      const result = await permissions.revokeAgreementRaw(args.provider as string, signer as string);
-      console.log(result);
-    },
-  )
+
   .demandCommand(1, "You need to specify at least one command.")
   .strict()
   .fail((msg, err, yargs) => {

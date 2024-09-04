@@ -413,6 +413,16 @@
         "internalType": "string",
         "name": "operatorDomain",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "url",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -451,6 +461,16 @@
       {
         "internalType": "string",
         "name": "operatorDomain",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "url",
         "type": "string"
       }
     ],

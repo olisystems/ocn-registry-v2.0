@@ -14,37 +14,47 @@
     limitations under the License.
 */
 
-import { Network } from "./types/network"
+import { Network } from "./types/network";
 
 export const networks: Record<string, Network> = {
-	local: {
-        provider: {
-            protocol: 'http',
-            host: 'localhost',
-            port: 8544,
-            network_id: '9',
-            gas: 8000000
-        },
-        contracts: require("../contract.defs.local.json")
-	},
-	volta: {
-        provider: {
-            protocol: 'https',
-            host: 'volta-rpc.energyweb.org',
-            port: 443,
-            network_id: '73799',
-            gasPrice: 100
-        },
-        contracts: require("../contract.defs.volta.json")
+  ganache: {
+    provider: {
+      protocol: "http",
+      host: "localhost",
+      port: 8544,
+      network_id: "1337",
+      gas: 8000000,
     },
-    prod: {
-        provider: {
-            protocol: 'https',
-            host: 'rpc.energyweb.org',
-            port: 443,
-            network_id: '246',
-            gasPrice: 100
-        },
-        contracts: require("../contract.defs.prod.json")
-    }
-}
+    contracts: require("../contract.defs.local.json"),
+  },
+  localhost: {
+    provider: {
+      protocol: "http",
+      host: "localhost",
+      port: 8545,
+      network_id: "31337",
+      gas: 8000000,
+    },
+    contracts: require("../contract.defs.local.json"),
+  },
+  volta: {
+    provider: {
+      protocol: "https",
+      host: "volta-rpc.energyweb.org",
+      port: 443,
+      network_id: "73799",
+      gasPrice: 100,
+    },
+    contracts: require("../contract.defs.volta.json"),
+  },
+  prod: {
+    provider: {
+      protocol: "https",
+      host: "rpc.energyweb.org",
+      port: 443,
+      network_id: "246",
+      gasPrice: 100,
+    },
+    contracts: require("../contract.defs.prod.json"),
+  },
+};

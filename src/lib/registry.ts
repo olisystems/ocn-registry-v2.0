@@ -18,16 +18,19 @@ import { ethers, Wallet } from "ethers";
 import { URL } from "url";
 import * as sign from "./sign";
 import * as types from "./types";
-import { Network } from "../types/network";
+import { Network, Contract } from "../types/network";
 import { ContractWrapper } from "./contract-wrapper";
 import { Signature } from "viem";
-
+import path from "path";
 /**
  * Registry contract wrapper
  */
 export class Registry extends ContractWrapper {
   constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>) {
-    super("Registry", environment, signer, environmentOptions);
+    const absolutePath = path.resolve(__dirname, `../../deployments/${environment}/OcnRegistry.json`);
+    const ocnRegistryJson: any = require(absolutePath);
+    const ocnRegistryContract: Contract = { ...ocnRegistryJson };
+    super(ocnRegistryContract, environment, signer, environmentOptions);
   }
 
   /**
@@ -170,13 +173,14 @@ export class Registry extends ContractWrapper {
    * EMSP and CPO roles under the same country_code/party_id).
    * @param operator the operator address of the OCN Node used by the party.
    */
-  public async setParty(countryCode: string, partyId: string, roles: types.Role[], operator: string): Promise<ethers.TransactionReceipt> {
+  public async setParty(countryCode: string, partyId: string, roles: types.Role[], operator: string, name: string, url: string): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
     this.verifyStringLen(countryCode, 2);
     this.verifyStringLen(partyId, 3);
     this.verifyAddress(operator);
+    this.verifyUrl(url);
 
-    const tx = await this.contract.setParty(this.toHex(countryCode), this.toHex(partyId), roles, operator);
+    const tx = await this.contract.setParty(this.toHex(countryCode), this.toHex(partyId), roles, operator, name, url);
     await tx.wait();
     return tx;
   }
@@ -208,38 +212,6 @@ export class Registry extends ContractWrapper {
   }
 
   /**
-   * Direct transaction to provide module interfaces supported by the signer's OCPI implementation.
-   * Can also be used to delete previously-set party modules by providing empty arrays.
-   * (note: this is an opt-in feature).
-   * @param sender array of sender interface role module Ids.
-   * @param receiver array of receiver interface role module Ids.
-   */
-  public async setPartyModules(sender: types.Module[], receiver: types.Module[]): Promise<ethers.TransactionReceipt> {
-    this.verifyWritable();
-    const tx = await this.contract.setPartyModules(sender, receiver);
-    await tx.wait();
-    return tx;
-  }
-
-  /**
-   * Raw transaction allowing another wallet to provide module interfaces supported by the signer's OCPI implementation.
-   * Can also be used to delete previously-set party modules by providing empty arrays.
-   * (note: this is an opt-in feature).
-   * @param sender array of sender interface role module Ids.
-   * @param receiver array of receiver interface role module Ids.
-   * @param signer the private key of the owner of the registry listing. The signer configured in the
-   * constructor is the "spender": they send and pay for the transaction on the network.
-   */
-  public async setPartyModulesRaw(sender: types.Module[], receiver: types.Module[], signer: string): Promise<ethers.TransactionReceipt> {
-    this.verifyWritable();
-    const wallet = new ethers.Wallet(signer);
-    const sig = await sign.setPartyModulesRaw(sender, receiver, wallet);
-    const tx = await this.contract.setPartyModulesRaw(wallet.address, sender, receiver, sig.v, sig.r, sig.s);
-    await tx.wait();
-    return tx;
-  }
-
-  /**
    * Direct transaction by signer to delete a party from the OCN Registry.
    */
   public async deleteParty(): Promise<ethers.TransactionReceipt> {
@@ -265,18 +237,17 @@ export class Registry extends ContractWrapper {
 
   private toPartyDetails(input: any): types.PartyDetails {
     return {
-      countryCode: ethers.toUtf8String(input.countryCode),
-      partyId: ethers.toUtf8String(input.partyId),
-      address: input.partyAddress,
-      roles: input.roles.map((index: number) => types.Role[index]),
-      modules: {
-        sender: input.modulesSender.map((index: number) => types.Module[index]),
-        receiver: input.modulesReceiver.map((index: number) => types.Module[index]),
-      },
+      countryCode: ethers.toUtf8String(input[0]),
+      partyId: ethers.toUtf8String(input[1]),
+      roles: input[2].map((index: number) => types.Role[index]),
+      paymentStatus: input[3],
       node: {
-        operator: input.operatorAddress,
-        url: input.operatorDomain,
+        operator: input[4],
+        url: input[5],
       },
+      name: input[6],
+      url: input[7],
+      address: input.partyAddress,
     };
   }
 

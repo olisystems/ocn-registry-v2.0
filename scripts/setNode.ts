@@ -9,7 +9,7 @@ import { toHex } from "web3-utils";
 export async function propose() {
   const ocnRegistry: any = await hardhatEthers.getContract("OcnRegistry");
   console.log(ocnRegistry.target);
-  const domain = "http://my-ocn-node.com";
+  const domain = "http://my-ocn-node2.com";
   await ocnRegistry.setNode(domain);
 }
 

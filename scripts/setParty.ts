@@ -3,9 +3,10 @@ import { FUNC, PROPOSAL_DESCRIPTION, NEW_STORE_VALUE, cpoOperatorPk } from "../h
 import { ethers } from "ethers";
 import { Role } from "../src/lib/types";
 import { toHex } from "web3-utils";
+import { OcnRegistry } from "../typechain";
 
 export async function propose(args: any[], functionToCall: string, proposalDescription: string) {
-  const ocnGovernor: any = await hardhatEthers.getContract("OcnRegistry");
+  const ocnGovernor: OcnRegistry = await hardhatEthers.getContract("OcnRegistry");
   const role = Role.CPO;
   const partyId = "CP3";
   const countryCode = "BR";

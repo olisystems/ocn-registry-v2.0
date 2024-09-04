@@ -12,6 +12,9 @@ fi
 # Assign the network parameter to a variable
 NETWORK=$1
 
+# Compile the contracts
+yarn hardhat compile --network $NETWORK
+
 # Deploy the contracts to the specified network
 yarn hardhat deploy --network $NETWORK --tags votetoken --reset
 yarn hardhat deploy --network $NETWORK --tags timelock

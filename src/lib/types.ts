@@ -15,70 +15,34 @@
 */
 
 export interface Node {
-    operator: string
-    url: string
+  operator: string;
+  url: string;
 }
 
 export interface PartyDetails {
-    countryCode: string
-    partyId: string
-    address: string
-    roles: Role[]
-    modules: {
-        sender: Module[]
-        receiver: Module[]
-    }
-    node: Node
+  countryCode: string;
+  partyId: string;
+  roles: Role[];
+  paymentStatus: PaymentStatus;
+  address: string;
+  node: Node;
+  name: string;
+  url: string;
+}
+
+export enum PaymentStatus {
+  PENDING,
+  PAYMENT_UP_TO_DATE,
+  INSUFFICIENT_FUNDS,
+  INACTIVE,
 }
 
 export enum Role {
-    CPO,
-    EMSP,
-    HUB,
-    NAP,
-    NSP,
-    OTHER,
-    SCSP
-}
-
-export enum Module {
-    cdrs,
-    chargingprofiles,
-    commands,
-    locations,
-    sessions,
-    tariffs,
-    tokens
-}
-
-export interface Service {
-    name: string
-    url: string
-    permissions: Permission[]
-    provider: {
-        address: string
-        countryCode: string
-        partyId: string
-    }
-}
-
-// examples; not full list
-export enum Permission {
-    FORWARD_ALL,
-    FORWARD_ALL_SENDER,
-    FORWARD_ALL_RECEIVER,
-    FORWARD_MODULE_LOCATIONS_SENDER,
-    FORWARD_MODULE_LOCATIONS_RECEIVER,
-    FORWARD_MODULE_SESSIONS_SENDER,
-    FORWARD_MODULE_SESSIONS_RECEIVER,
-    FORWARD_MODULE_CDRS_SENDER,
-    FORWARD_MODULE_CDRS_RECEIVER,
-    FORWARD_MODULE_TARIFFS_SENDER,
-    FORWARD_MODULE_TARIFFS_RECEIVER,
-    FORWARD_MODULE_TOKENS_SENDER,
-    FORWARD_MODULE_TOKENS_RECEIVER,
-    FORWARD_MODULE_COMMANDS_SENDER,
-    FORWARD_MODULE_COMMANDS_RECEIVER,
-    FORWARD_MODULE_CHARGINGPROFILES_SENDER,
-    FORWARD_MODULE_CHARGINGPROFILES_RECEIVER
+  CPO,
+  EMSP,
+  HUB,
+  NAP,
+  NSP,
+  OTHER,
+  SCSP,
 }
