@@ -5,6 +5,11 @@
         "internalType": "address",
         "name": "_euroStablecoin",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fundingYearlyAmount",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -347,6 +352,19 @@
       }
     ],
     "name": "setFundingYearlyAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_euroStablecoin",
+        "type": "address"
+      }
+    ],
+    "name": "setStablecoinAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

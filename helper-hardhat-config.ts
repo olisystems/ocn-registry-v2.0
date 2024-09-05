@@ -23,6 +23,7 @@ export const developmentChains = ["hardhat", "localhost", "ganache"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
 export const cpoOperatorPk = process.env.CPO_PRIVATE_KEY || "";
+export const emspOperatorPk = process.env.EMSP_PRIVATE_KEY || "";
 export const cpoWalletAdress = process.env.CPO_WALLET_ADDRESS || "";
 export const nodeWalletAddress = process.env.WALLET_ADDRESS || "";
 export const defaultAmountToSend: string = "2.0";

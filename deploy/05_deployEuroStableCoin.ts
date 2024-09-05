@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper-functions";
 import { networkExtraConfig, developmentChains } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
+import { EuroStableCoin } from "../typechain";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "EuroStableCoin";
@@ -12,7 +13,7 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   log("----------------------------------------------------");
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
-  const deployedContract = await deploy(contractName, {
+  await deploy(contractName, {
     from: deployer,
     args: [],
     log: true,

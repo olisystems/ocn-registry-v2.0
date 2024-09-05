@@ -8,10 +8,12 @@ import "@typechain/hardhat";
 import "hardhat-deploy";
 import dotenv from "dotenv";
 dotenv.config();
+import "./tasks/sendStablecoinsToParties";
 
 const walletPrivateKey: string = process.env.WALLET_PRIVATE_KEY || "";
 const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
+const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
 
 const config = {
   sourcify: {
@@ -46,13 +48,14 @@ const config = {
     },
     ganache: {
       url: `http://127.0.0.1:8544`,
-      accounts: [walletPrivateKey, cpoPrivateKey],
+      accounts: [walletPrivateKey, cpoPrivateKey, emspPrivateKey],
       chainId: 1337,
     },
     hardhat: {
       accounts: [
         { privateKey: walletPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: cpoPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: emspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
       ],
       chainId: 31337,
       live: false,
@@ -63,7 +66,7 @@ const config = {
       live: false,
       saveDeployments: true,
       tags: ["test"],
-      accounts: [walletPrivateKey, cpoPrivateKey],
+      accounts: [walletPrivateKey, cpoPrivateKey, emspPrivateKey],
     },
   },
   abiExporter: {
@@ -87,10 +90,12 @@ const config = {
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
-      1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
     },
     cpoOperator: {
       default: 1,
+    },
+    emspOperator: {
+      default: 2,
     },
   },
   mocha: {

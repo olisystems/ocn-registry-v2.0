@@ -42,8 +42,10 @@
     "yargs": "^17.7.2"
   },
   "scripts": {
-    "debug-deploy": "node --inspect node_modules/.bin/hardhat deploy",
+    "localhost": "HARDHAT_CONFIG=local.hardhat.config.ts yarn hardhat node",
+    "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
     "lint": "solhint 'contracts/*.sol'",
-    "debug-cli": "node --inspect -r ts-node/register  src/cli "
+    "debug-cli": "node --inspect -r ts-node/register  src/cli ",
+    "cli": "ts-node src/cli"
   }
 }

@@ -41,6 +41,19 @@ export const getPartyBuilder = (context: yargs.Argv) => {
     });
 };
 
+export const getPaymentStatusBuilder = (context: yargs.Argv) => {
+  context.example("get-payment-status -a 0x9bC11...bfeB4", "Get the payment status of a party by its wallet address").option("address", {
+    alias: "a",
+    string: true,
+    conflicts: "credentials",
+    describe: "Wallet address of the party",
+  });
+};
+
+export const getPayBuilder = (context: yargs.Argv) => {
+  context.example("pay -s bhi49KJ...bfeH", "Perform the payment of the funding yearly amount");
+};
+
 export const setPartyBuilder = (context: yargs.Argv) => {
   console.log("####### Setting party builder");
   context

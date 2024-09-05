@@ -5,7 +5,7 @@ set -e
 
 # Check if a network parameter is provided
 if [ -z "$1" ]; then
-  echo "No network specified. Usage: ./run-deploys.sh <network>"
+  echo "No network specified. Usage: ./run-deploy.sh <network>"
   exit 1
 fi
 

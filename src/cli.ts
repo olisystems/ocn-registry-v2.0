@@ -18,7 +18,8 @@
 
 import yargs from "yargs";
 import { Registry } from "./lib/registry";
-import { getPartyBuilder, setPartyBuilder, setPartyModulesBuilder, providerBuilder } from "./cli/builders";
+import { OcnPaymentManagerCli } from "./lib/ocnPaymentManager";
+import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder } from "./cli/builders";
 import { PartyDetails, Role } from "./lib/types";
 import { networks } from "./networks";
 import { getOverrides, bigIntToString } from "./lib/helpers";
@@ -112,9 +113,6 @@ yargs
       console.log(result);
     },
   )
-  .command("test-com", "Test command", async () => {
-    console.log("############ I M HERE test-com");
-  })
   .command("get-party", "Get OCPI party entry listed in the registry", getPartyBuilder, async (args) => {
     const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
     let result: PartyDetails | undefined;
@@ -131,14 +129,12 @@ yargs
     "List all OCPI parties listed in registry",
     () => {},
     async (args) => {
-      console.log("############ I M HERE list-parties");
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
       const result = await registry.getAllParties();
       console.log(JSON.stringify(result, bigIntToString, 2));
     },
   )
   .command("set-party", "Create or update OCPI party entry", setPartyBuilder, async (args) => {
-    console.log("############ I M HERE");
     const signer = process.env.SIGNER || args.signer;
     const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
     const [countryCode, partyId] = args.credentials as string[];
@@ -180,6 +176,28 @@ yargs
       console.log(result);
     },
   )
+  .command("get-payment-status", "Get payment status of the party", getPaymentStatusBuilder, async (args) => {
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+    const result = await ocnPaymentManager.getPaymentStatus(args.address as string);
+    console.log(result);
+  })
+
+  .command(
+    "get-funding-yearly-amount",
+    "Get funding yearly amount",
+    () => {},
+    async (args) => {
+      const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+      const result = await ocnPaymentManager.getFundingYearlyAmount();
+      console.log(result);
+    },
+  )
+  .command("pay", "Pay the funding yearly amount", getPayBuilder, async (args) => {
+    const signer = process.env.SIGNER || args.signer;
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
+    const result = await ocnPaymentManager.pay();
+    console.log(result);
+  })
 
   .demandCommand(1, "You need to specify at least one command.")
   .strict()

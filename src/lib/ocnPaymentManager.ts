@@ -22,8 +22,9 @@ import { Network, Contract } from "../types/network";
 import { ContractWrapper } from "./contract-wrapper";
 import { Signature } from "viem";
 import path from "path";
+import { PaymentStatus } from "./types";
 
-export class OcnPaymentManager extends ContractWrapper {
+export class OcnPaymentManagerCli extends ContractWrapper {
   constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>) {
     const absolutePath = path.resolve(__dirname, `../../deployments/${environment}/OcnPaymentManager.json`);
     const ocnPaymentManagerJson: any = require(absolutePath);
@@ -36,9 +37,9 @@ export class OcnPaymentManager extends ContractWrapper {
    * @param operator Ethereum address of the operator.
    * @returns enum PAYMENT STATUS.
    */
-  public async getPaymentStatus(operator: string): Promise<string | undefined> {
-    const status = await this.contract.getPaymentStatus(operator);
-    return status || undefined;
+  public async getPaymentStatus(operator: string): Promise<PaymentStatus | undefined> {
+    const status: any = await this.contract.getPaymentStatus(operator);
+    return status === undefined ? undefined : PaymentStatus[status as keyof typeof PaymentStatus];
   }
 
   public async getFundingYearlyAmount(): Promise<number | undefined> {
