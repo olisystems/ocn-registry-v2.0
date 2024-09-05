@@ -1,12 +1,12 @@
 import { ethers, network } from "hardhat";
-import { FUNC, NEW_STORE_VALUE, PROPOSAL_DESCRIPTION, MIN_DELAY, developmentChains } from "../helper-hardhat-config";
+import { FUNC, NEW_YEARLY_AMOUNT, PROPOSAL_DESCRIPTION, MIN_DELAY, developmentChains } from "../helper-hardhat-config";
 import { moveBlocks } from "../helper/moveBlocks";
 import { moveTime } from "../helper/moveTime";
 import { Box, OcnGovernor } from "../typechain";
 
 export async function queueAndExecute() {
   const contractName = "OcnPaymentManager";
-  const args = [NEW_STORE_VALUE];
+  const args = [NEW_YEARLY_AMOUNT];
   const functionToCall = FUNC;
   // TODO fix types generation and replace any by OcnPaymentManager
   const ocnPaymentManager: any = await ethers.getContract(contractName);

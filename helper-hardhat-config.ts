@@ -35,7 +35,8 @@ export const VOTING_PERIOD = 5; // blocks
 export const VOTING_DELAY = 0; // 1 Block - How many blocks till a proposal vote becomes active
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
-// export const NEW_STORE_VALUE = Math.floor(Math.random() * Math.pow(2, 16));
-export const NEW_STORE_VALUE = 100;
+// export const NEW_YEARLY_AMOUNT = Math.floor(Math.random() * Math.pow(2, 16));
+export const DEFAULT_YEARLY_AMOUNT = 100;
+export const NEW_YEARLY_AMOUNT = 140;
 export const FUNC = "setFundingYearlyAmount";
-export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_STORE_VALUE + " in the Box!";
+export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_YEARLY_AMOUNT + " in the Box!";

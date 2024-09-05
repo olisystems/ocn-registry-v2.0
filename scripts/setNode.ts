@@ -1,5 +1,5 @@
 import { ethers as hardhatEthers, network } from "hardhat";
-import { developmentChains, VOTING_DELAY, proposalsFile, FUNC, PROPOSAL_DESCRIPTION, NEW_STORE_VALUE } from "../helper-hardhat-config";
+import { developmentChains, VOTING_DELAY, proposalsFile, FUNC, PROPOSAL_DESCRIPTION, NEW_YEARLY_AMOUNT } from "../helper-hardhat-config";
 
 import * as fs from "fs";
 import { moveBlocks } from "../helper/moveBlocks";

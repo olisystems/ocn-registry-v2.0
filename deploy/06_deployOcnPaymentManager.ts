@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper-functions";
-import { networkExtraConfig, developmentChains } from "../helper-hardhat-config";
+import { networkExtraConfig, developmentChains, DEFAULT_YEARLY_AMOUNT } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -15,7 +15,7 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   const euroStableCoinDeplyedContract = await ethers.getContract("EuroStableCoin", deployer);
   await deploy(contractName, {
     from: deployer,
-    args: [euroStableCoinDeplyedContract.target],
+    args: [euroStableCoinDeplyedContract.target, DEFAULT_YEARLY_AMOUNT],
     log: true,
     waitConfirmations: networkExtraConfig[network.name].blockConfirmations || 1,
   });

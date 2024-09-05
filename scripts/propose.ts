@@ -1,5 +1,5 @@
 import { ethers as hardhatEthers, network } from "hardhat";
-import { developmentChains, VOTING_DELAY, proposalsFile, FUNC, PROPOSAL_DESCRIPTION, NEW_STORE_VALUE } from "../helper-hardhat-config";
+import { developmentChains, VOTING_DELAY, proposalsFile, FUNC, PROPOSAL_DESCRIPTION, NEW_YEARLY_AMOUNT } from "../helper-hardhat-config";
 import { OcnGovernor } from "../typechain";
 import * as fs from "fs";
 import { moveBlocks } from "../helper/moveBlocks";
@@ -57,7 +57,7 @@ function storeProposalId(proposalId: any) {
   fs.writeFileSync(proposalsFile, JSON.stringify(proposals), "utf8");
 }
 
-propose([NEW_STORE_VALUE], FUNC, PROPOSAL_DESCRIPTION)
+propose([NEW_YEARLY_AMOUNT], FUNC, PROPOSAL_DESCRIPTION)
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

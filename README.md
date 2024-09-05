@@ -21,10 +21,10 @@ yarn install
 
 ## Propose, vote and queue for execution
 
-- Change helper-hardhat-config iterating NEW_STORE_VALUE
+- Change helper-hardhat-config setting up NEW_YEARLY_AMOUNT
 - Verify current box value, should be 0: `yarn hardhat run scripts/get-box-value.ts --network ganache`
 - Run propose: `yarn hardhat run scripts/propose.ts --network ganache`
 - Run vote: `yarn hardhat run scripts/vote.ts --network ganache`
 - Run queue: `yarn hardhat run scripts/queue.ts --network ganache`
 - Run execute: `yarn hardhat run scripts/execute.ts --network ganache`
-- Verify again box value, should have changed for the value set in NEW_STORE_VALUE: `yarn hardhat run scripts/propose.ts --network ganache`
+- Verify again box value, should have changed for the value set in NEW_YEARLY_AMOUNT: `yarn hardhat run scripts/propose.ts --network ganache`

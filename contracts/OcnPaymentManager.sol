@@ -54,9 +54,9 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     // }
 
     // TODO remove for upgradebles
-    constructor(address _euroStablecoin) {
+    constructor(address _euroStablecoin, uint256 _fundingYearlyAmount) {
         euroStablecoin = IERC20(_euroStablecoin);
-        fundingYearlyAmount = 30 * 1e18; // 100 EUR
+        fundingYearlyAmount = _fundingYearlyAmount * 1e18; 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
     
@@ -126,12 +126,16 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
         }
     }
 
-    function setFundingYearlyAmount(uint256 _fundingYearlyAmount) external {
+    function setFundingYearlyAmount(uint256 _fundingYearlyAmount) onlyRole(DEFAULT_ADMIN_ROLE) external {
         fundingYearlyAmount = _fundingYearlyAmount * 1e18;
     }
 
     function getFundingYearlyAmount() external view returns (uint256) {
         return fundingYearlyAmount / 1e18;
+    }
+
+    function setStablecoinAddress(address _euroStablecoin) onlyRole(DEFAULT_ADMIN_ROLE) external {
+        euroStablecoin = IERC20(_euroStablecoin);
     }
 
     // To be used on deploy to transfer ownership from the deployer address to the Timelock Contract address

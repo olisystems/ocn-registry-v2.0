@@ -1,5 +1,5 @@
 import { ethers as hardhatEthers, network, getNamedAccounts } from "hardhat";
-import { FUNC, PROPOSAL_DESCRIPTION, NEW_STORE_VALUE, cpoOperatorPk } from "../helper-hardhat-config";
+import { FUNC, PROPOSAL_DESCRIPTION, NEW_YEARLY_AMOUNT, cpoOperatorPk } from "../helper-hardhat-config";
 import { ethers } from "ethers";
 import { Role } from "../src/lib/types";
 import { toHex } from "web3-utils";
@@ -21,7 +21,7 @@ export async function propose(args: any[], functionToCall: string, proposalDescr
   await ocnGovernorWithSigner.setParty(toHex(countryCode), toHex(partyId), [role], operator, cpoName, cpoUrl);
 }
 
-propose([NEW_STORE_VALUE], FUNC, PROPOSAL_DESCRIPTION)
+propose([NEW_YEARLY_AMOUNT], FUNC, PROPOSAL_DESCRIPTION)
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
