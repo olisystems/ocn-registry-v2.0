@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.20;
+pragma solidity 0.8.24;
 
-
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./IOcnPaymentManager.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
 // TODO uncoment for upgradebles
 // import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 // import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 // import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     /* ********************************** */
@@ -25,12 +23,11 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
 
     uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals    
     IERC20 public euroStablecoin; // ERC20 token contract address
-    address public withdrawalWallet;
+    address public ocnWallet;
 
     mapping(address => uint256) public stakedFunds;
     mapping(address => uint256) public lastPaymentTime;
 
-   
     /* ********************************** */
     /*          INITIALIZER               */
     /* ********************************** */
@@ -59,11 +56,17 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
         fundingYearlyAmount = _fundingYearlyAmount * 1e18; 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
+
+    // Custom Errors
+    error InsufficientAllowance();
+    error TransferFailed();
+    error NoFundsStaked();
+    error WithdrawalNotAllowed();
     
     /**
      * Called when Base Contract upgrades: iterate version   
      */
-     // TODO uncoment for upgradebles
+    // TODO uncoment for upgradebles
     // function _authorizeUpgrade(address newImplementation)
     //     internal
     //     onlyRole(UPGRADER_ROLE)
@@ -72,7 +75,6 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     //     currentBaseContract = newImplementation;
     //     version++;
     // }
-
 
     /* ********************************** */
     /*            FUNCTIONS               */
@@ -83,9 +85,13 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
      */
     function pay() external {
         uint256 amount = euroStablecoin.allowance(msg.sender, address(this));
-        require(amount >= fundingYearlyAmount, "Insufficient allowance for payment");
+        if (amount < fundingYearlyAmount) {
+            revert InsufficientAllowance();
+        }
 
-        require(euroStablecoin.transferFrom(msg.sender, address(this), fundingYearlyAmount), "Transfer failed");
+        if (!euroStablecoin.transferFrom(msg.sender, address(this), fundingYearlyAmount)) {
+            revert TransferFailed();
+        }
 
         stakedFunds[msg.sender] += fundingYearlyAmount;
         lastPaymentTime[msg.sender] = block.timestamp;
@@ -94,32 +100,22 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     }
 
     /**
-     * @notice Allows an operator to withdraw their staked funds gradually.
+     * @notice Execute a partial withdrawal of the staked funds to the OCN wallet.
      */
-    
-    function withdraw() external {
-        require(stakedFunds[msg.sender] > 0, "No funds staked");
-
-        uint256 elapsedTime = block.timestamp - lastPaymentTime[msg.sender];
-        uint256 allowableWithdrawal = (fundingYearlyAmount * elapsedTime) / (365 days);
-        
-        require(allowableWithdrawal > 0, "Withdrawal not allowed yet");
-        require(euroStablecoin.transfer(msg.sender, allowableWithdrawal), "Withdrawal transfer failed");
-
-        stakedFunds[msg.sender] -= allowableWithdrawal;
-        lastPaymentTime[msg.sender] = block.timestamp;
-        
-        emit Withdrawal(msg.sender, allowableWithdrawal);
+    function withdrawToOcnWallet(address party) external {
+        // TODO to be implemented
     }
-    
 
     /**
      * @notice Returns the payment status of a given operator.
+     * PAYMENT_UP_TO_DATE: has staked funds
+     * INSUFFICIENT_FUNDS: has no staked funds but has made a payment before
+     * PENDING: has not made any payment yet
      */
     function getPaymentStatus(address operator) external view returns (PaymentStatus) {
-        if (stakedFunds[operator] >= fundingYearlyAmount) {
+        if (stakedFunds[operator] > 0) {
             return PaymentStatus.PAYMENT_UP_TO_DATE;
-        } else if (stakedFunds[operator] > 0) {
+        } else if (lastPaymentTime[operator] > 0) {
             return PaymentStatus.INSUFFICIENT_FUNDS;
         } else {
             return PaymentStatus.PENDING;

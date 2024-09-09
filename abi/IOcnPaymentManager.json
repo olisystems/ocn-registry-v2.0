@@ -5,6 +5,31 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "party",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "ocnWallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "PartialWithdrawal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "operator",
         "type": "address"
       },
@@ -16,25 +41,6 @@
       }
     ],
     "name": "PaymentMade",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "party",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "Withdrawal",
     "type": "event"
   },
   {
@@ -115,8 +121,14 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "withdraw",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "party",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawToOcnWallet",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

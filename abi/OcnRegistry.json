@@ -32,6 +32,105 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "DomainNameAlreadyRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "EmptyCountryCode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "EmptyDomainName",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "EmptyOperator",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "EmptyPartyId",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "NoRolesProvided",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "PartyAlreadyRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "PartyNotRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "SignerMismatch",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -76,6 +175,97 @@
         "internalType": "enum OcnRegistry.Role[]",
         "name": "roles",
         "type": "uint8[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IOcnPaymentManager.PaymentStatus",
+        "name": "paymentStatus",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IOcnCvManager.CvStatus",
+        "name": "cvStatus",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      }
+    ],
+    "name": "PartyDelete",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes2",
+        "name": "countryCode",
+        "type": "bytes2"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes3",
+        "name": "partyId",
+        "type": "bytes3"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "partyAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum OcnRegistry.Role[]",
+        "name": "roles",
+        "type": "uint8[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IOcnPaymentManager.PaymentStatus",
+        "name": "paymentStatus",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum IOcnCvManager.CvStatus",
+        "name": "cvStatus",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
       },
       {
         "indexed": true,
@@ -378,6 +568,57 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
+    ],
+    "name": "getPartiesByOperator",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum OcnRegistry.Role",
+        "name": "role",
+        "type": "uint8"
+      }
+    ],
+    "name": "getPartiesByRole",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getPartiesCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "partyAddress",
         "type": "address"
       }
@@ -411,11 +652,6 @@
       },
       {
         "internalType": "string",
-        "name": "operatorDomain",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
         "name": "name",
         "type": "string"
       },
@@ -423,6 +659,11 @@
         "internalType": "string",
         "name": "url",
         "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -454,14 +695,14 @@
         "type": "uint8[]"
       },
       {
+        "internalType": "enum IOcnPaymentManager.PaymentStatus",
+        "name": "paymentStatus",
+        "type": "uint8"
+      },
+      {
         "internalType": "address",
         "name": "operatorAddress",
         "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "operatorDomain",
-        "type": "string"
       },
       {
         "internalType": "string",
@@ -472,6 +713,11 @@
         "internalType": "string",
         "name": "url",
         "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -757,19 +1003,6 @@
       }
     ],
     "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "party",
-        "type": "address"
-      }
-    ],
-    "name": "updatePaymentStatus",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

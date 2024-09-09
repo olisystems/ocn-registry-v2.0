@@ -1,43 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.20;
+pragma solidity 0.8.24;
 
-import "./IOcnPaymentManager.sol";
+import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
+import {IOcnCvManager} from "./IOcnCvManager.sol";
 
-
-// TODO uncoment to transform in upgradebles
-// import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-// import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-// import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-// TODO remove to transrom in upgradeble
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
 
-// TODO uncoment to transform in upgradebles
-//contract OcnRegistry is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
+contract OcnRegistry is AccessControl {
 
-// TODO remove to transform in upgradeble
-contract OcnRegistry is AccessControl { 
-   
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
 
-    //storage reserve for future variables
-     // TODO uncoment to transform in upgradebles
-    // uint256[50] __gap;
-    // bytes32 public UPGRADER_ROLE;
-    // uint public version;
-    // address currentBaseContract;
     string private prefix;
-
-   
-
-    /// TODO uncoment for upgradebles
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
 
     // OCN Node Operator Listings
     mapping(address => string) private nodeOf;
@@ -49,9 +25,6 @@ contract OcnRegistry is AccessControl {
     enum Role { CPO, EMSP, HUB, NAP, NSP, OTHER, SCSP }
     enum Module { cdrs, chargingprofiles, commands, locations, sessions, tariffs, tokens }
 
-
-    enum VcStatus { NOT_VERIFIED, APPROVED, FAILED }
-
     struct PartyDetails {
         bytes2 countryCode;
         bytes3 partyId;
@@ -59,7 +32,7 @@ contract OcnRegistry is AccessControl {
         string name;
         string url;
         IOcnPaymentManager.PaymentStatus paymentStatus;
-        VcStatus vcStatus;
+        IOcnCvManager.CvStatus cvStatus;
         bool active;
     }
 
@@ -71,6 +44,20 @@ contract OcnRegistry is AccessControl {
 
     IOcnPaymentManager public paymentManager;
 
+   
+    /* ********************************** */
+    /*          CUSTOM ERRORS             */
+    /* ********************************** */
+    error EmptyDomainName(string reason);
+    error DomainNameAlreadyRegistered(string reason);
+    error EmptyCountryCode(string reason);
+    error EmptyPartyId(string reason);
+    error NoRolesProvided(string reason);
+    error EmptyOperator(string reason);
+    error PartyAlreadyRegistered(string reason);
+    error PartyNotRegistered(string reason);
+    error SignerMismatch(string reason);
+
     /* ********************************** */
     /*               EVENTS               */
     /* ********************************** */
@@ -81,58 +68,39 @@ contract OcnRegistry is AccessControl {
         bytes3 partyId,
         address indexed partyAddress,
         Role[] roles,
+        string name,
+        string url,
+        IOcnPaymentManager.PaymentStatus paymentStatus,
+        IOcnCvManager.CvStatus cvStatus,
+        bool active,
         address indexed operatorAddress
     );
 
+    event PartyDelete(
+        bytes2 countryCode,
+        bytes3 partyId,
+        address indexed partyAddress,
+        Role[] roles,
+        string name,
+        string url,
+        IOcnPaymentManager.PaymentStatus paymentStatus,
+        IOcnCvManager.CvStatus cvStatus,
+        bool active
+    );
     /* ********************************** */
     /*          INITIALIZER               */
     /* ********************************** */
-    // used as constructor in upgradeble contracts
-    // TOEO uncoment for upgradebles
-    // function initialize(address _paymentManager) public initializer {
-    //     prefix = "\u0019Ethereum Signed Message:\n32";
-    //     paymentManager = IOcnPaymentManager(_paymentManager);
-    //     UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
-    //     __AccessControl_init();
-    //     __UUPSUpgradeable_init();
-
-    //     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    //     _grantRole(UPGRADER_ROLE, msg.sender);
-    // }
-
-     // TODO remove for upgradebles
-    constructor (address _paymentManager){
+    constructor(address _paymentManager) {
         prefix = "\u0019Ethereum Signed Message:\n32";
         paymentManager = IOcnPaymentManager(_paymentManager);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
-    
-    /**
-     * Called when Base Contract upgrades: iterate version   
-     */
-     // TODO uncoment for upgradebles
-    // function _authorizeUpgrade(address newImplementation)
-    //     internal
-    //     onlyRole(UPGRADER_ROLE)
-    //     override
-    // {
-    //     currentBaseContract = newImplementation;
-    //     version++;
-    // }
 
-    /* ********************************** */
-    /*            FUNCTIONS               */
-    /* ********************************** */
-
-    // To be used on deploy to transfer ownership from the deployer address to the Timelock Contract address
     function transferOwnership(address newOwner) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        // Grant DEFAULT_ADMIN_ROLE to new owner
         grantRole(DEFAULT_ADMIN_ROLE, newOwner);
-        // Revoke DEFAULT_ADMIN_ROLE from current owner
         revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
-
 
     function adminDeleteOperator(address operator) public onlyRole(DEFAULT_ADMIN_ROLE) {
         deleteNode(operator);
@@ -144,11 +112,15 @@ contract OcnRegistry is AccessControl {
     }
 
     function setNode(address operator, string memory domain) private {
-        require(bytes(domain).length != 0, "Cannot set empty domain name. Use deleteNode method instead.");
-        require(uniqueDomains[domain] == false, "Domain name already registered.");
+        if (bytes(domain).length == 0) {
+            revert EmptyDomainName("Cannot set empty domain name. Use deleteNode method instead.");
+        }
+        if (uniqueDomains[domain]) {
+            revert DomainNameAlreadyRegistered("Domain name already registered.");
+        }
         uniqueDomains[domain] = true;
 
-        if (uniqueOperators[operator] == false) {
+        if (!uniqueOperators[operator]) {
             operators.push(operator);
         }
 
@@ -169,7 +141,9 @@ contract OcnRegistry is AccessControl {
 
     function deleteNode(address operator) private {
         string memory domain = nodeOf[operator];
-        require(bytes(domain).length > 0, "Cannot delete node that does not exist.");
+        if (bytes(domain).length == 0) {
+            revert EmptyDomainName("Cannot delete node that does not exist.");
+        }
         uniqueDomains[domain] = false;
         delete nodeOf[operator];
         emit OperatorUpdate(operator, "");
@@ -193,7 +167,6 @@ contract OcnRegistry is AccessControl {
         return operators;
     }
 
-
     function setParty(
         address party,
         bytes2 countryCode,
@@ -203,32 +176,39 @@ contract OcnRegistry is AccessControl {
         string memory name,
         string memory url
     ) private {
-        require(countryCode != bytes2(0), "Cannot set empty country_code. Use deleteParty method instead.");
-        require(partyId != bytes3(0), "Cannot set empty party_id. Use deleteParty method instead.");
-        require(roles.length > 0, "No roles provided.");
-        require(operator != address(0), "Cannot set empty operator. Use deleteParty method instead.");
-
-        address registeredParty = uniqueParties[countryCode][partyId];
-        require(
-            registeredParty == address(0) || registeredParty == party,
-            "Party with country_code/party_id already registered under different address."
-        );
-        uniqueParties[countryCode][partyId] = party;
-
-        require(bytes(nodeOf[operator]).length != 0, "Provided operator not registered.");
-
-        if (uniquePartyAddresses[party] == false) {
-            parties.push(party);
+        if (countryCode == bytes2(0)) {
+            revert EmptyCountryCode("Cannot set empty country_code. Use deleteParty method instead.");
+        }
+        if (partyId == bytes3(0)) {
+            revert EmptyPartyId("Cannot set empty party_id. Use deleteParty method instead.");
+        }
+        if (roles.length == 0) {
+            revert NoRolesProvided("No roles provided.");
+        }
+        if (operator == address(0)) {
+            revert EmptyOperator("Cannot set empty operator. Use deleteParty method instead.");
         }
 
+        address registeredParty = uniqueParties[countryCode][partyId];
+        if (registeredParty != address(0) && registeredParty != party) {
+            revert PartyAlreadyRegistered("Party with country_code/party_id already registered under different address.");
+        }
+        uniqueParties[countryCode][partyId] = party;
+        if (bytes(nodeOf[operator]).length == 0) {
+            revert PartyNotRegistered("Provided operator not registered.");
+        }
+        if (!uniquePartyAddresses[party]) {
+            parties.push(party);
+        }
         uniquePartyAddresses[party] = true;
 
-        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
-
-        partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, VcStatus.NOT_VERIFIED, true);
+        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);  
+        // TODO implmenet CV verification
+        partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true);
         operatorOf[party] = operator;
 
-        emit PartyUpdate(countryCode, partyId, party, roles, operator);
+        PartyDetails memory details = partyOf[party];
+        emit PartyUpdate(details.countryCode, details.partyId, party, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active, operator);
     }
 
     function setParty(
@@ -248,42 +228,43 @@ contract OcnRegistry is AccessControl {
         bytes3 partyId,
         Role[] memory roles,
         address operator,
-        string memory name, 
+        string memory name,
         string memory url,
         uint8 v,
         bytes32 r,
         bytes32 s
     ) public {
-        bytes32 paramHash = keccak256(abi.encodePacked(party, countryCode, partyId, roles, operator));
+        bytes32 paramHash = keccak256(abi.encodePacked(party, countryCode, partyId, roles, operator, name, url));
         address signer = ecrecover(keccak256(abi.encodePacked(prefix, paramHash)), v, r, s);
-        require(signer == party, "Signer and provided party address different.");
+        if (signer != party) {
+            revert SignerMismatch("Signer and provided party address different.");
+        }
         setParty(signer, countryCode, partyId, roles, operator, name, url);
     }
 
     function deleteParty(address party) private {
-        require(operatorOf[party] != address(0), "Cannot delete party that does not exist. No operator found for given party.");
+        if (operatorOf[party] == address(0)) {
+            revert PartyNotRegistered("Cannot delete party that does not exist. No operator found for given party.");
+        }
         delete operatorOf[party];
         PartyDetails memory details = partyOf[party];
         delete uniqueParties[details.countryCode][details.partyId];
         delete partyOf[party];
 
-        Role[] memory emptyRoles;
-        emit PartyUpdate(details.countryCode, details.partyId, party, emptyRoles, address(0));
+        emit PartyDelete(details.countryCode, details.partyId, party, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active);
+
     }
 
     function deleteParty() public {
         deleteParty(msg.sender);
     }
 
-    function deletePartyRaw(
-        address party,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public {
+    function deletePartyRaw(address party, uint8 v, bytes32 r, bytes32 s) public {
         bytes32 paramHash = keccak256(abi.encodePacked(party));
         address signer = ecrecover(keccak256(abi.encodePacked(prefix, paramHash)), v, r, s);
-        require(signer == party, "Signer and provided party address different.");
+        if (signer != party) {
+            revert SignerMismatch("Signer and provided party address different.");
+        }
         deleteParty(signer);
     }
 
@@ -304,44 +285,81 @@ contract OcnRegistry is AccessControl {
         Role[] memory roles,
         IOcnPaymentManager.PaymentStatus paymentStatus,
         address operatorAddress,
-        string memory operatorDomain,
         string memory name,
-        string memory url
+        string memory url,
+        bool active
     ) {
-        PartyDetails memory details = partyOf[partyAddress];
+        PartyDetails storage details = partyOf[partyAddress];
         countryCode = details.countryCode;
         partyId = details.partyId;
         roles = details.roles;
         paymentStatus = details.paymentStatus;
         operatorAddress = operatorOf[partyAddress];
-        operatorDomain = nodeOf[operatorAddress];
         name = details.name;
         url = details.url;
-    }
-
-    function getPartyDetailsByOcpi(bytes2 countryCode, bytes3 partyId) public view returns (
-        address partyAddress,
-        Role[] memory roles,
-        address operatorAddress,
-        string memory operatorDomain,
-        string memory name,
-        string memory url
-    ) {
-        partyAddress = uniqueParties[countryCode][partyId];
-        PartyDetails memory details = partyOf[partyAddress];
-        roles = details.roles;
-        operatorAddress = operatorOf[partyAddress];
-        operatorDomain = nodeOf[operatorAddress];
-        name = details.name;
-        url = details.url;
+        active = details.active;
     }
 
     function getParties() public view returns (address[] memory) {
         return parties;
     }
 
-    function updatePaymentStatus(address party) external {
-        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
-        partyOf[party].paymentStatus = paymentStatus;
+    function getPartiesByOperator(address operator) public view returns (address[] memory) {
+        address[] memory filteredParties = new address[](parties.length);
+        uint32 count = 0;
+        for (uint32 i = 0; i < parties.length; i++) {
+            if (operatorOf[parties[i]] == operator) {
+                filteredParties[count] = parties[i];
+                count++;
+            }
+        }
+        address[] memory result = new address[](count);
+        for (uint32 i = 0; i < count; i++) {
+            result[i] = filteredParties[i];
+        }
+        return result;
+    }
+
+    function getPartiesByRole(Role role) public view returns (address[] memory) {
+        address[] memory filteredParties = new address[](parties.length);
+        uint32 count = 0;
+        for (uint32 i = 0; i < parties.length; i++) {
+            PartyDetails memory details = partyOf[parties[i]];
+            for (uint32 j = 0; j < details.roles.length; j++) {
+                if (details.roles[j] == role) {
+                    filteredParties[count] = parties[i];
+                    count++;
+                    break;
+                }
+            }
+        }
+        address[] memory result = new address[](count);
+        for (uint32 i = 0; i < count; i++) {
+            result[i] = filteredParties[i];
+        }
+        return result;
+    }
+
+    function getPartyDetailsByOcpi(bytes2 countryCode, bytes3 partyId) public view returns (
+        address partyAddress,
+        Role[] memory roles,
+        IOcnPaymentManager.PaymentStatus paymentStatus,
+        address operatorAddress,
+        string memory name,
+        string memory url,
+        bool active
+    ) {
+        partyAddress = uniqueParties[countryCode][partyId];
+        PartyDetails storage details = partyOf[partyAddress];
+        roles = details.roles;
+        paymentStatus = details.paymentStatus;
+        operatorAddress = operatorOf[partyAddress];
+        name = details.name;
+        url = details.url;
+        active = details.active;
+    }
+
+    function getPartiesCount() public view returns (uint256) {
+        return parties.length;
     }
 }

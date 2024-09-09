@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Compatible with OpenZeppelin Contracts ^5.0.0
-pragma solidity ^0.8.2;
+pragma solidity 0.8.24;
 
 import { Governor } from "@openzeppelin/contracts/governance/Governor.sol";
 import { GovernorSettings } from "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";

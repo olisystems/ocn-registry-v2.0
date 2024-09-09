@@ -195,21 +195,22 @@ export class Registry extends ContractWrapper {
    * @param signer the private key of the owner of the registry listing. The signer configured in the
    * constructor is the "spender": they send and pay for the transaction on the network.
    */
-  public async setPartyRaw(countryCode: string, partyId: string, roles: types.Role[], operator: string, signer: string): Promise<ethers.TransactionReceipt> {
-    this.verifyWritable();
-    this.verifyStringLen(countryCode, 2);
-    this.verifyStringLen(partyId, 3);
-    this.verifyAddress(operator);
+  //TODO adjust to send name and url too
+  // public async setPartyRaw(countryCode: string, partyId: string, roles: types.Role[], operator: string, name: string, url: string, signer: string): Promise<ethers.TransactionReceipt> {
+  //   this.verifyWritable();
+  //   this.verifyStringLen(countryCode, 2);
+  //   this.verifyStringLen(partyId, 3);
+  //   this.verifyAddress(operator);
 
-    const country = this.toHex(countryCode);
-    const id = this.toHex(partyId);
+  //   const country = this.toHex(countryCode);
+  //   const id = this.toHex(partyId);
 
-    const wallet = new ethers.Wallet(signer);
-    const sig = await sign.setPartyRaw(country, id, roles, operator, wallet);
-    const tx = await this.contract.setPartyRaw(wallet.address, country, id, roles, operator, sig.v, sig.r, sig.s);
-    await tx.wait();
-    return tx;
-  }
+  //   const wallet = new ethers.Wallet(signer);
+  //   const sig = await sign.setPartyRaw(country, id, roles, operator, wallet);
+  //   const tx = await this.contract.setPartyRaw(wallet.address, country, id, roles, operator, sig.v, sig.r, sig.s);
+  //   await tx.wait();
+  //   return tx;
+  // }
 
   /**
    * Direct transaction by signer to delete a party from the OCN Registry.

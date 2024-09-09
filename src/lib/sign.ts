@@ -1,85 +1,72 @@
-/*
-    Copyright 2019-2020 eMobilify GmbH
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
-
-import { ethers } from "ethers";
+import { Wallet, keccak256, SigningKey, Signature, getBytes } from "ethers";
 import { soliditySha3 } from "web3-utils";
-// const {toBN} = require('./utils')
 
-interface SignatureWithHash extends ethers.Signature {
+// TODO unify with src/lib/sign.ts
+
+// Define the types for the functions
+type SignResult = {
+  r: string;
+  s: string;
+  v: number;
   hash: Uint8Array;
-}
+};
 
-async function sign(txMsg: string, wallet: ethers.Wallet): Promise<SignatureWithHash> {
-  // TODO find equivalent in ethersv6
-  // const messageHashBytes = ethers.utils.arrayify(txMsg)
-  // const sig = ethers.utils.splitSignature(flatSig)
-  const messageHashBytes: any = undefined;
-  const flatSig: any = await wallet.signMessage(messageHashBytes);
-  const sig: any = undefined;
-
+async function sign(txMsg: string, wallet: Wallet): Promise<SignResult> {
+  const messageHashBytes = getBytes(txMsg);
+  const flatSig = await wallet.signMessage(messageHashBytes);
+  const splitSig = Signature.from(flatSig);
   return {
-    ...sig,
+    v: splitSig.v,
+    r: splitSig.r,
+    s: splitSig.s,
     hash: messageHashBytes,
   };
 }
 
-export async function setNodeRaw(domain: string, wallet: ethers.Wallet) {
+async function setNodeRaw(domain: string, wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(wallet.address, domain);
-  return sign(txMsg as string, wallet);
+  return await sign(txMsg as string, wallet);
 }
 
-export async function deleteNodeRaw(wallet: ethers.Wallet) {
+async function deleteNodeRaw(wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(wallet.address);
   return sign(txMsg as string, wallet);
 }
 
-export async function setPartyRaw(countryCode: string, partyId: string, roles: number[], operator: string, wallet: ethers.Wallet) {
-  const txMsg = soliditySha3(wallet.address, countryCode, partyId, ...roles, operator);
+async function setPartyRaw(countryCode: string, partyId: string, roles: number[], operator: string, name: string, url: string, wallet: Wallet): Promise<SignResult> {
+  const txMsg = soliditySha3(wallet.address, countryCode, partyId, ...roles, operator, name, url);
   return sign(txMsg as string, wallet);
 }
 
-export async function setPartyModulesRaw(sender: number[], receiver: number[], wallet: ethers.Wallet) {
+async function setPartyModulesRaw(sender: string[], receiver: string[], wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(wallet.address, ...sender, ...receiver);
   return sign(txMsg as string, wallet);
 }
 
-export async function deletePartyRaw(wallet: ethers.Wallet) {
+async function deletePartyRaw(wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(wallet.address);
   return sign(txMsg as string, wallet);
 }
 
-export async function setServiceRaw(name: string, url: string, permissions: number[], wallet: ethers.Wallet) {
-  // Boolean filter is used because soliditySha3 considers empty string to have a value.
-  // This causes the resulting hash value to be different from solidity's keccak256.
-  const optionalParams = [name, url].filter(Boolean);
+async function setServiceRaw(name: string | null, url: string | null, permissions: string[], wallet: Wallet): Promise<SignResult> {
+  const optionalParams: string[] = [name, url].filter((param): param is string => param !== null && param !== undefined);
   const txMsg = soliditySha3(...optionalParams, ...permissions);
   return sign(txMsg as string, wallet);
 }
 
-export async function deleteServiceRaw(wallet: ethers.Wallet) {
+async function deleteServiceRaw(wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(wallet.address);
   return sign(txMsg as string, wallet);
 }
 
-export async function createAgreementRaw(provider: string, wallet: ethers.Wallet) {
+async function createAgreementRaw(provider: string, wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(provider);
   return sign(txMsg as string, wallet);
 }
 
-export async function revokeAgreementRaw(provider: string, wallet: ethers.Wallet) {
+async function revokeAgreementRaw(provider: string, wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(provider);
   return sign(txMsg as string, wallet);
 }
+
+export { setNodeRaw, deleteNodeRaw, setPartyRaw, setPartyModulesRaw, deletePartyRaw, setServiceRaw, deleteServiceRaw, createAgreementRaw, revokeAgreementRaw };

@@ -1,4 +1,3 @@
-import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 
 import "@nomiclabs/hardhat-ethers";
@@ -9,11 +8,14 @@ import "hardhat-deploy";
 import dotenv from "dotenv";
 dotenv.config();
 import "./tasks/sendStablecoinsToParties";
+import "./tasks/propose";
+import { log } from "console";
 
-const walletPrivateKey: string = process.env.WALLET_PRIVATE_KEY || "";
-const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
+const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
+const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
 const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
+const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
 
 const config = {
   sourcify: {
@@ -21,7 +23,7 @@ const config = {
   },
   defaultNetwork: "hardhat",
   solidity: {
-    version: "0.8.20",
+    version: "0.8.24",
     settings: {
       optimizer: {
         enabled: true,
@@ -37,23 +39,24 @@ const config = {
     amoy: {
       // polygon testnet
       url: "https://rpc-amoy.polygon.technology",
-      accounts: [walletPrivateKey],
+      accounts: [deployerPrivateKey],
       chainId: 80002,
     },
     volta: {
       // energy web chain testnet
       url: "https://volta-rpc.energyweb.org",
-      accounts: [walletPrivateKey],
+      accounts: [deployerPrivateKey],
       chainId: 73799,
     },
     ganache: {
       url: `http://127.0.0.1:8544`,
-      accounts: [walletPrivateKey, cpoPrivateKey, emspPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
       chainId: 1337,
     },
     hardhat: {
       accounts: [
-        { privateKey: walletPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: deployerPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: nodePrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: cpoPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: emspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
       ],
@@ -66,7 +69,8 @@ const config = {
       live: false,
       saveDeployments: true,
       tags: ["test"],
-      accounts: [walletPrivateKey, cpoPrivateKey, emspPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
+      loggingEnabled: true,
     },
   },
   abiExporter: {

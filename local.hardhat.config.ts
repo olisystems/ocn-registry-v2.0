@@ -2,7 +2,7 @@ import type { HardhatUserConfig } from "hardhat/config";
 import dotenv from "dotenv";
 dotenv.config();
 
-const walletPrivateKey: string = process.env.WALLET_PRIVATE_KEY || "";
+const walletPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
 const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
 

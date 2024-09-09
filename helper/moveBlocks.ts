@@ -1,6 +1,6 @@
-import { network } from "hardhat";
+import { Network } from "hardhat/types";
 
-export async function moveBlocks(amount: number) {
+export async function moveBlocks(amount: number, network: Network) {
   console.log("Moving blocks...");
   for (let index = 0; index < amount; index++) {
     await network.provider.request({

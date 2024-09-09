@@ -18,7 +18,7 @@ export async function propose(args: any[], functionToCall: string, proposalDescr
 
   // If working on a development chain, we will push forward till we get to the voting period.
   if (developmentChains.includes(network.name)) {
-    await moveBlocks(VOTING_DELAY + 1);
+    await moveBlocks(VOTING_DELAY + 1, network);
   }
   const proposeReceipt: any = await proposalTx.wait(1);
   const eventLogs = proposeReceipt.logs.map((log: any) => ocnGovernor.interface.parseLog(log));

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.0;
+pragma solidity 0.8.24;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IOcnPaymentManager {
     /* ********************************** */
@@ -15,37 +15,21 @@ interface IOcnPaymentManager {
     /* ********************************** */
 
     event PaymentMade(address indexed operator, uint256 amount);
-    event Withdrawal(address indexed party, uint256 amount);
+    event PartialWithdrawal(address indexed party, address ocnWallet, uint256 amount);
 
     /* ********************************** */
     /*            FUNCTIONS               */
     /* ********************************** */
 
-    /**
-     * @notice Initializes the contract with the given Euro stablecoin address.
-     * @param _euroStablecoin The address of the ERC20 Euro stablecoin contract.
-     */
+
      // TODO uncoment for upgradebles
     // function initialize(address _euroStablecoin) external;
 
-    /**
-     * @notice Allows an operator to make a payment.
-     */
     function pay() external;
-
-    /**
-     * @notice Allows an operator to withdraw their staked funds gradually.
-     */
-    function withdraw() external;
-
-    /**
-     * @notice Returns the payment status of a given operator.
-     * @param operator The address of the operator to check.
-     * @return The payment status of the operator.
-     */
+    function withdrawToOcnWallet(address party) external;
     function getPaymentStatus(address operator) external view returns (PaymentStatus);
 
-    
+
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
