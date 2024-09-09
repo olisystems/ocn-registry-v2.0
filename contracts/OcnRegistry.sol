@@ -34,6 +34,7 @@ contract OcnRegistry is AccessControl {
         IOcnPaymentManager.PaymentStatus paymentStatus;
         IOcnCvManager.CvStatus cvStatus;
         bool active;
+        uint256 partyIndex;
     }
 
     mapping(bytes2 => mapping(bytes3 => address)) private uniqueParties;
@@ -197,14 +198,19 @@ contract OcnRegistry is AccessControl {
         if (bytes(nodeOf[operator]).length == 0) {
             revert PartyNotRegistered("Provided operator not registered.");
         }
+
+        uint256 partyIndex = partyOf[party].partyIndex;
         if (!uniquePartyAddresses[party]) {
             parties.push(party);
-        }
+            // get last index of the array
+            partyIndex = parties.length - 1;
+        } 
+
         uniquePartyAddresses[party] = true;
 
         IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);  
         // TODO implmenet CV verification
-        partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true);
+        partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true, partyIndex);
         operatorOf[party] = operator;
 
         PartyDetails memory details = partyOf[party];
@@ -250,6 +256,8 @@ contract OcnRegistry is AccessControl {
         PartyDetails memory details = partyOf[party];
         delete uniqueParties[details.countryCode][details.partyId];
         delete partyOf[party];
+        delete parties[details.partyIndex];
+        uniquePartyAddresses[party] = false;
 
         emit PartyDelete(details.countryCode, details.partyId, party, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active);
 

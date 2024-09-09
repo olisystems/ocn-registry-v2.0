@@ -9,6 +9,14 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+# Remove the proposals.json file if it exists
+if [ -f proposals.json ]; then
+  echo "Removing proposals.json..."
+  rm proposals.json
+else
+  echo "No proposals.json file found."
+fi
+
 # Assign the network parameter to a variable
 NETWORK=$1
 

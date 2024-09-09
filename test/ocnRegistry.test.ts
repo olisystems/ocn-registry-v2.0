@@ -195,12 +195,10 @@ describe("Registry contract", function () {
     expect(parties).to.deep.equal([cpoOperator.address]);
   });
 
-  it.only("setPartyRaw allows different wallet to register party", async () => {
+  it("setPartyRaw allows different wallet to register party", async () => {
     const randomParty = new ethers.Wallet(ethers.Wallet.createRandom().privateKey);
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
-    console.log(`randomParty.address = ${randomParty.address}`);
-    console.log(`nodeOperator.address = ${nodeOperator.address}`);
     const { country, id, roles, name, url } = getTestPartyData();
     const sig = await signHelper.setPartyRaw(country, id, roles, nodeOperator.address, name, url, randomParty);
 
@@ -217,64 +215,47 @@ describe("Registry contract", function () {
     expect(parties).to.deep.equal([randomParty.address]);
   });
 
-  // it("deleteParty allows deletion of ocpi party", async () => {
-  //   const domain = "https://node.ocn.org";
-  //   await registry.connect(nodeOperator).setNode(domain);
+  it("deleteParty allows deletion of ocpi party", async () => {
+    const domain = "https://node.ocn.org";
+    await registry.connect(nodeOperator).setNode(domain);
 
-  //   const country = toHex("DE");
-  //   const id = toHex("ABC");
-  //   await registry.connect(cpoOperator).setParty(country, id, [0, 6], nodeOperator.address);
+    const { country, id, roles, name, url } = getTestPartyData();
+    await registry.connect(cpoOperator).setParty(country, id, roles, nodeOperator.address, name, url);
 
-  //   await registry.connect(cpoOperator).deleteParty();
+    await registry.connect(cpoOperator).deleteParty();
 
-  //   const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
-  //   expect(got.countryCode).to.equal("");
-  //   expect(got.partyId).to.equal("");
-  //   expect(got.roles.length).to.equal(0);
-  //   expect(got.operatorAddress).to.equal("");
-  //   expect(got.operatorDomain).to.equal("");
+    const got = await registry.connect(cpoOperator).getPartyDetailsByAddress(cpoOperator.address);
+    expect(got.countryCode).to.equal("0x0000");
+    expect(got.partyId).to.equal("0x000000");
+    expect(got.roles.length).to.equal(0);
+    expect(got.operatorAddress).to.equal("0x0000000000000000000000000000000000000000");
+    // since the deleted party index remains in the storage variable 'parties' as 0x000, a filter needs to be applied
+    const parties = (await registry.connect(cpoOperator).getParties()).filter((party) => party !== "0x0000000000000000000000000000000000000000");
+    expect(parties).to.deep.equal([]);
+  });
 
-  //   const parties = await registry.getParties();
-  //   expect(parties).to.deep.equal([]);
-  // });
+  it("deletePartyRaw allows deletion of ocpi party", async () => {
+    const domain = "https://node.ocn.org";
+    await registry.connect(nodeOperator).setNode(domain);
 
-  // it("deletePartyRaw allows deletion of ocpi party", async () => {
-  //   const domain = "https://node.ocn.org";
-  //   await registry.connect(nodeOperator).setNode(domain);
+    const randomWallet = ethers.Wallet.createRandom();
+    const operator = new ethers.Wallet(randomWallet.privateKey);
 
-  //   const randomWallet = ethers.Wallet.createRandom();
-  //   const operator = new ethers.Wallet(randomWallet.privateKey);
-  //   const country = toHex("DE");
-  //   const id = toHex("ABC");
-  //   const sig = await signHelper.setPartyRaw(country, id, [0, 6], operator);
+    const { country, id, roles, name, url } = getTestPartyData();
+    const sig = await signHelper.setPartyRaw(country, id, roles, nodeOperator.address, name, url, operator);
 
-  //   await registry.connect(operator).setPartyRaw(country, id, [0, 6], sig.v, sig.r, sig.s);
+    await registry.connect(nodeOperator).setPartyRaw(operator.address, country, id, roles, nodeOperator.address, name, url, sig.v, sig.r, sig.s);
 
-  //   const sig2 = await signHelper.deletePartyRaw(operator);
-  //   await registry.connect(operator).deletePartyRaw(sig2.v, sig2.r, sig2.s);
+    const sig2 = await signHelper.deletePartyRaw(operator);
+    await registry.connect(nodeOperator).deletePartyRaw(operator.address, sig2.v, sig2.r, sig2.s);
 
-  //   const got = await registry.getPartyDetailsByAddress(operator.address);
-  //   expect(got.countryCode).to.equal("");
-  //   expect(got.partyId).to.equal("");
-  //   expect(got.roles.length).to.equal(0);
-  //   expect(got.operatorAddress).to.equal("");
-  //   expect(got.operatorDomain).to.equal("");
-
-  //   const parties = await registry.getParties();
-  //   expect(parties).to.deep.equal([]);
-  // });
-
-  // it("updateNodeOperator allows updating of node operator address", async () => {
-  //   const oldDomain = "https://node.ocn.org";
-  //   const newDomain = "https://node.newocn.org";
-  //   await registry.connect(nodeOperator).setNode(oldDomain);
-  //   expect(await registry.getNode(nodeOperator.address)).to.equal(oldDomain);
-
-  //   const newOperator = ethers.Wallet.createRandom();
-  //   await registry.connect(nodeOperator).updateNodeOperator(newOperator.address);
-
-  //   expect(await registry.getNode(nodeOperator.address)).to.equal("");
-  //   expect(await registry.getNode(newOperator.address)).to.equal(oldDomain);
-  //   expect(await registry.getNodeOperators()).to.deep.equal([newOperator.address]);
-  // });
+    const got = await registry.getPartyDetailsByAddress(operator.address);
+    expect(got.countryCode).to.equal("0x0000");
+    expect(got.partyId).to.equal("0x000000");
+    expect(got.roles.length).to.equal(0);
+    expect(got.operatorAddress).to.equal("0x0000000000000000000000000000000000000000");
+    // since the deleted party index remains in the storage variable 'parties' as 0x000, a filter needs to be applied
+    const parties = (await registry.connect(cpoOperator).getParties()).filter((party) => party !== "0x0000000000000000000000000000000000000000");
+    expect(parties).to.deep.equal([]);
+  });
 });

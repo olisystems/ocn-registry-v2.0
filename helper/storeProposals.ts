@@ -5,6 +5,7 @@ import { proposalsFile } from "../helper-hardhat-config";
 export interface Proposal {
   proposalId: string;
   encodedFunction: string;
+  description: string;
 }
 
 // Class to manage proposal storage
@@ -25,12 +26,12 @@ export class ProposalStorage {
     fs.writeFileSync(proposalsFile, JSON.stringify(this.proposals, null, 2), "utf8");
   }
 
-  public storeProposal(networkName: string, proposalId: string, encodedFunction: string) {
+  public storeProposal(networkName: string, proposalId: string, encodedFunction: string, description: string) {
     if (!this.proposals[networkName]) {
       this.proposals[networkName] = [];
     }
 
-    this.proposals[networkName].push({ proposalId, encodedFunction });
+    this.proposals[networkName].push({ proposalId, encodedFunction, description });
     this.saveProposals();
   }
 
@@ -40,5 +41,13 @@ export class ProposalStorage {
 
   public getProposalById(networkName: string, proposalId: string): Proposal | undefined {
     return this.proposals[networkName]?.find((proposal) => proposal.proposalId === proposalId);
+  }
+
+  public getProposals(networkName: string): Proposal[] {
+    return this.proposals[networkName] || [];
+  }
+
+  public getLastProposal(networkName: string): Proposal | undefined {
+    return this.proposals[networkName]?.at(-1);
   }
 }

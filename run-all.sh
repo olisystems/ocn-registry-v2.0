@@ -15,4 +15,4 @@ NETWORK=$1
 # Deploy the contracts to the specified network
 sh run-deploy.sh $NETWORK 
 sh run-register.sh $NETWORK
-sh run-governance.sh $NETWORK
+sh run-governance-tasks.sh $NETWORK

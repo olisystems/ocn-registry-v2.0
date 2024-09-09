@@ -150,7 +150,9 @@ yargs
     const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
     const [countryCode, partyId] = args.credentials as string[];
     const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
-    const result = await registry.setPartyRaw(countryCode, partyId, roles, args.operator as string, signer as string);
+    const name: string = args.name as string;
+    const url: string = args.url as string;
+    const result = await registry.setPartyRaw(countryCode, partyId, roles, args.operator as string, name, url, signer as string);
     console.log(result);
   })
   .command(

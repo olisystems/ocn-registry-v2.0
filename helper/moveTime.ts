@@ -1,6 +1,6 @@
-import { network } from "hardhat";
+import { Network } from "hardhat/types";
 
-export async function moveTime(amount: number) {
+export async function moveTime(amount: number, network: Network) {
   console.log("Moving blocks...");
   await network.provider.send("evm_increaseTime", [amount]);
 

@@ -28,7 +28,7 @@ export async function vote(proposalId: string, voteWay: number, reason: string) 
     let proposalState = await ocnGovernor.state(proposalId);
     console.log(`Current Proposal State: ${proposalState}`);
     if (developmentChains.includes(network.name)) {
-      await moveBlocks(VOTING_PERIOD + 1);
+      await moveBlocks(VOTING_PERIOD + 1, network);
     }
     proposalId = eventLogs[0]?.args?.proposalId;
     proposalState = await ocnGovernor.state(proposalId);

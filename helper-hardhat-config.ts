@@ -12,9 +12,9 @@ export interface networkConfigInfo {
 }
 
 export const networkExtraConfig: networkConfigInfo = {
-  localhost: { mainPrivateKey: process.env.HARDHAT_WALLET_PRIVATE_KEY || "" },
-  hardhat: { mainPrivateKey: process.env.HARDHAT_WALLET_PRIVATE_KEY || "" },
-  ganache: { mainPrivateKey: process.env.GANACHE_WALLET_PRIVATE_KEY || "" },
+  localhost: {},
+  hardhat: {},
+  ganache: {},
   amoy: {},
   volta: {},
 };
@@ -22,10 +22,12 @@ export const networkExtraConfig: networkConfigInfo = {
 export const developmentChains = ["hardhat", "localhost", "ganache"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
+export const deployerPk = process.env.DEPLOYER_PRIVATE_KEY || "";
+export const nodeOperatorPk = process.env.NODE_PRIVATE_KEY || "";
 export const cpoOperatorPk = process.env.CPO_PRIVATE_KEY || "";
 export const emspOperatorPk = process.env.EMSP_PRIVATE_KEY || "";
 export const cpoWalletAdress = process.env.CPO_WALLET_ADDRESS || "";
-export const nodeWalletAddress = process.env.WALLET_ADDRESS || "";
+export const nodeWalletAddress = process.env.NODE_WALLET_ADDRESS || "";
 export const defaultAmountToSend: string = "2.0";
 
 // Governor Values

@@ -19,7 +19,7 @@ export async function queueAndExecute() {
 
   if (developmentChains.includes(network.name)) {
     await moveTime(MIN_DELAY + 1);
-    await moveBlocks(1);
+    await moveBlocks(1, network);
   }
 
   const currrentValue = await ocnPaymentManager.getFundingYearlyAmount();

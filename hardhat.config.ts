@@ -11,6 +11,15 @@ import "./tasks/sendStablecoinsToParties";
 import "./tasks/propose";
 import { log } from "console";
 
+//import all tasks
+let tasksFolder = "./tasks/";
+var normalizedPath = require("path").join(__dirname, tasksFolder);
+require("fs")
+  .readdirSync(normalizedPath)
+  .forEach(function (file: string) {
+    require(tasksFolder + file);
+  });
+
 const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
 const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
@@ -95,11 +104,14 @@ const config = {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     },
-    cpoOperator: {
+    nodeOperator: {
       default: 1,
     },
-    emspOperator: {
+    cpoOperator: {
       default: 2,
+    },
+    emspOperator: {
+      default: 3,
     },
   },
   mocha: {
