@@ -48,6 +48,7 @@ task("propose", "Proposes a new yearly funding amount")
       console.log(`Current Proposal State: ${proposalState}`);
       console.log(`Current Proposal Snapshot: ${proposalSnapShot}`);
       console.log(`Current Proposal Deadline: ${proposalDeadline}`);
+      return proposalId;
     }
 
     const { ethers, network } = hre;
@@ -57,5 +58,5 @@ task("propose", "Proposes a new yearly funding amount")
     const amount = taskArgs.amount ? taskArgs.amount : NEW_YEARLY_AMOUNT;
     const description = taskArgs.descr ? taskArgs.descr : PROPOSAL_DESCRIPTION;
     // Call the propose function with appropriate parameters
-    await propose([amount], FUNC, description);
+    return await propose([amount], FUNC, description);
   });

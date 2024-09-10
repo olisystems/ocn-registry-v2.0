@@ -129,7 +129,7 @@ export class Registry extends ContractWrapper {
    */
   public async getPartyByAddress(address: string): Promise<types.PartyDetails | undefined> {
     const details = await this.contract.getPartyDetailsByAddress(address);
-    const result = this.toPartyDetails(Object.assign({ partyAddress: address }, details));
+    const result = this.toPartyDetails(details);
     return result.node.operator !== "0x0000000000000000000000000000000000000000" ? result : undefined;
   }
 
@@ -146,7 +146,7 @@ export class Registry extends ContractWrapper {
     const id = this.toHex(partyId);
 
     const details = await this.contract.getPartyDetailsByOcpi(country, id);
-    const result = this.toPartyDetails(Object.assign({ countryCode: country, partyId: id }, details));
+    const result = this.toPartyDetails(details);
     return result.node.operator !== "0x0000000000000000000000000000000000000000" ? result : undefined;
   }
 
@@ -159,7 +159,7 @@ export class Registry extends ContractWrapper {
     for (const address of partyAddresses) {
       const result = await this.contract.getPartyDetailsByAddress(address);
       if (result.operatorAddress !== "0x0000000000000000000000000000000000000000") {
-        details.push(this.toPartyDetails(Object.assign({ partyAddress: address }, result)));
+        details.push(this.toPartyDetails(result));
       }
     }
     return details;
@@ -237,17 +237,17 @@ export class Registry extends ContractWrapper {
 
   private toPartyDetails(input: any): types.PartyDetails {
     return {
-      countryCode: ethers.toUtf8String(input[0]),
-      partyId: ethers.toUtf8String(input[1]),
-      roles: input[2].map((index: number) => types.Role[index]),
-      paymentStatus: input[3],
+      address: input[0],
+      countryCode: ethers.toUtf8String(input[1]),
+      partyId: ethers.toUtf8String(input[2]),
+      roles: input[3].map((index: number) => types.Role[index]),
+      paymentStatus: input[4],
       node: {
-        operator: input[4],
-        url: input[5],
+        operator: input[5],
+        url: input[6],
       },
-      name: input[6],
-      url: input[7],
-      address: input.partyAddress,
+      name: input[7],
+      url: input[8],
     };
   }
 

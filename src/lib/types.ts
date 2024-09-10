@@ -37,6 +37,17 @@ export enum PaymentStatus {
   INACTIVE,
 }
 
+export enum ProposalState {
+  Pending,
+  Active,
+  Canceled,
+  Defeated,
+  Succeeded,
+  Queued,
+  Expired,
+  Executed,
+}
+
 export enum Role {
   CPO,
   EMSP,

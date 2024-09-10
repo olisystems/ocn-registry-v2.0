@@ -1,5 +1,21 @@
 {
   "license": "MIT",
+  "version": "2.0.0",
+  "description": "Oli-systems OCN registry smart contracts",
+  "directories": {
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "main": "dist/library.js",
+  "bin": {
+    "ocn-registry": "dist/cli.js"
+  },
+  "files": [
+    "*.json",
+    "dist/*"
+  ],
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.2",
     "@nomicfoundation/hardhat-ignition": "^0.15.0",
@@ -42,6 +58,7 @@
     "yargs": "^17.7.2"
   },
   "scripts": {
+    "build": "tsc",
     "localhost": "HARDHAT_CONFIG=local.hardhat.config.ts yarn hardhat node",
     "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
     "lint": "solhint 'contracts/*.sol'",

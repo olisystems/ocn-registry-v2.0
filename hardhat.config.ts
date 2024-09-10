@@ -30,7 +30,7 @@ const config = {
   sourcify: {
     enabled: true,
   },
-  defaultNetwork: "hardhat",
+  defaultNetwork: "localhost",
   solidity: {
     version: "0.8.24",
     settings: {
@@ -71,7 +71,7 @@ const config = {
       ],
       chainId: 31337,
       live: false,
-      saveDeployments: false,
+      saveDeployments: true,
     },
     localhost: {
       chainId: 31337,

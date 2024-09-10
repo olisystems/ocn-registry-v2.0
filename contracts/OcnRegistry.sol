@@ -287,7 +287,8 @@ contract OcnRegistry is AccessControl {
         domain = nodeOf[operator];
     }
 
-    function getPartyDetailsByAddress(address partyAddress) public view returns (
+    function getPartyDetailsByAddress(address _partyAddress) public view returns (
+        address partyAddress,
         bytes2 countryCode,
         bytes3 partyId,
         Role[] memory roles,
@@ -297,6 +298,31 @@ contract OcnRegistry is AccessControl {
         string memory url,
         bool active
     ) {
+        PartyDetails storage details = partyOf[_partyAddress];
+        partyAddress = _partyAddress;
+        countryCode = details.countryCode;
+        partyId = details.partyId;
+        roles = details.roles;
+        paymentStatus = details.paymentStatus;
+        operatorAddress = operatorOf[_partyAddress];
+        name = details.name;
+        url = details.url;
+        active = details.active;
+    }
+
+    function getPartyDetailsByOcpi(bytes2 _countryCode, bytes3 _partyId) public view returns (
+        
+        address partyAddress,
+        bytes2 countryCode,
+        bytes3 partyId,
+        Role[] memory roles,
+        IOcnPaymentManager.PaymentStatus paymentStatus,
+        address operatorAddress,
+        string memory name,
+        string memory url,
+        bool active
+    ) {
+        partyAddress = uniqueParties[_countryCode][_partyId];
         PartyDetails storage details = partyOf[partyAddress];
         countryCode = details.countryCode;
         partyId = details.partyId;
@@ -306,6 +332,10 @@ contract OcnRegistry is AccessControl {
         name = details.name;
         url = details.url;
         active = details.active;
+    }
+
+    function getPartiesCount() public view returns (uint256) {
+        return parties.length;
     }
 
     function getParties() public view returns (address[] memory) {
@@ -348,26 +378,5 @@ contract OcnRegistry is AccessControl {
         return result;
     }
 
-    function getPartyDetailsByOcpi(bytes2 countryCode, bytes3 partyId) public view returns (
-        address partyAddress,
-        Role[] memory roles,
-        IOcnPaymentManager.PaymentStatus paymentStatus,
-        address operatorAddress,
-        string memory name,
-        string memory url,
-        bool active
-    ) {
-        partyAddress = uniqueParties[countryCode][partyId];
-        PartyDetails storage details = partyOf[partyAddress];
-        roles = details.roles;
-        paymentStatus = details.paymentStatus;
-        operatorAddress = operatorOf[partyAddress];
-        name = details.name;
-        url = details.url;
-        active = details.active;
-    }
-
-    function getPartiesCount() public view returns (uint256) {
-        return parties.length;
-    }
+    
 }

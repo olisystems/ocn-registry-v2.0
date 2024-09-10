@@ -619,12 +619,17 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "partyAddress",
+        "name": "_partyAddress",
         "type": "address"
       }
     ],
     "name": "getPartyDetailsByAddress",
     "outputs": [
+      {
+        "internalType": "address",
+        "name": "partyAddress",
+        "type": "address"
+      },
       {
         "internalType": "bytes2",
         "name": "countryCode",
@@ -673,12 +678,12 @@
     "inputs": [
       {
         "internalType": "bytes2",
-        "name": "countryCode",
+        "name": "_countryCode",
         "type": "bytes2"
       },
       {
         "internalType": "bytes3",
-        "name": "partyId",
+        "name": "_partyId",
         "type": "bytes3"
       }
     ],
@@ -688,6 +693,16 @@
         "internalType": "address",
         "name": "partyAddress",
         "type": "address"
+      },
+      {
+        "internalType": "bytes2",
+        "name": "countryCode",
+        "type": "bytes2"
+      },
+      {
+        "internalType": "bytes3",
+        "name": "partyId",
+        "type": "bytes3"
       },
       {
         "internalType": "enum OcnRegistry.Role[]",

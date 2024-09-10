@@ -55,7 +55,6 @@ export const getPayBuilder = (context: yargs.Argv) => {
 };
 
 export const setPartyBuilder = (context: yargs.Argv) => {
-  console.log("####### Setting party builder");
   context
     .option("credentials", {
       alias: "c",

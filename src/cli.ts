@@ -29,7 +29,7 @@ yargs
     alias: ["net", "n"],
     choices: Object.keys(networks),
     describe: "Specifies the target network.",
-    default: "local",
+    default: "localhost",
   })
   .option("network-file", {
     alias: ["net-file", "nf"],
@@ -49,7 +49,12 @@ yargs
   .command(
     "get-node <address>",
     "Get OCN Node operator entry by their wallet address",
-    () => {},
+    (yargs) => {
+      return yargs.positional("address", {
+        type: "string",
+        describe: "The address of the node operator",
+      });
+    },
     async (args) => {
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
       const result = await registry.getNode(args.address as string);
