@@ -1,10 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import verify from "../helper-functions";
+import verify from "../helper/verify";
 import { developmentChains, MIN_DELAY, QUORUM_PERCENTAGE, VOTING_DELAY, VOTING_PERIOD } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
-import { Box, OcnGovernor, OcnVoteToken, Timelock } from "../typechain";
-import { OcnPaymentManager$Type } from "../artifacts/contracts/OcnPaymentManager.sol/OcnPaymentManager";
+import { OcnGovernor, OcnVoteToken, Timelock } from "../typechain";
 
 const deployFunction: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();

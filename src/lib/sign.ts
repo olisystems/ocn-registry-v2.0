@@ -1,4 +1,4 @@
-import { Wallet, keccak256, SigningKey, Signature, getBytes } from "ethers";
+import { Wallet, Signature, getBytes } from "ethers";
 import { soliditySha3 } from "web3-utils";
 
 // TODO unify with src/lib/sign.ts

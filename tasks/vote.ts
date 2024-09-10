@@ -4,7 +4,7 @@ import { developmentChains, VOTING_PERIOD } from "../helper-hardhat-config";
 import { OcnGovernor } from "../typechain";
 import { moveBlocks } from "../helper/moveBlocks";
 import { ProposalStorage } from "../helper/storeProposals";
-import { bigint, int, string } from "hardhat/internal/core/params/argumentTypes";
+import { int, string } from "hardhat/internal/core/params/argumentTypes";
 
 task("vote", "Vote for a proposal")
   .addOptionalParam("id", "proposal id to vote for", undefined, string)

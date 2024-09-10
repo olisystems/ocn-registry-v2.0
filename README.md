@@ -75,8 +75,8 @@ yarn install
 
 ### How to execute local tests
 
-- PS: By default tests are executed in a separate blockchain called hardhat and not in the localhost blockchain
-- `yarn hardhat test`
+- Tests should be executed stand alone in a separate blockchain called hardhat that is built only for that: `yarn hardhat test --network hardhat`
+- If run-all.sh script was run over localhost network, tests could run over localhost as well: `yarn hardhat test --network localhost`
 
 ### Fund wallet (You dont need it for Hardhat localhost)
 

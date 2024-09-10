@@ -1,4 +1,3 @@
-import type { HardhatUserConfig } from "hardhat/config";
 import dotenv from "dotenv";
 dotenv.config();
 

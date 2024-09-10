@@ -25,10 +25,10 @@ task("send-stable-coins", "Sends stablecoins to the CPO operator").setAction(asy
 
   // Show balances
   console.log("Balances after transfer:");
-  console.log(`Deployer: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(deployer))}`);
-  console.log(`Node Operator: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(nodeOperator))}`);
-  console.log(`CPO Operator: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(cpoOperator))}`);
-  console.log(`EMSP Operator: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(emspOperator))}`);
+  console.log(`Deployer: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(deployer))} | ${deployer}`);
+  console.log(`Node Operator: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(nodeOperator))} | ${nodeOperator}`);
+  console.log(`CPO Operator: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(cpoOperator))} | ${cpoOperator}`);
+  console.log(`EMSP Operator: ${hre.ethers.formatEther(await euroStableCoinContract.balanceOf(emspOperator))} | ${emspOperator}`);
   console.log("--------------------------------------------------");
 
   // set approval to OCN Payment Manager for the parties

@@ -1,9 +1,8 @@
-import { ethers, deployments, tasks } from "hardhat";
+import { ethers, deployments } from "hardhat";
 import { expect } from "chai";
-import { OcnPaymentManager, EuroStableCoin, OcnGovernor } from "../typechain";
+import { OcnPaymentManager, OcnGovernor } from "../typechain";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { Contract } from "ethers";
-import { PaymentStatus, ProposalState } from "../src/lib/types";
+import { ProposalState } from "../src/lib/types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { FUNC, MIN_DELAY, NEW_YEARLY_AMOUNT, VOTING_DELAY, VOTING_PERIOD } from "../helper-hardhat-config";
 import { moveBlocks } from "../helper/moveBlocks";

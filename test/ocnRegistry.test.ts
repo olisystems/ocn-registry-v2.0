@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { OcnRegistry } from "../typechain";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import * as signHelper from "../src/lib/sign";
-import { get } from "http";
 
 describe("Registry contract", function () {
   let registry: OcnRegistry;

@@ -1,8 +1,7 @@
-import { ethers, deployments, tasks } from "hardhat";
+import { ethers, deployments, tasks, network } from "hardhat";
 import { expect } from "chai";
 import { OcnPaymentManager, EuroStableCoin } from "../typechain";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { Contract } from "ethers";
 import { PaymentStatus } from "../src/lib/types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
@@ -28,7 +27,7 @@ describe("OcnPaymentManager contract", function () {
     paymentManager = (await ethers.getContractAt("OcnPaymentManager", preDeployedOcnManager.address)) as unknown as OcnPaymentManager;
 
     // call sendStableCoins task
-    hre.run("send-stable-coins");
+    await hre.run("send-stable-coins", { network: network.name });
   });
 
   it("Should cpo operator to make a payment and change its status", async function () {

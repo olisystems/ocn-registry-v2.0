@@ -4,7 +4,7 @@ import { developmentChains, VOTING_PERIOD, MIN_DELAY } from "../helper-hardhat-c
 import { moveBlocks } from "../helper/moveBlocks";
 import { moveTime } from "../helper/moveTime";
 import { Proposal, ProposalStorage } from "../helper/storeProposals";
-import { bigint, int, string } from "hardhat/internal/core/params/argumentTypes";
+import { string } from "hardhat/internal/core/params/argumentTypes";
 
 task("queue", "Queue proposal")
   .addOptionalParam("id", "proposal id to queue", undefined, string)

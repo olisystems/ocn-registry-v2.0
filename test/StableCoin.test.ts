@@ -1,11 +1,7 @@
 import { ethers, deployments } from "hardhat";
 import { expect } from "chai";
-import { EuroStableCoin, OcnRegistry, OcnVoteToken } from "../typechain";
-import deployVoteToken from "../deploy/01_deployOcnVoteToken";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import exp from "constants";
+import { EuroStableCoin } from "../typechain";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { Contract } from "ethers";
 
 describe("EuroStableCoin contract", function () {
   let deployer: HardhatEthersSigner;

@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import verify from "../helper-functions";
+import verify from "../helper/verify";
 import { networkExtraConfig, developmentChains, DEFAULT_YEARLY_AMOUNT } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
 

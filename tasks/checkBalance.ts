@@ -1,12 +1,12 @@
 import { task } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { bigint, string } from "hardhat/internal/core/params/argumentTypes";
+import { string } from "hardhat/internal/core/params/argumentTypes";
 import { EuroStableCoin } from "../typechain";
 
 task("check-balance", "Displays the balance of the first signer")
   .addOptionalParam("address", "address to check balance", undefined, string)
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { ethers, network } = hre;
+    const { ethers } = hre;
     const signers = await ethers.getSigners();
     const signer = signers[0];
 

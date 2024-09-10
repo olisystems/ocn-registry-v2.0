@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import verify from "../helper-functions";
+import verify from "../helper/verify";
 import { networkExtraConfig, developmentChains } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
 import { EuroStableCoin } from "../typechain";

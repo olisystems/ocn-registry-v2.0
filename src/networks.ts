@@ -25,7 +25,6 @@ export const networks: Record<string, Network> = {
       network_id: "1337",
       gas: 8000000,
     },
-    contracts: require("../contract.defs.local.json"),
   },
   localhost: {
     provider: {
@@ -35,7 +34,6 @@ export const networks: Record<string, Network> = {
       network_id: "31337",
       gas: 8000000,
     },
-    contracts: require("../contract.defs.local.json"),
   },
   volta: {
     provider: {
@@ -45,7 +43,6 @@ export const networks: Record<string, Network> = {
       network_id: "73799",
       gasPrice: 100,
     },
-    contracts: require("../contract.defs.volta.json"),
   },
   prod: {
     provider: {
@@ -55,6 +52,5 @@ export const networks: Record<string, Network> = {
       network_id: "246",
       gasPrice: 100,
     },
-    contracts: require("../contract.defs.prod.json"),
   },
 };

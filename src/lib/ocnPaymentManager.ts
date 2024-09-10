@@ -15,12 +15,8 @@
 */
 
 import { ethers, Wallet } from "ethers";
-import { URL } from "url";
-import * as sign from "./sign";
-import * as types from "./types";
 import { Network, Contract } from "../types/network";
 import { ContractWrapper } from "./contract-wrapper";
-import { Signature } from "viem";
 import path from "path";
 import { PaymentStatus } from "./types";
 

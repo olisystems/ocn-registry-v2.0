@@ -14,24 +14,23 @@
     limitations under the License.
 */
 
-import { AbiItem } from "web3-utils"
+import { AbiItem } from "web3-utils";
 
 export interface Provider {
-    protocol: 'http' | 'https'
-    host: string
-    port: number
-    network_id: string
-    gas?: number
-    gasPrice?: number
+  protocol: "http" | "https";
+  host: string;
+  port: number;
+  network_id: string;
+  gas?: number;
+  gasPrice?: number;
 }
 
 export interface Contract {
-    abi: AbiItem[]
-    address: string
-    bytecode?: string
+  abi: AbiItem[];
+  address: string;
+  bytecode?: string;
 }
 
 export interface Network {
-    provider: Provider,
-    contracts: Record<string, Contract>
+  provider: Provider;
 }

@@ -18,7 +18,6 @@ import { ethers } from "ethers";
 import { toHex } from "web3-utils";
 import { networks } from "../networks";
 import { Contract, Network, Provider } from "../types/network";
-import { AbiItem } from "viem";
 
 export class ContractWrapper {
   private readonly provider: ethers.JsonRpcProvider;
