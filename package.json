@@ -1,0 +1,68 @@
+{
+  "license": "MIT",
+  "version": "2.0.0",
+  "description": "Oli-systems OCN registry smart contracts",
+  "directories": {
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "main": "dist/library.js",
+  "bin": {
+    "ocn-registry": "dist/cli.js"
+  },
+  "files": [
+    "*.json",
+    "dist/*"
+  ],
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.2",
+    "@nomicfoundation/hardhat-ignition": "^0.15.0",
+    "@nomicfoundation/hardhat-ignition-viem": "^0.15.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@nomicfoundation/hardhat-viem": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.4.2",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@openzeppelin/contracts-upgradeable": "^5.0.2",
+    "@openzeppelin/hardhat-upgrades": "^3.2.1",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.2.0",
+    "@types/chai-as-promised": "^7.1.6",
+    "@types/mocha": ">=9.1.0",
+    "@types/node": ">=18.0.0",
+    "@types/yargs": "^17.0.33",
+    "chai": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.2.0",
+    "hardhat": "^2.22.9",
+    "hardhat-abi-exporter": "^2.10.1",
+    "hardhat-deploy": "^0.12.4",
+    "hardhat-deploy-ethers": "^0.4.2",
+    "hardhat-gas-reporter": "^1.0.8",
+    "prettier": "^3.3.3",
+    "prettier-plugin-solidity": "^1.4.1",
+    "solhint": "^5.0.3",
+    "solhint-plugin-prettier": "^0.1.0",
+    "solidity-coverage": "^0.8.0",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.3.2",
+    "typescript": "~5.0.4",
+    "viem": "^2.7.6",
+    "web3-utils": "^4.3.1",
+    "yargs": "^17.7.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "localhost": "HARDHAT_CONFIG=local.hardhat.config.ts yarn hardhat node",
+    "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
+    "lint": "solhint 'contracts/*.sol'",
+    "debug-cli": "node --inspect -r ts-node/register  src/cli ",
+    "cli": "ts-node src/cli"
+  }
+}
