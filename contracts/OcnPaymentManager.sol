@@ -10,6 +10,13 @@ import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
+
+    /* ********************************** */
+    /*       EVENTS VARIABLES            */
+    /* ********************************** */
+
+    event OwnershipTransferred(address indexed oldAdmin, address indexed  newAdmin);
+
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
@@ -140,6 +147,8 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
         grantRole(DEFAULT_ADMIN_ROLE, newOwner);
         // Revoke DEFAULT_ADMIN_ROLE from current owner
         revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
+
+        emit OwnershipTransferred(msg.sender, newOwner);
     }
 
     // TODO uncoment for upgradebles

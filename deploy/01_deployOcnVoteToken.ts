@@ -4,6 +4,8 @@ import verify from "../helper/verify";
 import { networkExtraConfig, developmentChains } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
 
+//TODO resesarch deployments using Ignition
+
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "OcnVoteToken";
   const { deployer } = await hre.getNamedAccounts();

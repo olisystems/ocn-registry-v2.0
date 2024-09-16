@@ -63,6 +63,7 @@ contract OcnRegistry is AccessControl {
     /*               EVENTS               */
     /* ********************************** */
 
+    event OwnershipTransferred(address indexed oldAdmin, address indexed newAdmin);
     event OperatorUpdate(address indexed operator, string domain);
     event PartyUpdate(
         bytes2 countryCode,
@@ -101,6 +102,8 @@ contract OcnRegistry is AccessControl {
     function transferOwnership(address newOwner) public onlyRole(DEFAULT_ADMIN_ROLE) {
         grantRole(DEFAULT_ADMIN_ROLE, newOwner);
         revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
+
+        emit OwnershipTransferred(msg.sender, newOwner);
     }
 
     function adminDeleteOperator(address operator) public onlyRole(DEFAULT_ADMIN_ROLE) {
