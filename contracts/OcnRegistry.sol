@@ -3,6 +3,7 @@ pragma solidity 0.8.24;
 
 import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
 import {IOcnCvManager} from "./IOcnCvManager.sol";
+import "./interfaces/ICertificateVerifier.sol";
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -25,6 +26,11 @@ contract OcnRegistry is AccessControl {
     enum Role { CPO, EMSP, HUB, NAP, NSP, OTHER, SCSP }
     enum Module { cdrs, chargingprofiles, commands, locations, sessions, tariffs, tokens }
 
+    struct RoleDetails {
+        bytes data;
+        Role role;
+    }
+
     struct PartyDetails {
         bytes2 countryCode;
         bytes3 partyId;
@@ -44,8 +50,9 @@ contract OcnRegistry is AccessControl {
     address[] private parties;
 
     IOcnPaymentManager public paymentManager;
+    ICertificateVerifier public certificateVerifier;
 
-   
+
     /* ********************************** */
     /*          CUSTOM ERRORS             */
     /* ********************************** */
@@ -93,9 +100,10 @@ contract OcnRegistry is AccessControl {
     /*          INITIALIZER               */
     /* ********************************** */
 
-    constructor(address _paymentManager) {
+    constructor(address _paymentManager, address _certificateVerifier) {
         prefix = "\u0019Ethereum Signed Message:\n32";
         paymentManager = IOcnPaymentManager(_paymentManager);
+        certificateVerifier = ICertificateVerifier(_certificateVerifier);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -175,7 +183,7 @@ contract OcnRegistry is AccessControl {
         address party,
         bytes2 countryCode,
         bytes3 partyId,
-        Role[] memory roles,
+        RoleDetails[] memory roles,
         address operator,
         string memory name,
         string memory url
@@ -202,17 +210,27 @@ contract OcnRegistry is AccessControl {
             revert PartyNotRegistered("Provided operator not registered.");
         }
 
+        // VC verification (All roles must be verified)
+        for (uint8 i = 0; i <= roles.length; i++) {
+            if(roles[i].role === Role.EMSP) {
+                ICertificateVerifier.EMPCertificate memory certificate =
+                    abi.decode(roles[i].data, (ICertificateVerifier.EMPCertificate));
+            } else if (roles[i].role === Role.CPO) {
+                ICertificateVerifier.CPOCertificate memory certificate =
+                    abi.decode(roles[i].data, (ICertificateVerifier.CPOCertificate));
+            }
+        }
+
         uint256 partyIndex = partyOf[party].partyIndex;
         if (!uniquePartyAddresses[party]) {
             parties.push(party);
             // get last index of the array
             partyIndex = parties.length - 1;
-        } 
+        }
 
         uniquePartyAddresses[party] = true;
 
-        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);  
-        // TODO implmenet CV verification
+        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
         partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true, partyIndex);
         operatorOf[party] = operator;
 
@@ -314,7 +332,7 @@ contract OcnRegistry is AccessControl {
     }
 
     function getPartyDetailsByOcpi(bytes2 _countryCode, bytes3 _partyId) public view returns (
-        
+
         address partyAddress,
         bytes2 countryCode,
         bytes3 partyId,
@@ -381,5 +399,5 @@ contract OcnRegistry is AccessControl {
         return result;
     }
 
-    
+
 }
