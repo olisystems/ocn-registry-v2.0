@@ -375,14 +375,14 @@ contract OcnRegistry is AccessControl {
         return result;
     }
 
-    function setVerifier(address verifier) public {
+    function setVerifier(address verifier) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(verifier != address(0), "Invalid verifier address");
         require(!allowedCertificateVerifiers[verifier], "Verifier already allowed");
 
         allowedCertificateVerifiers[verifier] = true;
     }
 
-    function removeVerifier(address verifier) public {
+    function removeVerifier(address verifier) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(verifier != address(0), "Invalid verifier address");
         require(allowedCertificateVerifiers[verifier], "Verifier not currently allowed");
 
