@@ -172,7 +172,7 @@ export class Registry extends ContractWrapper {
    * EMSP and CPO roles under the same country_code/party_id).
    * @param operator the operator address of the OCN Node used by the party.
    */
-  public async setParty(countryCode: string, partyId: string, roles: types.Role[], operator: string, name: string, url: string): Promise<ethers.TransactionReceipt> {
+  public async setParty(countryCode: string, partyId: string, roles: types.RoleDetails[], operator: string, name: string, url: string): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
     this.verifyStringLen(countryCode, 2);
     this.verifyStringLen(partyId, 3);
@@ -194,7 +194,7 @@ export class Registry extends ContractWrapper {
    * @param signer the private key of the owner of the registry listing. The signer configured in the
    * constructor is the "spender": they send and pay for the transaction on the network.
    */
-  public async setPartyRaw(countryCode: string, partyId: string, roles: types.Role[], operator: string, name: string, url: string, signer: string): Promise<ethers.TransactionReceipt> {
+  public async setPartyRaw(countryCode: string, partyId: string, roles: types.RoleDetails[], operator: string, name: string, url: string, signer: string): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
     this.verifyStringLen(countryCode, 2);
     this.verifyStringLen(partyId, 3);

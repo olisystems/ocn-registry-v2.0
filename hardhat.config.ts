@@ -45,6 +45,11 @@ const config = {
     target: "ethers-v6",
   },
   networks: {
+    anvil: {
+      url: "http://localhost:8545",
+      accounts: [deployerPrivateKey],
+      chainId: 31337
+    },
     amoy: {
       // polygon testnet
       url: "https://rpc-amoy.polygon.technology",

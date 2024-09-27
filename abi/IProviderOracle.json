@@ -1,0 +1,33 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "identifier",
+        "type": "string"
+      }
+    ],
+    "name": "getProvider",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "identifier",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct IProviderOracle.Provider",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

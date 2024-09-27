@@ -8,6 +8,7 @@ import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
 // import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 // import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import "hardhat/console.sol";
 
 contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
 
@@ -28,7 +29,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     // uint public version;
     // address currentBaseContract;
 
-    uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals    
+    uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals
     IERC20 public euroStablecoin; // ERC20 token contract address
     address public ocnWallet;
 
@@ -60,8 +61,10 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     // TODO remove for upgradebles
     constructor(address _euroStablecoin, uint256 _fundingYearlyAmount) {
         euroStablecoin = IERC20(_euroStablecoin);
-        fundingYearlyAmount = _fundingYearlyAmount * 1e18; 
+        fundingYearlyAmount = _fundingYearlyAmount * 1e18;
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        console.log("deployer is");
+        console.log(msg.sender);
     }
 
     // Custom Errors
@@ -69,9 +72,9 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     error TransferFailed();
     error NoFundsStaked();
     error WithdrawalNotAllowed();
-    
+
     /**
-     * Called when Base Contract upgrades: iterate version   
+     * Called when Base Contract upgrades: iterate version
      */
     // TODO uncoment for upgradebles
     // function _authorizeUpgrade(address newImplementation)

@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { OcnRegistry } from "../typechain";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import * as signHelper from "../src/lib/sign";
+import { encodedCpoCertificate, encodedCpoSignature, encodedEmpCertificate, encodedEmpSignature } from "./certificates";
 
 describe("Registry contract", function () {
   let registry: OcnRegistry;
@@ -128,8 +129,20 @@ describe("Registry contract", function () {
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
 
+    const emspRole = {
+      certificateData: encodedEmpCertificate,
+      signature: encodedEmpSignature,
+      role: 1
+    };
+    const cpoRole = {
+      certificateData: encodedCpoCertificate,
+      signature: encodedCpoSignature,
+      role: 0
+    };
+
+    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
     const { country, id, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, [1, 2], nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
 
     const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
 
@@ -153,10 +166,21 @@ describe("Registry contract", function () {
     await registry.connect(nodeOperator).setNode("https://node.ocn.org");
     await registry.connect(cpoOperator).setNode(domain);
 
-    const { country, id, roles, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, roles, nodeOperator.address, name, url);
+    const emspRole = {
+      certificateData: encodedEmpCertificate,
+      signature: encodedEmpSignature,
+      role: 1
+    };
+    const cpoRole = {
+      certificateData: encodedCpoCertificate,
+      signature: encodedCpoSignature,
+      role: 0
+    };
 
-    await registry.connect(cpoOperator).setParty(country, id, roles, cpoOperator.address, name, url);
+    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
+    const { country, id, roles, name, url } = getTestPartyData();
+    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], cpoOperator.address, name, url);
 
     const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
 
@@ -174,11 +198,24 @@ describe("Registry contract", function () {
     await registry.connect(nodeOperator).setNode(domain);
     await registry.connect(cpoOperator).setNode("https://node.provider.net");
 
+    const emspRole = {
+      certificateData: encodedEmpCertificate,
+      signature: encodedEmpSignature,
+      role: 1
+    };
+    const cpoRole = {
+      certificateData: encodedCpoCertificate,
+      signature: encodedCpoSignature,
+      role: 0
+    };
+
+    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
+
     const { country, id, roles, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, roles, nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
 
     try {
-      await registry.connect(deployer).setParty(country, id, roles, cpoOperator.address, name, url);
+      await registry.connect(deployer).setParty(country, id, [emspRole, cpoRole], cpoOperator.address, name, url);
       expect.fail("Expected error not received");
     } catch (err: any) {
       expect(err.message).to.include("Party with country_code/party_id already registered under different address.");
@@ -198,10 +235,24 @@ describe("Registry contract", function () {
     const randomParty = new ethers.Wallet(ethers.Wallet.createRandom().privateKey);
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
-    const { country, id, roles, name, url } = getTestPartyData();
-    const sig = await signHelper.setPartyRaw(country, id, roles, nodeOperator.address, name, url, randomParty);
 
-    await registry.connect(nodeOperator).setPartyRaw(randomParty.address, country, id, roles, nodeOperator.address, name, url, sig.v, sig.r, sig.s);
+    const emspRole = {
+      certificateData: encodedEmpCertificate,
+      signature: encodedEmpSignature,
+      role: 1
+    };
+    const cpoRole = {
+      certificateData: encodedCpoCertificate,
+      signature: encodedCpoSignature,
+      role: 0
+    };
+
+    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
+
+    const { country, id, roles, name, url } = getTestPartyData();
+    const sig = await signHelper.setPartyRaw(country, id, [emspRole, cpoRole], nodeOperator.address, name, url, randomParty);
+
+    await registry.connect(nodeOperator).setPartyRaw(randomParty.address, country, id, [emspRole, cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
 
     const got = await registry.getPartyDetailsByAddress(randomParty.address);
 
@@ -218,8 +269,21 @@ describe("Registry contract", function () {
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
 
-    const { country, id, roles, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, roles, nodeOperator.address, name, url);
+    const emspRole = {
+      certificateData: encodedEmpCertificate,
+      signature: encodedEmpSignature,
+      role: 1
+    };
+    const cpoRole = {
+      certificateData: encodedCpoCertificate,
+      signature: encodedCpoSignature,
+      role: 0
+    };
+
+    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
+
+    const { country, id, name, url } = getTestPartyData();
+    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
 
     await registry.connect(cpoOperator).deleteParty();
 
@@ -240,10 +304,23 @@ describe("Registry contract", function () {
     const randomWallet = ethers.Wallet.createRandom();
     const operator = new ethers.Wallet(randomWallet.privateKey);
 
-    const { country, id, roles, name, url } = getTestPartyData();
-    const sig = await signHelper.setPartyRaw(country, id, roles, nodeOperator.address, name, url, operator);
+    const emspRole = {
+      certificateData: encodedEmpCertificate,
+      signature: encodedEmpSignature,
+      role: 1
+    };
+    const cpoRole = {
+      certificateData: encodedCpoCertificate,
+      signature: encodedCpoSignature,
+      role: 0
+    };
 
-    await registry.connect(nodeOperator).setPartyRaw(operator.address, country, id, roles, nodeOperator.address, name, url, sig.v, sig.r, sig.s);
+    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
+
+    const { country, id, name, url } = getTestPartyData();
+    const sig = await signHelper.setPartyRaw(country, id, [emspRole, cpoRole], nodeOperator.address, name, url, operator);
+
+    await registry.connect(nodeOperator).setPartyRaw(operator.address, country, id, [emspRole, cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
 
     const sig2 = await signHelper.deletePartyRaw(operator);
     await registry.connect(nodeOperator).deletePartyRaw(operator.address, sig2.v, sig2.r, sig2.s);

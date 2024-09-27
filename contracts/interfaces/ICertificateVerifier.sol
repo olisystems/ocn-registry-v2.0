@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.24;
 
 interface ICertificateVerifier {
+    struct Signature {
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+    }
+
     struct EMPCertificate {
         string name;
         string marktfunktion;
@@ -16,7 +22,13 @@ interface ICertificateVerifier {
         address owner;
     }
 
-    function verifyEMPCertificate(EMPCertificate memory certificate, uint8 v, bytes32 r, bytes32 s) external view returns (address);
+    function verifyEMP(
+        bytes memory certificateData,
+        bytes memory signature
+    ) external view returns (address, EMPCertificate memory, Signature memory);
 
-    function verifyCPOCertificate(CPOCertificate memory certificate, uint8 v, bytes32 r, bytes32 s) external view returns (address);
+    function verifyCPO(
+        bytes memory certificateData,
+        bytes memory signature
+    ) external view returns (address, CPOCertificate memory, Signature memory);
 }

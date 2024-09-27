@@ -1,0 +1,21 @@
+{
+    "certificate": {
+        "bilanzkreis": "bilanzkreis",
+        "lieferant": "lieferant",
+        "marktfunktion": "marktfunktion",
+        "name": "Name",
+        "owner": "0xbef84c17eF8E9e1e6c6ae3379cF96F2CD4720C25",
+        "signature": "a3QuYATAxxBSHvJL9dW/9dQ7vZ5JMY/MzPOQ6cKwmlYNsfn9PI+zu9uHrhvMZoma+NXJaeb5X3Yr2HJovuDoaBs="
+    },
+    "signature": {
+        "inner": {
+            "r": "0x5792b10e308613a94cc0772b3d7bb3f474275ff5edcb69bcf35a0649e4bf775e",
+            "s": "0x5456e72cc64e8a0e688d6abcdd4c3cd99510ce0311237dd92132356615f962bc",
+            "yParity": "0x1"
+        },
+        "message_hash": "0xb222a853e0d7a52c6f85f8acadc3bc9d6da0e370222ee7c32a350bda8e650de5",
+        "r": "0x5792b10e308613a94cc0772b3d7bb3f474275ff5edcb69bcf35a0649e4bf775e",
+        "s": "0x5456e72cc64e8a0e688d6abcdd4c3cd99510ce0311237dd92132356615f962bc",
+        "v": 28
+    }
+}

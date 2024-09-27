@@ -30,7 +30,7 @@ yarn hardhat deploy --network $NETWORK --tags governor
 yarn hardhat deploy --network $NETWORK --tags setup
 yarn hardhat deploy --network $NETWORK --tags stablecoin
 yarn hardhat deploy --network $NETWORK --tags payment
+yarn hardhat deploy --network $NETWORK --tags certificateverifier
 yarn hardhat deploy --network $NETWORK --tags registry
-
 
 echo "All Smart Contracts deployed and configured successfully on blockchain: $NETWORK."
