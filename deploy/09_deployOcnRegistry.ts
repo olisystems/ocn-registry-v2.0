@@ -4,6 +4,7 @@ import { networkExtraConfig } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const defaultVerifier = process.env.DEFAULT_VERIFIER || "";
   const contractName = "OcnRegistry";
   const { deployer } = await hre.getNamedAccounts();
   const { deployments, network } = hre;
@@ -24,12 +25,16 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   const timelockContract: any = await ethers.getContract("Timelock", deployer);
   const deployedContract: any = await ethers.getContract(contractName, deployer);
+
+  if (defaultVerifier !== "") {
+    log(`Adding default certificate verifier ${defaultVerifier} to OcnRegistry ${contractName}...`);
+    const allowedVerifierTx: any = await deployedContract.setVerifier(defaultVerifier);
+    await allowedVerifierTx.wait(1);
+  }
+
   log(`Transferring ownership of ${contractName} to TimeLock at ${timelockContract.target}...`);
   const transferTx = await deployedContract.transferOwnership(await timelockContract.getAddress());
   await transferTx.wait(1);
-
-  const allowedVerifierTx: any = await deployedContract.setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
-  await allowedVerifierTx.wait(1);
 };
 
 export default deployVoteToken;

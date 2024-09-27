@@ -4,6 +4,7 @@ import { OcnRegistry } from "../typechain";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import * as signHelper from "../src/lib/sign";
 import { encodedCpoCertificate, encodedCpoSignature, encodedEmpCertificate, encodedEmpSignature } from "./certificates";
+import ProviderOracleABI from "../test/oracles/ProvidersOracle.json";
 
 describe("Registry contract", function () {
   let registry: OcnRegistry;
@@ -33,6 +34,23 @@ describe("Registry contract", function () {
     await deployments.fixture(); // Ensure a clean deployment environment
     const preDeployedRegistry = await deployments.get("OcnRegistry");
     registry = (await ethers.getContractAt("OcnRegistry", preDeployedRegistry.address)) as unknown as OcnRegistry;
+
+    const preDeployedCpoOracle = await deployments.get("CPOOracle");
+    const cpoOracle = new ethers.Contract(preDeployedCpoOracle.address, ProviderOracleABI.abi, deployer) as unknown as any;
+
+    const preDeployedEmspOracle = await deployments.get("EMSPOracle");
+    const emspOracle = new ethers.Contract(preDeployedEmspOracle.address, ProviderOracleABI.abi, deployer) as unknown as any;
+
+    await cpoOracle.connect(deployer).addProvider({
+      name: "OLI Systems GmbH",
+      identifier: "DE OLI"
+    });
+
+    await emspOracle.connect(deployer).addProvider({
+      name: "bilanzkreis",
+      identifier: "bilanzkreis"
+    });
+
   });
 
   it("setNode allows operator to add their node", async () => {
@@ -140,7 +158,6 @@ describe("Registry contract", function () {
       role: 0
     };
 
-    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
     const { country, id, name, url } = getTestPartyData();
     await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
 
@@ -177,7 +194,6 @@ describe("Registry contract", function () {
       role: 0
     };
 
-    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
     const { country, id, roles, name, url } = getTestPartyData();
     await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
     await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], cpoOperator.address, name, url);
@@ -208,8 +224,6 @@ describe("Registry contract", function () {
       signature: encodedCpoSignature,
       role: 0
     };
-
-    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
 
     const { country, id, roles, name, url } = getTestPartyData();
     await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
@@ -247,8 +261,6 @@ describe("Registry contract", function () {
       role: 0
     };
 
-    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
-
     const { country, id, roles, name, url } = getTestPartyData();
     const sig = await signHelper.setPartyRaw(country, id, [emspRole, cpoRole], nodeOperator.address, name, url, randomParty);
 
@@ -279,8 +291,6 @@ describe("Registry contract", function () {
       signature: encodedCpoSignature,
       role: 0
     };
-
-    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
 
     const { country, id, name, url } = getTestPartyData();
     await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
@@ -314,8 +324,6 @@ describe("Registry contract", function () {
       signature: encodedCpoSignature,
       role: 0
     };
-
-    await registry.connect(deployer).setVerifier("0x65bcB90561Af8a203196713FC2729960728283eA");
 
     const { country, id, name, url } = getTestPartyData();
     const sig = await signHelper.setPartyRaw(country, id, [emspRole, cpoRole], nodeOperator.address, name, url, operator);

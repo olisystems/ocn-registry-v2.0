@@ -216,7 +216,7 @@ contract OcnRegistry is AccessControl {
 
                 if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid CPO certificate"); }
 
-                IProviderOracle.Provider memory provider = emspOracle.getProvider(certificate.identifier);
+                IProviderOracle.Provider memory provider = cpoOracle.getProvider(certificate.identifier);
                 if(!compareIdentifiers(certificate.identifier, provider.identifier)) {
                     revert ProviderNotFound("CPO not active in oracle");
                 }
