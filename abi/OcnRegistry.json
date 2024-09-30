@@ -10,16 +10,6 @@
         "internalType": "address",
         "name": "_certificateVerifier",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_emspOracle",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_cpoOracle",
-        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -147,6 +137,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "enum OcnRegistry.Role",
+        "name": "role",
+        "type": "uint8"
+      },
       {
         "internalType": "string",
         "name": "reason",
@@ -467,19 +462,6 @@
   },
   {
     "inputs": [],
-    "name": "cpoOracle",
-    "outputs": [
-      {
-        "internalType": "contract IProviderOracle",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "deleteNode",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -546,19 +528,6 @@
     "name": "deletePartyRaw",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "emspOracle",
-    "outputs": [
-      {
-        "internalType": "contract IProviderOracle",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1147,6 +1116,24 @@
       }
     ],
     "name": "setPartyRaw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum OcnRegistry.Role",
+        "name": "role",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "oracleAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setProviderOracle",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

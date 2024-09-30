@@ -22,7 +22,7 @@ contract OcnRegistry is AccessControl {
     address[] private operators;
 
     // OCPI Party Listings
-    enum Role { CPO, EMSP, HUB, NAP, NSP, OTHER, SCSP }
+    enum Role { CPO, EMSP, NAP, NSP, OTHER, SCSP }
     enum Module { cdrs,chargingprofiles, commands, locations, sessions, tariffs, tokens }
 
     struct RoleDetails {
@@ -54,8 +54,7 @@ contract OcnRegistry is AccessControl {
     ICertificateVerifier public certificateVerifier;
 
     // Providers Oracle
-    IProviderOracle public emspOracle;
-    IProviderOracle public cpoOracle;
+    mapping(Role => IProviderOracle) private roleOracle;
 
     /* ********************************** */
     /*          CUSTOM ERRORS             */
@@ -70,7 +69,7 @@ contract OcnRegistry is AccessControl {
     error PartyNotRegistered(string reason);
     error SignerMismatch(string reason);
     error InvalidCertificate(string reason);
-    error ProviderNotFound(string reason);
+    error ProviderNotFound(Role role, string reason);
 
     /* ********************************** */
     /*               EVENTS               */
@@ -86,12 +85,10 @@ contract OcnRegistry is AccessControl {
     /*          INITIALIZER               */
     /* ********************************** */
 
-    constructor(address _paymentManager, address _certificateVerifier, address _emspOracle, address _cpoOracle) {
+    constructor(address _paymentManager, address _certificateVerifier) {
         prefix = "\u0019Ethereum Signed Message:\n32";
         paymentManager = IOcnPaymentManager(_paymentManager);
         certificateVerifier = ICertificateVerifier(_certificateVerifier);
-        emspOracle = IProviderOracle(_emspOracle);
-        cpoOracle = IProviderOracle(_cpoOracle);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -195,37 +192,14 @@ contract OcnRegistry is AccessControl {
         // VC verification (All roles must be verified)
         for (uint8 i = 0; i < roles.length; i++) {
             RoleDetails memory roleDetails = roles[i];
+            string memory certificateIdentifier = verifyCertificate(roleDetails);
 
-            if(roleDetails.role == Role.EMSP) {
-                (address verifier, ICertificateVerifier.EMPCertificate memory certificate,) = certificateVerifier.verifyEMP(
-                    roleDetails.certificateData,
-                    roleDetails.signature
-                );
-
-                if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid EMP certificate"); }
-
-                IProviderOracle.Provider memory provider = emspOracle.getProvider(certificate.bilanzkreis);
-                if(!compareIdentifiers(certificate.bilanzkreis, provider.identifier)) {
-                    revert ProviderNotFound("EMSP not active in oracle");
+            IProviderOracle oracle = roleOracle[roleDetails.role];
+            if(address(oracle) != address(0)) {
+                IProviderOracle.Provider memory provider = oracle.getProvider(certificateIdentifier);
+                if(!compareIdentifiers(certificateIdentifier, provider.identifier)) {
+                    revert ProviderNotFound(roleDetails.role, "Not active in oracle");
                 }
-            } else if (roleDetails.role == Role.CPO) {
-                (address verifier, ICertificateVerifier.CPOCertificate memory certificate,) = certificateVerifier.verifyCPO(
-                    roleDetails.certificateData,
-                    roleDetails.signature
-                );
-
-                if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid CPO certificate"); }
-
-                IProviderOracle.Provider memory provider = cpoOracle.getProvider(certificate.identifier);
-                if(!compareIdentifiers(certificate.identifier, provider.identifier)) {
-                    revert ProviderNotFound("CPO not active in oracle");
-                }
-            } else {
-                (address verifier,,) = certificateVerifier.verifyCPO(
-                    roleDetails.certificateData,
-                    roleDetails.signature
-                );
-                if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid certificate"); }
             }
 
             verifiedRoles[i] = roleDetails.role;
@@ -391,6 +365,35 @@ contract OcnRegistry is AccessControl {
 
     function isAllowedVerifier(address verifier) public view returns (bool) {
         return allowedCertificateVerifiers[verifier];
+    }
+
+    function setProviderOracle(Role role, address oracleAddress) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        roleOracle[role] = IProviderOracle(oracleAddress);
+    }
+
+    function verifyCertificate(RoleDetails memory roleDetails) private view returns (string memory) {
+        if(roleDetails.role == Role.EMSP) {
+            (address verifier, ICertificateVerifier.EMPCertificate memory certificate,) = certificateVerifier.verifyEMP(
+                roleDetails.certificateData,
+                roleDetails.signature
+            );
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid EMP certificate"); }
+            return certificate.bilanzkreis;
+        } else if (roleDetails.role == Role.CPO) {
+            (address verifier, ICertificateVerifier.CPOCertificate memory certificate,) = certificateVerifier.verifyCPO(
+                roleDetails.certificateData,
+                roleDetails.signature
+            );
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid CPO certificate"); }
+            return certificate.identifier;
+        } else {
+            (address verifier, ICertificateVerifier.OtherCertificate memory certificate,) = certificateVerifier.verifyOther(
+                roleDetails.certificateData,
+                roleDetails.signature
+            );
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid Other certificate"); }
+            return certificate.identifier;
+        }
     }
 
     function compareIdentifiers(

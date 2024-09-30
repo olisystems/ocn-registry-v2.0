@@ -90,7 +90,6 @@ export enum ProposalState {
 export enum Role {
   CPO,
   EMSP,
-  HUB,
   NAP,
   NSP,
   OTHER,
