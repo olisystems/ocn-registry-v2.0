@@ -23,7 +23,6 @@ contract OcnRegistry is AccessControl {
 
     // OCPI Party Listings
     enum Role { CPO, EMSP, NAP, NSP, OTHER, SCSP }
-    enum Module { cdrs,chargingprofiles, commands, locations, sessions, tariffs, tokens }
 
     struct RoleDetails {
         bytes certificateData;
