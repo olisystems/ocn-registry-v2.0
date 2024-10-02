@@ -17,6 +17,7 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   const credentialsVerifier = await ethers.getContract("CertificateVerifier", deployer);
   const emspOracle = await ethers.getContract("EMSPOracle", deployer);
   const cpoOracle = await ethers.getContract("CPOOracle", deployer);
+
   await deploy(contractName, {
     from: deployer,
     args: [ocnPaymentManager.target, credentialsVerifier.target],

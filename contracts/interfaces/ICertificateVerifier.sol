@@ -9,6 +9,7 @@ interface ICertificateVerifier {
     }
 
     struct EMPCertificate {
+        string identifier;
         string name;
         string marktfunktion;
         string lieferant;

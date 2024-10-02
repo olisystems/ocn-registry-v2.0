@@ -27,6 +27,7 @@ export interface JsonCertificate {
 }
 
 export interface EmpCertificate {
+  identifier: string;
   name: string;
   marktfunktion: string;
   lieferant: string;

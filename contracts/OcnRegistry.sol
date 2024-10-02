@@ -67,7 +67,7 @@ contract OcnRegistry is AccessControl {
     error PartyAlreadyRegistered(string reason);
     error PartyNotRegistered(string reason);
     error SignerMismatch(string reason);
-    error InvalidCertificate(string reason);
+    error InvalidCertificate(address verifier, string reason);
     error ProviderNotFound(Role role, string reason);
 
     /* ********************************** */
@@ -376,21 +376,21 @@ contract OcnRegistry is AccessControl {
                 roleDetails.certificateData,
                 roleDetails.signature
             );
-            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid EMP certificate"); }
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid EMP certificate"); }
             return certificate.bilanzkreis;
         } else if (roleDetails.role == Role.CPO) {
             (address verifier, ICertificateVerifier.CPOCertificate memory certificate,) = certificateVerifier.verifyCPO(
                 roleDetails.certificateData,
                 roleDetails.signature
             );
-            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid CPO certificate"); }
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid CPO certificate"); }
             return certificate.identifier;
         } else {
             (address verifier, ICertificateVerifier.OtherCertificate memory certificate,) = certificateVerifier.verifyOther(
                 roleDetails.certificateData,
                 roleDetails.signature
             );
-            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate("Invalid Other certificate"); }
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid Other certificate"); }
             return certificate.identifier;
         }
     }

@@ -1,14 +1,15 @@
 {
-  "role": "CPO",
-  "certificate": {
-    "identifier": "DE OLI",
-    "name": "OLI Systems GmbH",
-    "owner": "0xbef84c17eF8E9e1e6c6ae3379cF96F2CD4720C25",
-    "signature": "viRKohbC5bVp3oP0Dd7Us1fF9UOgawiQAU5bvmKwGZgt82/pEx51Yyi1VKHQeuBc7gAxN8hNc9m+KGjrD5P1+hw="
-  },
-  "signature": {
-    "r": "0xaa2aafdb051f15c48241870bdc14f93995dc754fed6314103c3ba2ea25de2406",
-    "s": "0x3aef3c962dceec9c3ff64fa969d985cbb5e4915e928a28ded1462c5d84501b1c",
-    "v": 27
-  }
+    "certificate": {
+        "identifier": "DE OLI",
+        "name": "OLI Systems GmbH",
+        "owner": "0xbef84c17eF8E9e1e6c6ae3379cF96F2CD4720C25",
+        "signature": "viRKohbC5bVp3oP0Dd7Us1fF9UOgawiQAU5bvmKwGZgt82/pEx51Yyi1VKHQeuBc7gAxN8hNc9m+KGjrD5P1+hw="
+    },
+    "role": "CPO",
+    "signature": {
+        "message_hash": "0x3779fe3b04686d1b9e53f4c843f2b5dfa6606b8fddc9d5da36930a0e1eaccda9",
+        "r": "0x84807085267cde48bf2e7606cd27e4d18d0b50e21eef1e49400626e692961cbf",
+        "s": "0x3c5942e30917e923402d6d390f2091aaee0ccd63d18175639313bf4554959bc5",
+        "v": 27
+    }
 }

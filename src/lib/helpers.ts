@@ -20,8 +20,9 @@ export const bigIntToString = (key: string, value: any): string => {
 
 export function encodeEmpCertificate(certificate: EmpCertificate) {
   return ethers.AbiCoder.defaultAbiCoder().encode(
-    ['tuple(string,string,string,string,address)'],
+    ['tuple(string,string,string,string,string,address)'],
     [[
+      certificate.identifier,
       certificate.name,
       certificate.marktfunktion,
       certificate.lieferant,

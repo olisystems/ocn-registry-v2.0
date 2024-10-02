@@ -337,10 +337,13 @@ yarn cli get-party --credentials CH CPO
 To list a party, the following information is required:
 
 - `country_code` and `party_id`
-- role
+- role details (role with certificate metadata)
 - OCN Node operator wallet address
 - name
 - url of the sercice
+
+#### Role Details
+In order to register into the ocn-registry the party needs a valid certificate signed by a allowed verifier, this certificate can be generated following the instructions on: https://github.com/olisystems/banula-provider-credentials
 
 The following commands can be used to both create and update the party information.
 

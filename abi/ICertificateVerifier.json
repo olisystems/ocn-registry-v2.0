@@ -91,6 +91,11 @@
         "components": [
           {
             "internalType": "string",
+            "name": "identifier",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
             "name": "name",
             "type": "string"
           },

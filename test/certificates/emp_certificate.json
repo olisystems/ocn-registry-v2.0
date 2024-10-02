@@ -1,21 +1,18 @@
 {
     "certificate": {
         "bilanzkreis": "bilanzkreis",
+        "identifier": "DE OLI",
         "lieferant": "lieferant",
         "marktfunktion": "marktfunktion",
         "name": "Name",
-        "owner": "0xbef84c17eF8E9e1e6c6ae3379cF96F2CD4720C25",
-        "signature": "a3QuYATAxxBSHvJL9dW/9dQ7vZ5JMY/MzPOQ6cKwmlYNsfn9PI+zu9uHrhvMZoma+NXJaeb5X3Yr2HJovuDoaBs="
+        "owner": "0x3cdC973A207a6D8E859c9864d2510049b99861C2",
+        "signature": "nJlxLsVKDnYjLhfaeDTX1Es2HJoV1T3Yx2zpg0DLVf4VYOR8oO87++vlp2n/3aPo/BGLoMp0Ey8wLHCVWbJ0yxs="
     },
+    "role": "EMSP",
     "signature": {
-        "inner": {
-            "r": "0x5792b10e308613a94cc0772b3d7bb3f474275ff5edcb69bcf35a0649e4bf775e",
-            "s": "0x5456e72cc64e8a0e688d6abcdd4c3cd99510ce0311237dd92132356615f962bc",
-            "yParity": "0x1"
-        },
-        "message_hash": "0xb222a853e0d7a52c6f85f8acadc3bc9d6da0e370222ee7c32a350bda8e650de5",
-        "r": "0x5792b10e308613a94cc0772b3d7bb3f474275ff5edcb69bcf35a0649e4bf775e",
-        "s": "0x5456e72cc64e8a0e688d6abcdd4c3cd99510ce0311237dd92132356615f962bc",
+        "message_hash": "0x35954b1d7da63b26771378531ca5d6d7092d971d3b87df7080a7f8af978be657",
+        "r": "0x41533d4a4e3b0bc17e783067df4d4f4b77eb315a67128b34d3b0de9afb2e5be3",
+        "s": "0x142073f05a075f5136e878232f91b5dd3670c92198b24cb08b125ce2bbdbb688",
         "v": 28
     }
 }
