@@ -87,6 +87,12 @@ yarn install
 
 - Deploy and setup Smart Contracts: `sh run-deploy.sh <NETWORK>`, example: `sh run-deploy.sh localhost`
 
+### Verify Contracts (Polygon testnet only)
+
+- Verify the OcnVoteToken SmartContract example in polygon scan:
+  `SC=OcnVoteToken yarn hardhat deploy --network amoy --tags verify`  
+  Result: https://amoy.polygonscan.com/address/0xe69907c318B0Ca7F04d0849BCC2558d65BB2a61A#code
+
 ### Governance
 
 #### [Localhost Only] Propose, vote, queue and execute a proposal at once
@@ -430,3 +436,19 @@ TODO TO be implemented
 
 - Generate Java classes for the Smart Contracts using web3j
 - Publish package in the npmjs to replace @shareandcharge/ocn-registry
+
+## How To Generate Java classes from Smart Contracts to be used by OCN Node
+
+### Compile smart contracts
+
+- install solc select: `brew install solc-select`
+- install right solidity compiler version: `solc-select install 0.8.24`
+- generate bin and abi files: `solc --abi --bin -o wrapped-java-classes/build --base-path . --include-path ./node_modules  contracts/OcnRegistry.sol`
+
+### Generata Java files
+
+- install sdkman: `curl -s "https://get.sdkman.io" | bash`
+- `source "$HOME/.sdkman/bin/sdkman-init.sh"`
+- set java version using sdkman: `sdk use java 17.0.10-amzn`
+- generate files:`sh web3j-1.6.1/bin/web3j generate solidity -a build/OcnRegistry.abi -b build/OcnRegistry.bin -o src/main/java -p com.oli-systems.ocn-registry-v2.0`
+- verify a file OcnRegistry.java was created in wrapped-java-classes/src/main/java/com/oli-systems/ocn-registry-v2/0

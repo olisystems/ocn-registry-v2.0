@@ -77,7 +77,7 @@ export class Registry extends ContractWrapper {
       throw new Error("Signer address is needed to verify for existing node registration");
     }
     await this.checkForExistingNode(this.wallet);
-    const tx = await this.contract.setNode(url.href);
+    const tx = await this.contract.setNode(url.origin);
     await tx.wait();
     return tx;
   }

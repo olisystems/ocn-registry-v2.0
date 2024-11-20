@@ -40,6 +40,6 @@ export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 // export const NEW_YEARLY_AMOUNT = Math.floor(Math.random() * Math.pow(2, 16));
 export const DEFAULT_YEARLY_AMOUNT = 100;
-export const NEW_YEARLY_AMOUNT = 104;
+export const NEW_YEARLY_AMOUNT = 150;
 export const FUNC = "setFundingYearlyAmount";
 export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_YEARLY_AMOUNT + " in the Box!";
