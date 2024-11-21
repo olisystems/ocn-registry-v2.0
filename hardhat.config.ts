@@ -82,7 +82,7 @@ const config = {
       loggingEnabled: true,
     },
     minikube: {
-      url: `hardhat:8555`,
+      url: `http://hardhat.default.svc.cluster.local:8555`,
       chainId: 31337,
       live: false,
       saveDeployments: true,
