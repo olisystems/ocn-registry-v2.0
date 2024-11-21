@@ -26,6 +26,15 @@ export const networks: Record<string, Network> = {
       gas: 8000000,
     },
   },
+  minikube: {
+    provider: {
+      protocol: "http",
+      host: "hardhat.default.svc.cluster.local",
+      port: 8555,
+      network_id: "1337",
+      gas: 8000000,
+    },
+  },
   localhost: {
     provider: {
       protocol: "http",
