@@ -1,0 +1,13 @@
+.env
+node_modules
+.git
+
+# Hardhat files
+/cache
+/artifacts
+/deployments
+
+
+# solidity-coverage files
+/coverage
+/coverage.json

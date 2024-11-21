@@ -69,6 +69,24 @@ yarn install
 
 ## Development
 
+### Environment variables
+
+create evm compatible wallets and insert them in a .env file like this or attribute straight in memory (`export DEPLOYER_PRIVATE_KEY="PRIVATE_KEY"`) , optionally you can insert polygonscan and etherscan api for smart contract verification (last three variables):
+
+```
+DEPLOYER_PRIVATE_KEY=
+DEPLOYER_ADDRESS=
+NODE_PRIVATE_KEY=
+NODE_WALLET_ADDRESS=
+CPO_PRIVATE_KEY=
+CPO_WALLET_ADDRESS=
+EMSP_PRIVATE_KEY=
+EMSP_WALLET_ADDRESS=
+MUMBAI_ALCHEMY_URL=
+POLYGON_ALCHEMY_URL=
+ETHERSCAN_API_KEY=
+```
+
 ### How to initiate hadhat local network
 
 - `yarn localhost`
@@ -97,7 +115,7 @@ yarn install
 
 #### [Localhost Only] Propose, vote, queue and execute a proposal at once
 
-- `sh run-governance.sh localhost`
+- `sh run-governance-example.sh localhost`
 
 #### How to make a proposal
 
@@ -424,20 +442,9 @@ yarn cli delete-party-raw
 
 ---
 
-### [TypeScript Library](#typescript-library)
+## [Java Library](#java-library)
 
-TODO: To be implemented
-
-### [Java Library](#java-library)
-
-TODO TO be implemented
-
-## TODOs
-
-- Generate Java classes for the Smart Contracts using web3j
-- Publish package in the npmjs to replace @shareandcharge/ocn-registry
-
-## How To Generate Java classes from Smart Contracts to be used by OCN Node
+How To Generate Java classes from Smart Contracts to be used by OCN Node
 
 ### Compile smart contracts
 
