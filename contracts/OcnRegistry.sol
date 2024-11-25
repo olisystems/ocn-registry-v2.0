@@ -3,12 +3,12 @@ pragma solidity 0.8.24;
 
 import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
 import {IOcnCvManager} from "./IOcnCvManager.sol";
+import "./interfaces/ICertificateVerifier.sol";
+import "./interfaces/IProviderOracle.sol";
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
-
 contract OcnRegistry is AccessControl {
-
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
@@ -22,8 +22,13 @@ contract OcnRegistry is AccessControl {
     address[] private operators;
 
     // OCPI Party Listings
-    enum Role { CPO, EMSP, HUB, NAP, NSP, OTHER, SCSP }
-    enum Module { cdrs, chargingprofiles, commands, locations, sessions, tariffs, tokens }
+    enum Role { CPO, EMSP, NAP, NSP, OTHER, SCSP }
+
+    struct RoleDetails {
+        bytes certificateData;
+        bytes signature;
+        Role role;
+    }
 
     struct PartyDetails {
         bytes2 countryCode;
@@ -41,11 +46,15 @@ contract OcnRegistry is AccessControl {
     mapping(address => bool) private uniquePartyAddresses;
     mapping(address => PartyDetails) private partyOf;
     mapping(address => address) private operatorOf;
+    mapping(address => bool) private allowedCertificateVerifiers;
     address[] private parties;
 
     IOcnPaymentManager public paymentManager;
+    ICertificateVerifier public certificateVerifier;
 
-   
+    // Providers Oracle
+    mapping(Role => IProviderOracle) private roleOracle;
+
     /* ********************************** */
     /*          CUSTOM ERRORS             */
     /* ********************************** */
@@ -58,6 +67,8 @@ contract OcnRegistry is AccessControl {
     error PartyAlreadyRegistered(string reason);
     error PartyNotRegistered(string reason);
     error SignerMismatch(string reason);
+    error InvalidCertificate(address verifier, string reason);
+    error ProviderNotFound(Role role, string reason);
 
     /* ********************************** */
     /*               EVENTS               */
@@ -65,37 +76,18 @@ contract OcnRegistry is AccessControl {
 
     event OwnershipTransferred(address indexed oldAdmin, address indexed newAdmin);
     event OperatorUpdate(address indexed operator, string domain);
-    event PartyUpdate(
-        bytes2 countryCode,
-        bytes3 partyId,
-        address indexed partyAddress,
-        Role[] roles,
-        string name,
-        string url,
-        IOcnPaymentManager.PaymentStatus paymentStatus,
-        IOcnCvManager.CvStatus cvStatus,
-        bool active,
-        address indexed operatorAddress
-    );
+    event PartyUpdate(bytes2 countryCode, bytes3 partyId, address indexed partyAddress, Role[] roles, string name, string url, IOcnPaymentManager.PaymentStatus paymentStatus, IOcnCvManager.CvStatus cvStatus, bool active, address indexed operatorAddress);
 
-    event PartyDelete(
-        bytes2 countryCode,
-        bytes3 partyId,
-        address indexed partyAddress,
-        Role[] roles,
-        string name,
-        string url,
-        IOcnPaymentManager.PaymentStatus paymentStatus,
-        IOcnCvManager.CvStatus cvStatus,
-        bool active
-    );
+    event PartyDelete(bytes2 countryCode, bytes3 partyId, address indexed partyAddress, Role[] roles, string name, string url, IOcnPaymentManager.PaymentStatus paymentStatus, IOcnCvManager.CvStatus cvStatus, bool active);
+
     /* ********************************** */
     /*          INITIALIZER               */
     /* ********************************** */
 
-    constructor(address _paymentManager) {
+    constructor(address _paymentManager, address _certificateVerifier) {
         prefix = "\u0019Ethereum Signed Message:\n32";
         paymentManager = IOcnPaymentManager(_paymentManager);
+        certificateVerifier = ICertificateVerifier(_certificateVerifier);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -171,15 +163,7 @@ contract OcnRegistry is AccessControl {
         return operators;
     }
 
-    function setParty(
-        address party,
-        bytes2 countryCode,
-        bytes3 partyId,
-        Role[] memory roles,
-        address operator,
-        string memory name,
-        string memory url
-    ) private {
+    function setParty(address party, bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url) private {
         if (countryCode == bytes2(0)) {
             revert EmptyCountryCode("Cannot set empty country_code. Use deleteParty method instead.");
         }
@@ -202,48 +186,53 @@ contract OcnRegistry is AccessControl {
             revert PartyNotRegistered("Provided operator not registered.");
         }
 
+        Role[] memory verifiedRoles = new Role[](roles.length);
+
+        // VC verification (All roles must be verified)
+        for (uint8 i = 0; i < roles.length; i++) {
+            RoleDetails memory roleDetails = roles[i];
+            string memory certificateIdentifier = verifyCertificate(roleDetails);
+
+            IProviderOracle oracle = roleOracle[roleDetails.role];
+            if(address(oracle) != address(0)) {
+                IProviderOracle.Provider memory provider = oracle.getProvider(certificateIdentifier);
+                if(!compareIdentifiers(certificateIdentifier, provider.identifier)) {
+                    revert ProviderNotFound(roleDetails.role, "Not active in oracle");
+                }
+            }
+
+            verifiedRoles[i] = roleDetails.role;
+        }
+
         uint256 partyIndex = partyOf[party].partyIndex;
         if (!uniquePartyAddresses[party]) {
             parties.push(party);
             // get last index of the array
             partyIndex = parties.length - 1;
-        } 
+        }
 
         uniquePartyAddresses[party] = true;
 
-        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);  
-        // TODO implmenet CV verification
-        partyOf[party] = PartyDetails(countryCode, partyId, roles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true, partyIndex);
+        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
+        partyOf[party] = PartyDetails(countryCode, partyId, verifiedRoles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true, partyIndex);
         operatorOf[party] = operator;
 
         PartyDetails memory details = partyOf[party];
         emit PartyUpdate(details.countryCode, details.partyId, party, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active, operator);
     }
 
-    function setParty(
-        bytes2 countryCode,
-        bytes3 partyId,
-        Role[] memory roles,
-        address operator,
-        string memory name,
-        string memory url
-    ) public {
+    function setParty(bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url) public {
         setParty(msg.sender, countryCode, partyId, roles, operator, name, url);
     }
 
-    function setPartyRaw(
-        address party,
-        bytes2 countryCode,
-        bytes3 partyId,
-        Role[] memory roles,
-        address operator,
-        string memory name,
-        string memory url,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public {
-        bytes32 paramHash = keccak256(abi.encodePacked(party, countryCode, partyId, roles, operator, name, url));
+    function setPartyRaw(address party, bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url, uint8 v, bytes32 r, bytes32 s) public {
+        bytes memory rolesBytes = "";
+        for(uint8 i = 0; i < roles.length; i++) {
+            RoleDetails memory roleDetails = roles[i];
+            rolesBytes = abi.encodePacked(rolesBytes, roleDetails.certificateData, roleDetails.signature, roleDetails.role);
+        }
+        bytes32 rolesHash = keccak256(rolesBytes);
+        bytes32 paramHash = keccak256(abi.encodePacked(party, countryCode, partyId, rolesHash, operator, name, url));
         address signer = ecrecover(keccak256(abi.encodePacked(prefix, paramHash)), v, r, s);
         if (signer != party) {
             revert SignerMismatch("Signer and provided party address different.");
@@ -263,7 +252,6 @@ contract OcnRegistry is AccessControl {
         uniquePartyAddresses[party] = false;
 
         emit PartyDelete(details.countryCode, details.partyId, party, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active);
-
     }
 
     function deleteParty() public {
@@ -290,17 +278,7 @@ contract OcnRegistry is AccessControl {
         domain = nodeOf[operator];
     }
 
-    function getPartyDetailsByAddress(address _partyAddress) public view returns (
-        address partyAddress,
-        bytes2 countryCode,
-        bytes3 partyId,
-        Role[] memory roles,
-        IOcnPaymentManager.PaymentStatus paymentStatus,
-        address operatorAddress,
-        string memory name,
-        string memory url,
-        bool active
-    ) {
+    function getPartyDetailsByAddress(address _partyAddress) public view returns (address partyAddress, bytes2 countryCode, bytes3 partyId, Role[] memory roles, IOcnPaymentManager.PaymentStatus paymentStatus, address operatorAddress, string memory name, string memory url, bool active) {
         PartyDetails storage details = partyOf[_partyAddress];
         partyAddress = _partyAddress;
         countryCode = details.countryCode;
@@ -313,18 +291,7 @@ contract OcnRegistry is AccessControl {
         active = details.active;
     }
 
-    function getPartyDetailsByOcpi(bytes2 _countryCode, bytes3 _partyId) public view returns (
-        
-        address partyAddress,
-        bytes2 countryCode,
-        bytes3 partyId,
-        Role[] memory roles,
-        IOcnPaymentManager.PaymentStatus paymentStatus,
-        address operatorAddress,
-        string memory name,
-        string memory url,
-        bool active
-    ) {
+    function getPartyDetailsByOcpi(bytes2 _countryCode, bytes3 _partyId) public view returns (address partyAddress, bytes2 countryCode, bytes3 partyId, Role[] memory roles, IOcnPaymentManager.PaymentStatus paymentStatus, address operatorAddress, string memory name, string memory url, bool active) {
         partyAddress = uniqueParties[_countryCode][_partyId];
         PartyDetails storage details = partyOf[partyAddress];
         countryCode = details.countryCode;
@@ -381,5 +348,57 @@ contract OcnRegistry is AccessControl {
         return result;
     }
 
-    
+    function setVerifier(address verifier) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(verifier != address(0), "Invalid verifier address");
+        require(!allowedCertificateVerifiers[verifier], "Verifier already allowed");
+
+        allowedCertificateVerifiers[verifier] = true;
+    }
+
+    function removeVerifier(address verifier) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(verifier != address(0), "Invalid verifier address");
+        require(allowedCertificateVerifiers[verifier], "Verifier not currently allowed");
+
+        allowedCertificateVerifiers[verifier] = false;
+    }
+
+    function isAllowedVerifier(address verifier) public view returns (bool) {
+        return allowedCertificateVerifiers[verifier];
+    }
+
+    function setProviderOracle(Role role, address oracleAddress) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        roleOracle[role] = IProviderOracle(oracleAddress);
+    }
+
+    function verifyCertificate(RoleDetails memory roleDetails) private view returns (string memory) {
+        if(roleDetails.role == Role.EMSP) {
+            (address verifier, ICertificateVerifier.EMPCertificate memory certificate,) = certificateVerifier.verifyEMP(
+                roleDetails.certificateData,
+                roleDetails.signature
+            );
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid EMP certificate"); }
+            return certificate.bilanzkreis;
+        } else if (roleDetails.role == Role.CPO) {
+            (address verifier, ICertificateVerifier.CPOCertificate memory certificate,) = certificateVerifier.verifyCPO(
+                roleDetails.certificateData,
+                roleDetails.signature
+            );
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid CPO certificate"); }
+            return certificate.identifier;
+        } else {
+            (address verifier, ICertificateVerifier.OtherCertificate memory certificate,) = certificateVerifier.verifyOther(
+                roleDetails.certificateData,
+                roleDetails.signature
+            );
+            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid Other certificate"); }
+            return certificate.identifier;
+        }
+    }
+
+    function compareIdentifiers(
+        string memory a,
+        string memory b
+    ) private pure returns (bool) {
+        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+    }
 }

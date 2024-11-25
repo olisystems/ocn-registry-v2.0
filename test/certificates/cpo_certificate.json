@@ -1,0 +1,15 @@
+{
+    "certificate": {
+        "identifier": "DE OLI",
+        "name": "OLI Systems GmbH",
+        "owner": "0xbef84c17eF8E9e1e6c6ae3379cF96F2CD4720C25",
+        "signature": "viRKohbC5bVp3oP0Dd7Us1fF9UOgawiQAU5bvmKwGZgt82/pEx51Yyi1VKHQeuBc7gAxN8hNc9m+KGjrD5P1+hw="
+    },
+    "role": "CPO",
+    "signature": {
+        "message_hash": "0xebf602a8c7e609adf26348b97d47e460819a67ebaf48add4792103432f51146f",
+        "r": "0x2735d27372a17c45a8c3c8220357b76476cc6c2b9656071690dc978de393d153",
+        "s": "0x0249a88961ad1822b1edc43193e9e20f85b3b0d41d6dd0638dd41b833310d3cc",
+        "v": 27
+    }
+}

@@ -56,6 +56,7 @@ export const getPayBuilder = (context: yargs.Argv) => {
 
 export const setPartyBuilder = (context: yargs.Argv) => {
   context
+    .example("set-party -c XY XYZ -cert /path/to/emsp-certificate.json -o 0x9bC11...bfeB4 -n OCPIService -u https://ocpi-service.xyz", "Sets a party (XY XYZ) with role emsp given by the certificate")
     .option("credentials", {
       alias: "c",
       array: true,
@@ -63,12 +64,11 @@ export const setPartyBuilder = (context: yargs.Argv) => {
       required: true,
       describe: "OCPI country_code (ISO-3166 alpha-2) and party_id (ISO-15118)",
     })
-    .option("roles", {
-      alias: "r",
+    .option("certificates", {
+      alias: "cert",
       array: true,
-      choices: ["CPO", "EMSP", "HUB", "NAP", "NSP", "OTHER", "SCSP"],
       required: true,
-      describe: "OCPI roles implemented by party.",
+      describe: "Certificates of OCPI roles implemented by party.",
     })
     .options("operator", {
       alias: "o",

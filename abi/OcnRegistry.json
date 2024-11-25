@@ -5,6 +5,11 @@
         "internalType": "address",
         "name": "_paymentManager",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_certificateVerifier",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -89,6 +94,22 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "verifier",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "InvalidCertificate",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "string",
         "name": "reason",
         "type": "string"
@@ -117,6 +138,22 @@
       }
     ],
     "name": "PartyNotRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum OcnRegistry.Role",
+        "name": "role",
+        "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "ProviderNotFound",
     "type": "error"
   },
   {
@@ -413,6 +450,19 @@
     "name": "adminDeleteParty",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "certificateVerifier",
+    "outputs": [
+      {
+        "internalType": "contract ICertificateVerifier",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -819,6 +869,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "verifier",
+        "type": "address"
+      }
+    ],
+    "name": "isAllowedVerifier",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "paymentManager",
     "outputs": [
@@ -829,6 +898,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "verifier",
+        "type": "address"
+      }
+    ],
+    "name": "removeVerifier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -926,9 +1008,26 @@
         "type": "bytes3"
       },
       {
-        "internalType": "enum OcnRegistry.Role[]",
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "certificateData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          },
+          {
+            "internalType": "enum OcnRegistry.Role",
+            "name": "role",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct OcnRegistry.RoleDetails[]",
         "name": "roles",
-        "type": "uint8[]"
+        "type": "tuple[]"
       },
       {
         "internalType": "address",
@@ -969,9 +1068,26 @@
         "type": "bytes3"
       },
       {
-        "internalType": "enum OcnRegistry.Role[]",
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "certificateData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          },
+          {
+            "internalType": "enum OcnRegistry.Role",
+            "name": "role",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct OcnRegistry.RoleDetails[]",
         "name": "roles",
-        "type": "uint8[]"
+        "type": "tuple[]"
       },
       {
         "internalType": "address",
@@ -1005,6 +1121,37 @@
       }
     ],
     "name": "setPartyRaw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum OcnRegistry.Role",
+        "name": "role",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "oracleAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setProviderOracle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "verifier",
+        "type": "address"
+      }
+    ],
+    "name": "setVerifier",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

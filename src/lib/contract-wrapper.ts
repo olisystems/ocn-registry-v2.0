@@ -82,6 +82,6 @@ export class ContractWrapper {
   }
 
   protected toHex(str: string): string {
-    return toHex(str.toUpperCase());
+    return ethers.hexlify(ethers.toUtf8Bytes(str.toUpperCase()));
   }
 }
