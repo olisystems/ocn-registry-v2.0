@@ -22,7 +22,14 @@ contract OcnRegistry is AccessControl {
     address[] private operators;
 
     // OCPI Party Listings
-    enum Role { CPO, EMSP, NAP, NSP, OTHER, SCSP }
+    enum Role {
+        CPO,
+        EMSP,
+        NAP,
+        NSP,
+        OTHER,
+        SCSP
+    }
 
     struct RoleDetails {
         bytes certificateData;
@@ -69,6 +76,7 @@ contract OcnRegistry is AccessControl {
     error SignerMismatch(string reason);
     error InvalidCertificate(address verifier, string reason);
     error ProviderNotFound(Role role, string reason);
+    error CerificateOwnerMismatch(string reason);
 
     /* ********************************** */
     /*               EVENTS               */
@@ -163,7 +171,7 @@ contract OcnRegistry is AccessControl {
         return operators;
     }
 
-    function setParty(address party, bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url) private {
+    function setParty(bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url) public {
         if (countryCode == bytes2(0)) {
             revert EmptyCountryCode("Cannot set empty country_code. Use deleteParty method instead.");
         }
@@ -177,26 +185,26 @@ contract OcnRegistry is AccessControl {
             revert EmptyOperator("Cannot set empty operator. Use deleteParty method instead.");
         }
 
-        address registeredParty = uniqueParties[countryCode][partyId];
-        if (registeredParty != address(0) && registeredParty != party) {
-            revert PartyAlreadyRegistered("Party with country_code/party_id already registered under different address.");
-        }
-        uniqueParties[countryCode][partyId] = party;
-        if (bytes(nodeOf[operator]).length == 0) {
-            revert PartyNotRegistered("Provided operator not registered.");
-        }
-
         Role[] memory verifiedRoles = new Role[](roles.length);
+        address credentialOwner = address(0);
 
         // VC verification (All roles must be verified)
         for (uint8 i = 0; i < roles.length; i++) {
             RoleDetails memory roleDetails = roles[i];
-            string memory certificateIdentifier = verifyCertificate(roleDetails);
+            (string memory certificateIdentifier, address owner) = verifyCertificate(roleDetails);
+
+            if (credentialOwner == address(0)) {
+                credentialOwner = owner;
+            }
+
+            if (credentialOwner != address(0) && credentialOwner != owner) {
+                revert CerificateOwnerMismatch("Certificates have different owners");
+            }
 
             IProviderOracle oracle = roleOracle[roleDetails.role];
-            if(address(oracle) != address(0)) {
+            if (address(oracle) != address(0)) {
                 IProviderOracle.Provider memory provider = oracle.getProvider(certificateIdentifier);
-                if(!compareIdentifiers(certificateIdentifier, provider.identifier)) {
+                if (!compareIdentifiers(certificateIdentifier, provider.identifier)) {
                     revert ProviderNotFound(roleDetails.role, "Not active in oracle");
                 }
             }
@@ -204,30 +212,35 @@ contract OcnRegistry is AccessControl {
             verifiedRoles[i] = roleDetails.role;
         }
 
-        uint256 partyIndex = partyOf[party].partyIndex;
-        if (!uniquePartyAddresses[party]) {
-            parties.push(party);
+        address registeredParty = uniqueParties[countryCode][partyId];
+        if (registeredParty != address(0) && registeredParty != credentialOwner) {
+            revert PartyAlreadyRegistered("Party with country_code/party_id already registered under different address.");
+        }
+        uniqueParties[countryCode][partyId] = credentialOwner;
+        if (bytes(nodeOf[operator]).length == 0) {
+            revert PartyNotRegistered("Provided operator not registered.");
+        }
+
+        uint256 partyIndex = partyOf[credentialOwner].partyIndex;
+        if (!uniquePartyAddresses[credentialOwner]) {
+            parties.push(credentialOwner);
             // get last index of the array
             partyIndex = parties.length - 1;
         }
 
-        uniquePartyAddresses[party] = true;
+        uniquePartyAddresses[credentialOwner] = true;
 
-        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(party);
-        partyOf[party] = PartyDetails(countryCode, partyId, verifiedRoles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true, partyIndex);
-        operatorOf[party] = operator;
+        IOcnPaymentManager.PaymentStatus paymentStatus = paymentManager.getPaymentStatus(credentialOwner);
+        partyOf[credentialOwner] = PartyDetails(countryCode, partyId, verifiedRoles, name, url, paymentStatus, IOcnCvManager.CvStatus.NOT_VERIFIED, true, partyIndex);
+        operatorOf[credentialOwner] = operator;
 
-        PartyDetails memory details = partyOf[party];
-        emit PartyUpdate(details.countryCode, details.partyId, party, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active, operator);
-    }
-
-    function setParty(bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url) public {
-        setParty(msg.sender, countryCode, partyId, roles, operator, name, url);
+        PartyDetails memory details = partyOf[credentialOwner];
+        emit PartyUpdate(details.countryCode, details.partyId, credentialOwner, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active, operator);
     }
 
     function setPartyRaw(address party, bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url, uint8 v, bytes32 r, bytes32 s) public {
         bytes memory rolesBytes = "";
-        for(uint8 i = 0; i < roles.length; i++) {
+        for (uint8 i = 0; i < roles.length; i++) {
             RoleDetails memory roleDetails = roles[i];
             rolesBytes = abi.encodePacked(rolesBytes, roleDetails.certificateData, roleDetails.signature, roleDetails.role);
         }
@@ -237,7 +250,7 @@ contract OcnRegistry is AccessControl {
         if (signer != party) {
             revert SignerMismatch("Signer and provided party address different.");
         }
-        setParty(signer, countryCode, partyId, roles, operator, name, url);
+        setParty(countryCode, partyId, roles, operator, name, url);
     }
 
     function deleteParty(address party) private {
@@ -370,35 +383,29 @@ contract OcnRegistry is AccessControl {
         roleOracle[role] = IProviderOracle(oracleAddress);
     }
 
-    function verifyCertificate(RoleDetails memory roleDetails) private view returns (string memory) {
-        if(roleDetails.role == Role.EMSP) {
-            (address verifier, ICertificateVerifier.EMPCertificate memory certificate,) = certificateVerifier.verifyEMP(
-                roleDetails.certificateData,
-                roleDetails.signature
-            );
-            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid EMP certificate"); }
-            return certificate.bilanzkreis;
+    function verifyCertificate(RoleDetails memory roleDetails) private view returns (string memory, address) {
+        if (roleDetails.role == Role.EMSP) {
+            (address verifier, ICertificateVerifier.EMPCertificate memory certificate, ) = certificateVerifier.verifyEMP(roleDetails.certificateData, roleDetails.signature);
+            if (!isAllowedVerifier(verifier)) {
+                revert InvalidCertificate(verifier, "Invalid EMP certificate");
+            }
+            return (certificate.bilanzkreis, certificate.owner);
         } else if (roleDetails.role == Role.CPO) {
-            (address verifier, ICertificateVerifier.CPOCertificate memory certificate,) = certificateVerifier.verifyCPO(
-                roleDetails.certificateData,
-                roleDetails.signature
-            );
-            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid CPO certificate"); }
-            return certificate.identifier;
+            (address verifier, ICertificateVerifier.CPOCertificate memory certificate, ) = certificateVerifier.verifyCPO(roleDetails.certificateData, roleDetails.signature);
+            if (!isAllowedVerifier(verifier)) {
+                revert InvalidCertificate(verifier, "Invalid CPO certificate");
+            }
+            return (certificate.identifier, certificate.owner);
         } else {
-            (address verifier, ICertificateVerifier.OtherCertificate memory certificate,) = certificateVerifier.verifyOther(
-                roleDetails.certificateData,
-                roleDetails.signature
-            );
-            if(!isAllowedVerifier(verifier)) { revert InvalidCertificate(verifier, "Invalid Other certificate"); }
-            return certificate.identifier;
+            (address verifier, ICertificateVerifier.OtherCertificate memory certificate, ) = certificateVerifier.verifyOther(roleDetails.certificateData, roleDetails.signature);
+            if (!isAllowedVerifier(verifier)) {
+                revert InvalidCertificate(verifier, "Invalid Other certificate");
+            }
+            return (certificate.identifier, certificate.owner);
         }
     }
 
-    function compareIdentifiers(
-        string memory a,
-        string memory b
-    ) private pure returns (bool) {
+    function compareIdentifiers(string memory a, string memory b) private pure returns (bool) {
         return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 }
