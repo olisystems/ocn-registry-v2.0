@@ -45,9 +45,6 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
-
-        console.log("admin");
-        console.log(msg.sender);
     }
 
     /**
@@ -85,7 +82,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
         }
 
         stakedFunds[party] += fundingYearlyAmount;
-        stakingBlock[party] = block.timestamp;
+        stakingBlock[party] = block.number;
 
         emit PartyStaked(msg.sender, party, fundingYearlyAmount);
     }
@@ -94,7 +91,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
      * @notice Implements the withdrawal function
      * @param party The address whose stake should be withdrawn
      */
-    function withdrawToOcnWallet(address party) external {
+    function withdrawToRegistryOperator(address party) external {
         if (operatorAddress == address(0)) {
             revert("Withdrawal account not set");
         }

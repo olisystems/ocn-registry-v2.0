@@ -196,7 +196,7 @@
         "type": "address"
       }
     ],
-    "name": "withdrawToOcnWallet",
+    "name": "withdrawToRegistryOperator",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

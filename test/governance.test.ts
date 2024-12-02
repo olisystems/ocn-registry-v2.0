@@ -4,7 +4,7 @@ import { OcnPaymentManager, OcnGovernor } from "../typechain";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ProposalState } from "../src/lib/types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { FUNC, MIN_DELAY, NEW_YEARLY_AMOUNT, VOTING_DELAY, VOTING_PERIOD } from "../helper-hardhat-config";
+import { FUNC_SET_FUNDING_YEARLY_AMOUNT, MIN_DELAY, NEW_YEARLY_AMOUNT, VOTING_DELAY, VOTING_PERIOD } from "../helper-hardhat-config";
 import { moveBlocks } from "../helper/moveBlocks";
 import { moveTime } from "../helper/moveTime";
 
@@ -32,7 +32,7 @@ describe("OcnPaymentManager contract", function () {
   });
 
   async function executeProposalTest(): Promise<string> {
-    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC as any, [NEW_YEARLY_AMOUNT]);
+    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC_SET_FUNDING_YEARLY_AMOUNT as any, [NEW_YEARLY_AMOUNT]);
     const proposalTx = await ocnGovernor.propose([await ocnPaymentManager.getAddress()], [0], [encodedFunction], "proposal test");
     const proposeReceipt: any = await proposalTx.wait(1);
     const eventLogs = proposeReceipt.logs.map((log: any) => ocnGovernor.interface.parseLog(log));
@@ -97,7 +97,7 @@ describe("OcnPaymentManager contract", function () {
     await voteTx.wait(1);
     await moveBlocks(VOTING_PERIOD + 1, hre.network);
 
-    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC as any, [NEW_YEARLY_AMOUNT]);
+    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC_SET_FUNDING_YEARLY_AMOUNT as any, [NEW_YEARLY_AMOUNT]);
     const descriptionHash = ethers.id("proposal test");
 
     await expect(ocnGovernor.queue([await ocnPaymentManager.getAddress()], [0], [encodedFunction], descriptionHash)).to.be.rejectedWith("GovernorUnexpectedProposalState");
@@ -112,7 +112,7 @@ describe("OcnPaymentManager contract", function () {
     const voteTx = await ocnGovernor.castVoteWithReason(proposalId, 1, "Voting for the proposal");
     await voteTx.wait(1);
     await moveBlocks(VOTING_PERIOD + 1, hre.network);
-    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC as any, [NEW_YEARLY_AMOUNT]);
+    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC_SET_FUNDING_YEARLY_AMOUNT as any, [NEW_YEARLY_AMOUNT]);
     const descriptionHash = ethers.id("proposal test");
     const queueTx = await ocnGovernor.queue([await ocnPaymentManager.getAddress()], [0], [encodedFunction], descriptionHash);
     await queueTx.wait(1);
