@@ -13,7 +13,9 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   log("----------------------------------------------------");
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
+  console.log("lagartijo");
   const ocnPaymentManager = await ethers.getContract("OcnPaymentManager", deployer);
+  console.log("lagarto");
   const credentialsVerifier = await ethers.getContract("CertificateVerifier", deployer);
   const emspOracle = await ethers.getContract("EMSPOracle", deployer);
   const cpoOracle = await ethers.getContract("CPOOracle", deployer);
