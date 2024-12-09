@@ -197,7 +197,7 @@ contract OcnRegistry is AccessControl {
                 credentialOwner = owner;
             }
 
-            if (credentialOwner != address(0) && credentialOwner != owner) {
+            if (credentialOwner != owner) {
                 revert CerificateOwnerMismatch("Certificates have different owners");
             }
 

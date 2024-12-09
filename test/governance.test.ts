@@ -50,7 +50,7 @@ describe("OcnPaymentManager contract", function () {
     const proposalId = await executeProposalTest();
     let status = await ocnGovernor.state(proposalId);
     expect(Number(status)).to.equal(ProposalState.Pending);
-    await moveBlocks(VOTING_DELAY + 1, hre.network);
+    await moveBlocks(VOTING_DELAY + 1, hre.network, true);
     status = await ocnGovernor.state(proposalId);
     expect(Number(status)).to.equal(ProposalState.Active);
   });
@@ -82,7 +82,7 @@ describe("OcnPaymentManager contract", function () {
     await voteTx.wait(1);
     await moveBlocks(VOTING_PERIOD + 1, hre.network);
 
-    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC as any, [NEW_YEARLY_AMOUNT]);
+    const encodedFunction = ocnPaymentManager.interface.encodeFunctionData(FUNC_SET_FUNDING_YEARLY_AMOUNT as any, [NEW_YEARLY_AMOUNT]);
     const descriptionHash = ethers.id("proposal test");
     const proposalTx = await ocnGovernor.queue([await ocnPaymentManager.getAddress()], [0], [encodedFunction], descriptionHash);
     await proposalTx.wait(1);
