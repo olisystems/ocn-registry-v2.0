@@ -44,6 +44,17 @@
         "type": "string"
       }
     ],
+    "name": "CerificateOwnerMismatch",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
     "name": "DomainNameAlreadyRegistered",
     "type": "error"
   },

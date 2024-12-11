@@ -3,85 +3,59 @@ pragma solidity 0.8.24;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
-// TODO uncoment for upgradebles
-// import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-// import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-// import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
-
-    /* ********************************** */
-    /*       EVENTS VARIABLES            */
-    /* ********************************** */
-
-    event OwnershipTransferred(address indexed oldAdmin, address indexed  newAdmin);
+contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPSUpgradeable {
 
     /* ********************************** */
-    /*       STORAGE VARIABLES            */
+    /*  STORAGE VARIABLES                 */
     /* ********************************** */
 
-    //storage reserve for future variables
-    // TODO uncoment for upgradebles
-    // uint256[50] __gap;
-    // bytes32 public UPGRADER_ROLE;
-    // uint public version;
-    // address currentBaseContract;
+    bytes32 public UPGRADER_ROLE;
+    uint public version;
+    address currentBaseContract;
 
-    uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals
-    IERC20 public euroStablecoin; // ERC20 token contract address
-    address public ocnWallet;
+    uint256 public fundingYearlyAmount;                     // Assuming the stablecoin has 18 decimals
+    IERC20  public euroStablecoin;                          // ERC20 token contract address
+    address public operatorAddress;                         // Address to receive the deposited yearly stakes
+    uint256 public stakingPeriodInBlocks;                   // Amount of blocks to wait before withdrawing the stakes
 
-    mapping(address => uint256) public stakedFunds;
-    mapping(address => uint256) public lastPaymentTime;
+    mapping(address => uint256) public stakingBlock;        // Block when stake started by part
+    mapping(address => uint256) public stakedFunds;         // Amount staked by party
+
+    uint256[50] __gap;
 
     /* ********************************** */
     /*          INITIALIZER               */
     /* ********************************** */
-    // used as constructor in upgradeble contracts
-    // TODO uncoment for upgradebles
-    // function initialize(address _euroStablecoin) public initializer {
-    //     UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-    //     euroStablecoin = IERC20(_euroStablecoin);
-    //     fundingYearlyAmount = 100 * 1e18; // 100 EUR
-    //     __AccessControl_init();
-    //     __UUPSUpgradeable_init();
 
-    //     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    //     _grantRole(UPGRADER_ROLE, msg.sender);
-    // }
-
-    // TODO uncoment for upgradebles
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
-    // TODO remove for upgradebles
-    constructor(address _euroStablecoin, uint256 _fundingYearlyAmount) {
+    function initialize(address _euroStablecoin, uint256 _fundingYearlyAmount) public initializer {
+        UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
         euroStablecoin = IERC20(_euroStablecoin);
         fundingYearlyAmount = _fundingYearlyAmount * 1e18;
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    }
+        stakingPeriodInBlocks = 2102400;
 
-    // Custom Errors
-    error InsufficientAllowance();
-    error TransferFailed();
-    error NoFundsStaked();
-    error WithdrawalNotAllowed();
+        __AccessControl_init();
+        __UUPSUpgradeable_init();
+
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(UPGRADER_ROLE, msg.sender);
+    }
 
     /**
      * Called when Base Contract upgrades: iterate version
      */
-    // TODO uncoment for upgradebles
-    // function _authorizeUpgrade(address newImplementation)
-    //     internal
-    //     onlyRole(UPGRADER_ROLE)
-    //     override
-    // {
-    //     currentBaseContract = newImplementation;
-    //     version++;
-    // }
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        onlyRole(UPGRADER_ROLE)
+        override
+    {
+        currentBaseContract = newImplementation;
+        version++;
+    }
 
     /* ********************************** */
     /*            FUNCTIONS               */
@@ -90,7 +64,12 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
     /**
      * @notice Allows an operator to make a payment.
      */
-    function pay() external {
+    function pay(address party) external {
+        uint256 currentStake = stakedFunds[party];
+        if (currentStake > 0) {
+            revert StakeAlreadyDeposited();
+        }
+
         uint256 amount = euroStablecoin.allowance(msg.sender, address(this));
         if (amount < fundingYearlyAmount) {
             revert InsufficientAllowance();
@@ -100,17 +79,44 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
             revert TransferFailed();
         }
 
-        stakedFunds[msg.sender] += fundingYearlyAmount;
-        lastPaymentTime[msg.sender] = block.timestamp;
+        stakedFunds[party] += fundingYearlyAmount;
+        stakingBlock[party] = block.number;
 
-        emit PaymentMade(msg.sender, fundingYearlyAmount);
+        emit PartyStaked(msg.sender, party, fundingYearlyAmount);
     }
 
     /**
-     * @notice Execute a partial withdrawal of the staked funds to the OCN wallet.
+     * @notice Implements the withdrawal function
+     * @param party The address whose stake should be withdrawn
      */
-    function withdrawToOcnWallet(address party) external {
-        // TODO to be implemented
+    function withdrawToRegistryOperator(address party) external {
+        if (operatorAddress == address(0)) {
+            revert("Withdrawal account not set");
+        }
+
+        if (stakedFunds[party] == 0) {
+            revert NoFundsStaked();
+        }
+
+        if (block.number < stakingBlock[party] + stakingPeriodInBlocks) {
+            revert WithdrawalNotAllowed();
+        }
+
+        uint256 amountToWithdraw = stakedFunds[party];
+        stakedFunds[party] = 0;
+
+        if (!euroStablecoin.transfer(operatorAddress, amountToWithdraw)) {
+            revert TransferFailed();
+        }
+
+        emit StakeWithdrawn(party, amountToWithdraw);
+    }
+
+    /**
+     * @notice Sets the operator address to withdraw to
+    **/
+    function setOperator(address _operatorAddress) onlyRole(DEFAULT_ADMIN_ROLE) external {
+        operatorAddress = _operatorAddress;
     }
 
     /**
@@ -119,24 +125,33 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
      * INSUFFICIENT_FUNDS: has no staked funds but has made a payment before
      * PENDING: has not made any payment yet
      */
-    function getPaymentStatus(address operator) external view returns (PaymentStatus) {
-        if (stakedFunds[operator] > 0) {
+    function getPaymentStatus(address party) external view returns (PaymentStatus) {
+        if (stakedFunds[party] > 0) {
             return PaymentStatus.PAYMENT_UP_TO_DATE;
-        } else if (lastPaymentTime[operator] > 0) {
+        } else if (stakingBlock[party] > 0) {
             return PaymentStatus.INSUFFICIENT_FUNDS;
         } else {
             return PaymentStatus.PENDING;
         }
     }
 
+    /**
+     * @notice Sets the yearly required stake amount for the parties
+    **/
     function setFundingYearlyAmount(uint256 _fundingYearlyAmount) onlyRole(DEFAULT_ADMIN_ROLE) external {
         fundingYearlyAmount = _fundingYearlyAmount * 1e18;
     }
 
+    /**
+     * @notice Gets the current required stake amount for the parties
+    **/
     function getFundingYearlyAmount() external view returns (uint256) {
         return fundingYearlyAmount / 1e18;
     }
 
+    /**
+     * @notice Updates the ERC20 used for staking
+    **/
     function setStablecoinAddress(address _euroStablecoin) onlyRole(DEFAULT_ADMIN_ROLE) external {
         euroStablecoin = IERC20(_euroStablecoin);
     }
@@ -150,9 +165,4 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControl {
 
         emit OwnershipTransferred(msg.sender, newOwner);
     }
-
-    // TODO uncoment for upgradebles
-    // function getCurrentBaseContract() external view returns (address){
-    //     return currentBaseContract;
-    // }
 }

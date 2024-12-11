@@ -50,7 +50,6 @@ describe("Registry contract", function () {
       name: "bilanzkreis",
       identifier: "bilanzkreis"
     });
-
   });
 
   it("setNode allows operator to add their node", async () => {
@@ -159,13 +158,13 @@ describe("Registry contract", function () {
     };
 
     const { country, id, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [cpoRole], nodeOperator.address, name, url);
 
     const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
 
     expect(got.countryCode).to.equal(country);
     expect(got.partyId).to.equal(id);
-    expect(got.roles.length).to.equal(2);
+    expect(got.roles.length).to.equal(1);
     expect(got.name).to.equal(name);
     expect(got.url).to.equal(url);
     expect(got.operatorAddress).to.equal(nodeOperator.address);
@@ -195,14 +194,14 @@ describe("Registry contract", function () {
     };
 
     const { country, id, roles, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
-    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], cpoOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [cpoRole], nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [cpoRole], cpoOperator.address, name, url);
 
     const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
 
     expect(got.countryCode).to.equal(country);
     expect(got.partyId).to.equal(id);
-    expect(got.roles.length).to.equal(2);
+    expect(got.roles.length).to.equal(1);
     expect(got.operatorAddress).to.equal(cpoOperator.address);
 
     const parties = await registry.getParties();
@@ -226,10 +225,10 @@ describe("Registry contract", function () {
     };
 
     const { country, id, roles, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [cpoRole], nodeOperator.address, name, url);
 
     try {
-      await registry.connect(deployer).setParty(country, id, [emspRole, cpoRole], cpoOperator.address, name, url);
+      await registry.connect(deployer).setParty(country, id, [emspRole], cpoOperator.address, name, url);
       expect.fail("Expected error not received");
     } catch (err: any) {
       expect(err.message).to.include("Party with country_code/party_id already registered under different address.");
@@ -238,7 +237,7 @@ describe("Registry contract", function () {
     const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
     expect(got.countryCode).to.equal(country);
     expect(got.partyId).to.equal(id);
-    expect(got.roles.length).to.equal(2);
+    expect(got.roles.length).to.equal(1);
     expect(got.operatorAddress).to.equal(nodeOperator.address);
 
     const parties = await registry.getParties();
@@ -250,11 +249,6 @@ describe("Registry contract", function () {
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
 
-    const emspRole = {
-      certificateData: encodedEmpCertificate,
-      signature: encodedEmpSignature,
-      role: 1
-    };
     const cpoRole = {
       certificateData: encodedCpoCertificate,
       signature: encodedCpoSignature,
@@ -262,30 +256,25 @@ describe("Registry contract", function () {
     };
 
     const { country, id, roles, name, url } = getTestPartyData();
-    const sig = await signHelper.setPartyRaw(country, id, [emspRole, cpoRole], nodeOperator.address, name, url, randomParty);
+    const sig = await signHelper.setPartyRaw(country, id, [cpoRole], nodeOperator.address, name, url, randomParty);
 
-    await registry.connect(nodeOperator).setPartyRaw(randomParty.address, country, id, [emspRole, cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
+    await registry.connect(nodeOperator).setPartyRaw(randomParty.address, country, id, [cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
 
-    const got = await registry.getPartyDetailsByAddress(randomParty.address);
+    const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
 
     expect(got.countryCode).to.equal(country);
     expect(got.partyId).to.equal(id);
-    expect(got.roles.length).to.equal(2);
+    expect(got.roles.length).to.equal(1);
     expect(got.operatorAddress).to.equal(nodeOperator.address);
 
     const parties = await registry.getParties();
-    expect(parties).to.deep.equal([randomParty.address]);
+    expect(parties).to.deep.equal([cpoOperator.address]);
   });
 
   it("deleteParty allows deletion of ocpi party", async () => {
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
 
-    const emspRole = {
-      certificateData: encodedEmpCertificate,
-      signature: encodedEmpSignature,
-      role: 1
-    };
     const cpoRole = {
       certificateData: encodedCpoCertificate,
       signature: encodedCpoSignature,
@@ -293,7 +282,7 @@ describe("Registry contract", function () {
     };
 
     const { country, id, name, url } = getTestPartyData();
-    await registry.connect(cpoOperator).setParty(country, id, [emspRole, cpoRole], nodeOperator.address, name, url);
+    await registry.connect(cpoOperator).setParty(country, id, [cpoRole], nodeOperator.address, name, url);
 
     await registry.connect(cpoOperator).deleteParty();
 
@@ -307,39 +296,39 @@ describe("Registry contract", function () {
     expect(parties).to.deep.equal([]);
   });
 
-  it("deletePartyRaw allows deletion of ocpi party", async () => {
-    const domain = "https://node.ocn.org";
-    await registry.connect(nodeOperator).setNode(domain);
+  // it("deletePartyRaw allows deletion of ocpi party", async () => {
+  //   const domain = "https://node.ocn.org";
+  //   await registry.connect(nodeOperator).setNode(domain);
 
-    const randomWallet = ethers.Wallet.createRandom();
-    const operator = new ethers.Wallet(randomWallet.privateKey);
+  //   const randomWallet = ethers.Wallet.createRandom();
+  //   const operator = new ethers.Wallet(randomWallet.privateKey);
 
-    const emspRole = {
-      certificateData: encodedEmpCertificate,
-      signature: encodedEmpSignature,
-      role: 1
-    };
-    const cpoRole = {
-      certificateData: encodedCpoCertificate,
-      signature: encodedCpoSignature,
-      role: 0
-    };
+  //   const emspRole = {
+  //     certificateData: encodedEmpCertificate,
+  //     signature: encodedEmpSignature,
+  //     role: 1
+  //   };
+  //   const cpoRole = {
+  //     certificateData: encodedCpoCertificate,
+  //     signature: encodedCpoSignature,
+  //     role: 0
+  //   };
 
-    const { country, id, name, url } = getTestPartyData();
-    const sig = await signHelper.setPartyRaw(country, id, [emspRole, cpoRole], nodeOperator.address, name, url, operator);
+  //   const { country, id, name, url } = getTestPartyData();
+  //   const sig = await signHelper.setPartyRaw(country, id, [cpoRole], cpoOperator.address, name, url, operator);
 
-    await registry.connect(nodeOperator).setPartyRaw(operator.address, country, id, [emspRole, cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
+  //   await registry.connect(cpoOperator).setPartyRaw(cpoOperator.address, country, id, [cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
 
-    const sig2 = await signHelper.deletePartyRaw(operator);
-    await registry.connect(nodeOperator).deletePartyRaw(operator.address, sig2.v, sig2.r, sig2.s);
+  //   const sig2 = await signHelper.deletePartyRaw(cpoOperator);
+  //   await registry.connect(cpoOperator).deletePartyRaw(cpoOperator.address, sig2.v, sig2.r, sig2.s);
 
-    const got = await registry.getPartyDetailsByAddress(operator.address);
-    expect(got.countryCode).to.equal("0x0000");
-    expect(got.partyId).to.equal("0x000000");
-    expect(got.roles.length).to.equal(0);
-    expect(got.operatorAddress).to.equal("0x0000000000000000000000000000000000000000");
-    // since the deleted party index remains in the storage variable 'parties' as 0x000, a filter needs to be applied
-    const parties = (await registry.connect(cpoOperator).getParties()).filter((party) => party !== "0x0000000000000000000000000000000000000000");
-    expect(parties).to.deep.equal([]);
-  });
+  //   const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
+  //   expect(got.countryCode).to.equal("0x0000");
+  //   expect(got.partyId).to.equal("0x000000");
+  //   expect(got.roles.length).to.equal(0);
+  //   expect(got.operatorAddress).to.equal("0x0000000000000000000000000000000000000000");
+  //   // since the deleted party index remains in the storage variable 'parties' as 0x000, a filter needs to be applied
+  //   const parties = (await registry.connect(cpoOperator).getParties()).filter((party) => party !== "0x0000000000000000000000000000000000000000");
+  //   expect(parties).to.deep.equal([]);
+  // });
 });

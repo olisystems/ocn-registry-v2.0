@@ -1,5 +1,74 @@
 [
   {
+    "inputs": [],
+    "name": "InsufficientAllowance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoFundsStaked",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "StakeAlreadyDeposited",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WithdrawalNotAllowed",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "stakedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "party",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "PartyStaked",
+    "type": "event"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -10,37 +79,12 @@
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "ocnWallet",
-        "type": "address"
-      },
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
     ],
-    "name": "PartialWithdrawal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "operator",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "PaymentMade",
+    "name": "StakeWithdrawn",
     "type": "event"
   },
   {
@@ -60,7 +104,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "operator",
+        "name": "party",
         "type": "address"
       }
     ],
@@ -79,23 +123,28 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "operator",
+        "name": "_euroStablecoin",
         "type": "address"
-      }
-    ],
-    "name": "lastPaymentTime",
-    "outputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_fundingYearlyAmount",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "party",
+        "type": "address"
+      }
+    ],
     "name": "pay",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -105,7 +154,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "operator",
+        "name": "party",
         "type": "address"
       }
     ],
@@ -128,7 +177,26 @@
         "type": "address"
       }
     ],
-    "name": "withdrawToOcnWallet",
+    "name": "stakingBlock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "party",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawToRegistryOperator",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

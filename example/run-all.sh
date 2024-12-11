@@ -13,6 +13,6 @@ fi
 NETWORK=$1
 
 # Deploy the contracts to the specified network
-sh run-deploy.sh $NETWORK 
+sh run-deploy.sh $NETWORK
 sh run-register-example.sh $NETWORK
 sh run-governance-example.sh $NETWORK
