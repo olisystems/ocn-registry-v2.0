@@ -24,7 +24,6 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
   });
 
   contractName = "CPOOracle";
-
   log("----------------------------------------------------");
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
   await deploy(contractName, {

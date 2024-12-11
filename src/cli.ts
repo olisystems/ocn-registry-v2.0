@@ -162,6 +162,7 @@ yargs
         };
       }
     });
+    console.log(roleDetails);
     const name: string = args.name as string;
     const url: string = args.url as string;
     const result = await registry.setParty(countryCode, partyId, roleDetails, args.operator as string, name, url);

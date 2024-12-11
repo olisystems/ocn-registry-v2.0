@@ -5,15 +5,11 @@
         "owner": "0x46Cbb47C915C645BE33049AF2387757bfD35b399",
         "signature": "1i9eAE29N/purRjzZd5oWBYJFEjERg0NRNZGDga8G61E4FV3QQCHIzGfYp1vvkLFosrtNGXIZsLRWuezOzPUwBs="
     },
+    "role": "CPO",
     "signature": {
-        "inner": {
-            "r": "0x6c3a6997dfce403d40beabacd1eb1c6b3e1161c146ee47a867739e5c77f2b3f0",
-            "s": "0x6c0fce93a8f2214f79bcf607c83ccee42538f0efa891830209223fb08659157f",
-            "yParity": "0x0"
-        },
-        "message_hash": "0xab7712cc1821c99614751a8517a083b18e50386e4c53d4a8a97d3e029a334317",
-        "r": "0x6c3a6997dfce403d40beabacd1eb1c6b3e1161c146ee47a867739e5c77f2b3f0",
-        "s": "0x6c0fce93a8f2214f79bcf607c83ccee42538f0efa891830209223fb08659157f",
-        "v": 27
+        "message_hash": "0x8d29cc20fddcc73ddad7172058b0c929c1fbd4ef20adbb9cd652c38ef61706b9",
+        "r": "0xac9bfdfa5ecfcbf9d3547ad0bb3606576d3a1ecf930a3e2565282183f0c7d35d",
+        "s": "0x4f2f46ee23c53935cffaa285518d5a14fe983fee75c23a98860e1e3ba3cf56d1",
+        "v": 28
     }
 }
