@@ -19,7 +19,7 @@
 import yargs from "yargs";
 import { Registry } from "./lib/registry";
 import { OcnPaymentManagerCli } from "./lib/ocnPaymentManager";
-import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder } from "./cli/builders";
+import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder, getOracleProviderBuilder } from "./cli/builders";
 import { PartyDetails, Role, RoleDetails, EmpCertificate, CpoCertificate } from "./lib/types";
 import { networks } from "./networks";
 import { getOverrides, bigIntToString, readJsonCertificates, encodeEmpCertificate, encodeCertificateSignature, encodeCpoCertificate } from "./lib/helpers";
@@ -248,7 +248,9 @@ yargs
     const result = await ocnPaymentManager.withdraw(partyAddress);
     console.log(result);
   })
-
+  .command("get-provider", "Check provider status from the oracles", getOracleProviderBuilder, async (args) => {
+    const oracle = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+  })
   .demandCommand(1, "You need to specify at least one command.")
   .strict()
   .fail((msg, err, yargs) => {

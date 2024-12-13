@@ -70,6 +70,23 @@ export const getWithdrawBuilder = (context: yargs.Argv) => {
     })
 }
 
+export const getOracleProviderBuilder = (context: yargs.Argv) => {
+  context.example("provider-status -c XY XYZ -r CPO", "Check provider status from the oracles")
+    .option("credentials", {
+      alias: "c",
+      array: true,
+      nargs: 2,
+      required: true,
+      describe: "OCPI country_code (ISO-3166 alpha-2) and party_id (ISO-15118)",
+    })
+    .option("role", {
+      alias: "r",
+      array: false,
+      required: true,
+      describe: "Role of the party"
+    });
+}
+
 export const setPartyBuilder = (context: yargs.Argv) => {
   context
     .example("set-party -c XY XYZ -cert /path/to/emsp-certificate.json -o 0x9bC11...bfeB4 -n OCPIService -u https://ocpi-service.xyz", "Sets a party (XY XYZ) with role emsp given by the certificate")
