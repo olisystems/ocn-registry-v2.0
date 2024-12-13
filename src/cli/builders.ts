@@ -51,8 +51,24 @@ export const getPaymentStatusBuilder = (context: yargs.Argv) => {
 };
 
 export const getPayBuilder = (context: yargs.Argv) => {
-  context.example("pay -s bhi49KJ...bfeH", "Perform the payment of the funding yearly amount");
+  context.example("pay -p 0x123...789 -s bhi49KJ...bfeH", "Perform the payment of the funding yearly amount")
+    .option("partyAddress", {
+      alias: "p",
+      array: false,
+      required: true,
+      describe: "Address of the party to pay on behalf of"
+    })
 };
+
+export const getWithdrawBuilder = (context: yargs.Argv) => {
+  context.example("withdraw -p 0x123...789 -s bhi49KJ...bfeH", "Perform the withdrawal of the funding yearly amount to the OCN operator")
+    .option("partyAddress", {
+      alias: "p",
+      array: false,
+      required: true,
+      describe: "Address of the party to withdraw funding from"
+    })
+}
 
 export const setPartyBuilder = (context: yargs.Argv) => {
   context

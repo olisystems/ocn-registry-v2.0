@@ -19,7 +19,7 @@
 import yargs from "yargs";
 import { Registry } from "./lib/registry";
 import { OcnPaymentManagerCli } from "./lib/ocnPaymentManager";
-import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder } from "./cli/builders";
+import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder } from "./cli/builders";
 import { PartyDetails, Role, RoleDetails, EmpCertificate, CpoCertificate } from "./lib/types";
 import { networks } from "./networks";
 import { getOverrides, bigIntToString, readJsonCertificates, encodeEmpCertificate, encodeCertificateSignature, encodeCpoCertificate } from "./lib/helpers";
@@ -162,7 +162,6 @@ yargs
         };
       }
     });
-    console.log(roleDetails);
     const name: string = args.name as string;
     const url: string = args.url as string;
     const result = await registry.setParty(countryCode, partyId, roleDetails, args.operator as string, name, url);
@@ -225,7 +224,6 @@ yargs
     const result = await ocnPaymentManager.getPaymentStatus(args.address as string);
     console.log(result);
   })
-
   .command(
     "get-funding-yearly-amount",
     "Get funding yearly amount",
@@ -238,8 +236,16 @@ yargs
   )
   .command("pay", "Pay the funding yearly amount", getPayBuilder, async (args) => {
     const signer = process.env.SIGNER || args.signer;
+    const partyAddress = args.partyAddress as string;
     const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
-    const result = await ocnPaymentManager.pay();
+    const result = await ocnPaymentManager.pay(partyAddress);
+    console.log(result);
+  })
+  .command("withdraw", "Withdraw yearly funding from party to OCN operator", getWithdrawBuilder, async (args) => {
+    const signer = process.env.SIGNER || args.signer;
+    const partyAddress = args.partyAddress as string;
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
+    const result = await ocnPaymentManager.withdraw(partyAddress);
     console.log(result);
   })
 
