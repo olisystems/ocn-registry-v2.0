@@ -19,10 +19,11 @@
 import yargs from "yargs";
 import { Registry } from "./lib/registry";
 import { OcnPaymentManagerCli } from "./lib/ocnPaymentManager";
-import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder, getOracleProviderBuilder } from "./cli/builders";
+import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder, getOracleProviderBuilder, setOracleProviderBuilder, getOracleProvidersBuilder } from "./cli/builders";
 import { PartyDetails, Role, RoleDetails, EmpCertificate, CpoCertificate } from "./lib/types";
 import { networks } from "./networks";
 import { getOverrides, bigIntToString, readJsonCertificates, encodeEmpCertificate, encodeCertificateSignature, encodeCpoCertificate } from "./lib/helpers";
+import { OracleCli, OracleType } from "./lib/oracle";
 
 yargs
   .option("network", {
@@ -151,14 +152,14 @@ yargs
         return {
           certificateData: encodeEmpCertificate(certificateData.certificate as unknown as EmpCertificate),
           signature: encodeCertificateSignature(certificateData.signature),
-          role: Role.EMSP
+          role: Role.EMSP,
         };
       } else {
         let { role, ...certificateData } = certificate;
         return {
           certificateData: encodeCpoCertificate(certificateData.certificate as unknown as CpoCertificate),
           signature: encodeCertificateSignature(certificateData.signature),
-          role: Role[role as keyof typeof Role]
+          role: Role[role as keyof typeof Role],
         };
       }
     });
@@ -180,14 +181,14 @@ yargs
         return {
           certificateData: encodeEmpCertificate(certificateData.certificate as unknown as EmpCertificate),
           signature: encodeCertificateSignature(certificateData.signature),
-          role: Role.EMSP
+          role: Role.EMSP,
         };
       } else {
         let { role, ...certificateData } = certificate;
         return {
           certificateData: encodeCpoCertificate(certificateData.certificate as unknown as CpoCertificate),
           signature: encodeCertificateSignature(certificateData.signature),
-          role: Role[role as keyof typeof Role]
+          role: Role[role as keyof typeof Role],
         };
       }
     });
@@ -248,8 +249,27 @@ yargs
     const result = await ocnPaymentManager.withdraw(partyAddress);
     console.log(result);
   })
-  .command("get-provider", "Check provider status from the oracles", getOracleProviderBuilder, async (args) => {
-    const oracle = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+  .command("get-all-providers", "Check all provider status from the oracle", getOracleProvidersBuilder, async (args) => {
+    const role = args.role as OracleType;
+    const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));
+    const details = await oracle.getAllProviders();
+    console.log(details);
+  })
+  .command("get-provider", "Check provider status from the oracle", getOracleProviderBuilder, async (args) => {
+    const role = args.role as OracleType;
+    const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));
+    const [countryCode, partyId] = args.credentials as string[];
+    const details = await oracle.getProvider(countryCode + "-" + partyId);
+    console.log(details);
+  })
+  .command("set-provider", "Set provider status from the oracle", setOracleProviderBuilder, async (args) => {
+    const role = args.role as OracleType;
+    const signer = process.env.SIGNER || args.signer;
+    const [countryCode, partyId] = args.credentials as string[];
+    const tag = args.tag as string;
+    const oracle = new OracleCli(args.network, role, signer, getOverrides(args["network-file"]));
+    const details = await oracle.setProvider(countryCode + "-" + partyId, tag);
+    console.log(details);
   })
   .demandCommand(1, "You need to specify at least one command.")
   .strict()
