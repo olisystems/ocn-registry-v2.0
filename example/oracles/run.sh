@@ -5,7 +5,7 @@ set -e
 
 # Check if a network parameter is provided
 if [ -z "$1" ]; then
-  echo "No network specified. Usage: ./run-all.sh <network>"
+  echo "No network specified. Usage: ./run.sh <network>"
   exit 1
 fi
 
@@ -14,6 +14,6 @@ NETWORK=$1
 
 # Deploy the contracts to the specified network
 sh run-deploy.sh $NETWORK
-sh run-register-example.sh $NETWORK
 sh run-oracles.sh $NETWORK
+sh run-register-example.sh $NETWORK
 sh run-governance-example.sh $NETWORK

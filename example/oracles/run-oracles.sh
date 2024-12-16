@@ -19,3 +19,6 @@ fi
 
 # Assign the network parameter to a variable
 NETWORK=$1
+
+yarn cli set-provider -c DE OLI -r EMSP -t 0123456 -s d6ca2410370821633d05f95a2856afadea95e07b8242b5c1aa0cb7196da1e0a3 -n $NETWORK
+yarn cli get-provider -c DE OLI -r EMSP -n $NETWORK

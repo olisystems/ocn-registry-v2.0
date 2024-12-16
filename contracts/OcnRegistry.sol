@@ -389,7 +389,7 @@ contract OcnRegistry is AccessControl {
             if (!isAllowedVerifier(verifier)) {
                 revert InvalidCertificate(verifier, "Invalid EMP certificate");
             }
-            return (certificate.bilanzkreis, certificate.owner);
+            return (certificate.identifier, certificate.owner);
         } else if (roleDetails.role == Role.CPO) {
             (address verifier, ICertificateVerifier.CPOCertificate memory certificate, ) = certificateVerifier.verifyCPO(roleDetails.certificateData, roleDetails.signature);
             if (!isAllowedVerifier(verifier)) {

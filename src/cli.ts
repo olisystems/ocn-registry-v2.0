@@ -259,7 +259,7 @@ yargs
     const role = args.role as OracleType;
     const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));
     const [countryCode, partyId] = args.credentials as string[];
-    const details = await oracle.getProvider(countryCode + "-" + partyId);
+    const details = await oracle.getProvider(countryCode + " " + partyId);
     console.log(details);
   })
   .command("set-provider", "Set provider status from the oracle", setOracleProviderBuilder, async (args) => {
@@ -268,7 +268,7 @@ yargs
     const [countryCode, partyId] = args.credentials as string[];
     const tag = args.tag as string;
     const oracle = new OracleCli(args.network, role, signer, getOverrides(args["network-file"]));
-    const details = await oracle.setProvider(countryCode + "-" + partyId, tag);
+    const details = await oracle.setProvider(countryCode + " " + partyId, tag);
     console.log(details);
   })
   .demandCommand(1, "You need to specify at least one command.")
