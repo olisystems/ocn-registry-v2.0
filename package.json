@@ -65,6 +65,7 @@
   "scripts": {
     "build": "tsc",
     "test": "yarn hardhat test --network localhost",
+    "ocn-tests": "HARDHAT_CONFIG=ocn-tests.hardhat.config.ts yarn hardhat node",
     "localhost": "HARDHAT_CONFIG=local.hardhat.config.ts yarn hardhat node",
     "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
     "lint": "solhint 'contracts/*.sol'",

@@ -41,6 +41,11 @@ yargs
     string: true,
     describe: "Data owner's private key. Required for modifying contract state.",
   })
+  .option("ocn-registry", {
+      alias: "r",
+      string: true,
+      describe: "Specific contract address of a pre deployed Ocn Registry. By default it uses the one from deployments folder",
+    })
   .option("spender", {
     alias: "x",
     string: true,

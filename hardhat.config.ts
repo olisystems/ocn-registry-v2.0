@@ -89,6 +89,14 @@ const config = {
       accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
       loggingEnabled: true,
     },
+    minikube_external: {
+      url: `http://127.0.0.1:8555`,
+      chainId: 31337,
+      live: false,
+      saveDeployments: true,
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
+      loggingEnabled: true,
+    },
   },
   abiExporter: {
     path: "./abi",

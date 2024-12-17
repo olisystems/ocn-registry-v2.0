@@ -35,6 +35,15 @@ export const networks: Record<string, Network> = {
       gas: 8000000,
     },
   },
+  minikube_external: {
+    provider: {
+      protocol: "http",
+      host: "localhost",
+      port: 8555,
+      network_id: "1337",
+      gas: 8000000,
+    },
+  },
   localhost: {
     provider: {
       protocol: "http",

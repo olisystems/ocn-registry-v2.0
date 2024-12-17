@@ -429,7 +429,7 @@ yarn cli set-party --credentials CH MSP \
 Use the following command to remove a party listing from the registry:
 
 ```
-yarn cli delete-party
+yarn cli delete-party -s PARTY_PRIVATE_KEY
 ```
 
 And with raw transaction (setting including signer and spender PKs):

@@ -5,8 +5,6 @@ node_modules
 # Hardhat files
 /cache
 /artifacts
-/deployments
-
 
 # solidity-coverage files
 /coverage
