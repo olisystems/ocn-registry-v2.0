@@ -25,11 +25,11 @@ import path from "path";
  * Registry contract wrapper
  */
 export class Registry extends ContractWrapper {
-  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>) {
-    const absolutePath = path.resolve(__dirname, `../../deployments/${environment}/OcnRegistry.json`);
+  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>, specifContractAddress?: string) {
+    const absolutePath = path.resolve(__dirname, `../deployments/${environment}/OcnRegistry.json`);
     const ocnRegistryJson: any = require(absolutePath);
     const ocnRegistryContract: Contract = { ...ocnRegistryJson };
-    super(ocnRegistryContract, environment, signer, environmentOptions);
+    super(ocnRegistryContract, environment, signer, environmentOptions, specifContractAddress);
   }
 
   /**

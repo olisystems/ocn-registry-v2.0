@@ -42,10 +42,10 @@ yargs
     describe: "Data owner's private key. Required for modifying contract state.",
   })
   .option("ocn-registry", {
-      alias: "r",
-      string: true,
-      describe: "Specific contract address of a pre deployed Ocn Registry. By default it uses the one from deployments folder",
-    })
+    alias: "r",
+    string: true,
+    describe: "Specific contract address of a pre deployed Ocn Registry. By default it uses the one from deployments folder",
+  })
   .option("spender", {
     alias: "x",
     string: true,
@@ -61,7 +61,7 @@ yargs
       });
     },
     async (args) => {
-      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getNode(args.address as string);
       console.log(result || "Node operator not listed in registry.");
     },
@@ -72,7 +72,7 @@ yargs
     () => {},
     async (args) => {
       console.log("############ list-nodes called.  I M HERE");
-      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllNodes();
       console.log(JSON.stringify(result, null, 2));
     },
@@ -83,7 +83,7 @@ yargs
     () => {},
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
-      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.setNode(args.domain as string);
       console.log(result);
     },
@@ -95,7 +95,7 @@ yargs
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const spender = process.env.SPENDER || args.spender;
-      const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, spender, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.setNodeRaw(args.domain as string, signer as string);
       console.log(result);
     },
@@ -106,7 +106,7 @@ yargs
     () => {},
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
-      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.deleteNode();
       console.log(result);
     },
@@ -118,13 +118,13 @@ yargs
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const spender = process.env.SPENDER || args.spender;
-      const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, spender, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.deleteNodeRaw(signer as string);
       console.log(result);
     },
   )
   .command("get-party", "Get OCPI party entry listed in the registry", getPartyBuilder, async (args) => {
-    const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
+    const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
     let result: PartyDetails | undefined;
     if (args.address) {
       result = await registry.getPartyByAddress(args.address as string);
@@ -139,14 +139,14 @@ yargs
     "List all OCPI parties listed in registry",
     () => {},
     async (args) => {
-      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllParties();
       console.log(JSON.stringify(result, bigIntToString, 2));
     },
   )
   .command("set-party", "Create or update OCPI party entry", setPartyBuilder, async (args) => {
     const signer = process.env.SIGNER || args.signer;
-    const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
+    const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
     const [countryCode, partyId] = args.credentials as string[];
     const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
     const name: string = args.name as string;
@@ -157,7 +157,7 @@ yargs
   .command("set-party-raw", "Create or update OCPI party entry using raw transaction", setPartyBuilder, async (args) => {
     const signer = process.env.SIGNER || args.signer;
     const spender = process.env.SPENDER || args.spender;
-    const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
+    const registry = new Registry(args.network, spender, getOverrides(args["network-file"]), args["ocn-registry"]);
     const [countryCode, partyId] = args.credentials as string[];
     const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
     const name: string = args.name as string;
@@ -171,7 +171,7 @@ yargs
     () => {},
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
-      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.deleteParty();
       console.log(result);
     },
@@ -183,7 +183,7 @@ yargs
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const spender = process.env.SPENDER || args.spender;
-      const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
+      const registry = new Registry(args.network, spender, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.deletePartyRaw(signer as string);
       console.log(result);
     },

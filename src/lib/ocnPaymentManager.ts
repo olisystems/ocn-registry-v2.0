@@ -22,7 +22,7 @@ import { PaymentStatus } from "./types";
 
 export class OcnPaymentManagerCli extends ContractWrapper {
   constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>) {
-    const absolutePath = path.resolve(__dirname, `../../deployments/${environment}/OcnPaymentManager.json`);
+    const absolutePath = path.resolve(__dirname, `../deployments/${environment}/OcnPaymentManager.json`);
     const ocnPaymentManagerJson: any = require(absolutePath);
     const ocnPaymentManagerContract: Contract = { ...ocnPaymentManagerJson };
     super(ocnPaymentManagerContract, environment, signer, environmentOptions);
