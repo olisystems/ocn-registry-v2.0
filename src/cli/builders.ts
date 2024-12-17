@@ -56,6 +56,7 @@ export const getPayBuilder = (context: yargs.Argv) => {
     array: false,
     required: true,
     describe: "Address of the party to pay on behalf of",
+    string: true,
   });
 };
 
@@ -65,6 +66,7 @@ export const getWithdrawBuilder = (context: yargs.Argv) => {
     array: false,
     required: true,
     describe: "Address of the party to withdraw funding from",
+    string: true,
   });
 };
 

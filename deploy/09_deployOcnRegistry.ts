@@ -15,8 +15,6 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
   const ocnPaymentManager = await ethers.getContract("OcnPaymentManager", deployer);
   const credentialsVerifier = await ethers.getContract("CertificateVerifier", deployer);
-  const emspOracle = await ethers.getContract("EMSPOracle", deployer);
-  const cpoOracle = await ethers.getContract("CPOOracle", deployer);
 
   await deploy(contractName, {
     from: deployer,
@@ -34,12 +32,20 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
     await allowedVerifierTx.wait(1);
   }
 
-  log(`Adding CPO and EMSP oracles to registry`);
-  const setCpoOracleTx: any = await deployedContract.setProviderOracle(Role.CPO, cpoOracle.target);
-  await setCpoOracleTx.wait(1);
+  const emspOracle = await ethers.getContractOrNull("EMSPOracle", deployer);
+  const cpoOracle = await ethers.getContractOrNull("CPOOracle", deployer);
 
-  const setEmspOracleTx: any = await deployedContract.setProviderOracle(Role.EMSP, emspOracle.target);
-  await setEmspOracleTx.wait(1);
+  if (cpoOracle) {
+    log(`Adding CPO oracle to registry`);
+    const setCpoOracleTx: any = await deployedContract.setProviderOracle(Role.CPO, cpoOracle.target);
+    await setCpoOracleTx.wait(1);
+  }
+
+  if (emspOracle) {
+    log(`Adding EMSP oracle to registry`);
+    const setEmspOracleTx: any = await deployedContract.setProviderOracle(Role.EMSP, emspOracle.target);
+    await setEmspOracleTx.wait(1);
+  }
 
   log(`Transferring ownership of ${contractName} to TimeLock at ${timelockContract.target}...`);
   const transferTx = await deployedContract.transferOwnership(await timelockContract.getAddress());

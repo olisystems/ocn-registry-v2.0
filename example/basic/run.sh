@@ -14,6 +14,4 @@ NETWORK=$1
 
 # Deploy the contracts to the specified network
 sh 1-run-deploy.sh $NETWORK
-sh 2-run-oracles.sh $NETWORK
-sh 3-run-register-example.sh $NETWORK
-sh 4-run-governance-example.sh $NETWORK
+sh 2-run-register-example.sh $NETWORK
