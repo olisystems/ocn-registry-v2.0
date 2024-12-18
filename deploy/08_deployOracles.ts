@@ -40,4 +40,4 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
 };
 
 export default deployCertificateVerifier;
-deployCertificateVerifier.tags = ["all", "certificateverifier"];
+deployCertificateVerifier.tags = ["all", "oracles"];

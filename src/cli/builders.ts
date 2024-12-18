@@ -51,7 +51,74 @@ export const getPaymentStatusBuilder = (context: yargs.Argv) => {
 };
 
 export const getPayBuilder = (context: yargs.Argv) => {
-  context.example("pay -s bhi49KJ...bfeH", "Perform the payment of the funding yearly amount");
+  context.example("pay -p 0x123...789 -s bhi49KJ...bfeH", "Perform the payment of the funding yearly amount").option("partyAddress", {
+    alias: "p",
+    array: false,
+    required: true,
+    describe: "Address of the party to pay on behalf of",
+    string: true,
+  });
+};
+
+export const getWithdrawBuilder = (context: yargs.Argv) => {
+  context.example("withdraw -p 0x123...789 -s bhi49KJ...bfeH", "Perform the withdrawal of the funding yearly amount to the OCN operator").option("partyAddress", {
+    alias: "p",
+    array: false,
+    required: true,
+    describe: "Address of the party to withdraw funding from",
+    string: true,
+  });
+};
+
+export const getOracleProviderBuilder = (context: yargs.Argv) => {
+  context
+    .example("provider-status -c XY XYZ -r CPO", "Check provider status from the oracles")
+    .option("credentials", {
+      alias: "c",
+      array: true,
+      nargs: 2,
+      required: true,
+      describe: "OCPI country_code (ISO-3166 alpha-2) and party_id (ISO-15118)",
+    })
+    .option("role", {
+      alias: "r",
+      array: false,
+      required: true,
+      describe: "Role of the party",
+    });
+};
+
+export const getOracleProvidersBuilder = (context: yargs.Argv) => {
+  context.example("provider-status -r CPO", "Check all providers status from the oracles").option("role", {
+    alias: "r",
+    array: false,
+    required: true,
+    describe: "Role of the party",
+  });
+};
+
+export const setOracleProviderBuilder = (context: yargs.Argv) => {
+  context
+    .example("provider-add -c XY XYZ -r CPO -t XYZ -s bhi49KJ...bfeH", "Set provider status from the oracles")
+    .option("credentials", {
+      alias: "c",
+      array: true,
+      nargs: 2,
+      required: true,
+      describe: "OCPI country_code (ISO-3166 alpha-2) and party_id (ISO-15118)",
+    })
+    .option("role", {
+      alias: "r",
+      array: false,
+      required: true,
+      describe: "Role of the party",
+    })
+    .option("tag", {
+      alias: "t",
+      array: false,
+      required: true,
+      describe: "Tag of the party",
+    });
 };
 
 export const setPartyBuilder = (context: yargs.Argv) => {

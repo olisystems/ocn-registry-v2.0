@@ -10,9 +10,9 @@ if [ -z "$1" ]; then
 fi
 
 # Remove the proposals.json file if it exists
-if [ -f proposals.json ]; then
+if [ -f ../../proposals.json ]; then
   echo "Removing proposals.json..."
-  rm proposals.json
+  rm ../../proposals.json
 else
   echo "No proposals.json file found."
 fi
@@ -31,6 +31,7 @@ yarn hardhat deploy --network $NETWORK --tags setup
 yarn hardhat deploy --network $NETWORK --tags stablecoin
 yarn hardhat deploy --network $NETWORK --tags payment
 yarn hardhat deploy --network $NETWORK --tags certificateverifier
+yarn hardhat deploy --network $NETWORK --tags oracles
 yarn hardhat deploy --network $NETWORK --tags registry
 
 echo "All Smart Contracts deployed and configured successfully on blockchain: $NETWORK."
