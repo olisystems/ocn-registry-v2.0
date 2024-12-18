@@ -25,6 +25,7 @@ const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
 const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
 const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
+const minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_URL || "http://hardhat.default.svc.cluster.local:8555";
 
 const config = {
   sourcify: {
@@ -82,15 +83,7 @@ const config = {
       loggingEnabled: true,
     },
     minikube: {
-      url: `http://hardhat.default.svc.cluster.local:8555`,
-      chainId: 31337,
-      live: false,
-      saveDeployments: true,
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
-      loggingEnabled: true,
-    },
-    minikube_external: {
-      url: `http://127.0.0.1:8555`,
+      url: minikubeHardhatURL,
       chainId: 31337,
       live: false,
       saveDeployments: true,

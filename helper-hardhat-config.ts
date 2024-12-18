@@ -18,7 +18,6 @@ export const networkExtraConfig: networkConfigInfo = {
   amoy: {},
   volta: {},
   minikube: {},
-  minikube_external: {},
 };
 
 export const developmentChains = ["hardhat", "localhost", "ganache"];

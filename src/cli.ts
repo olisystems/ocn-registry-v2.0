@@ -207,7 +207,7 @@ yargs
       console.log(result);
     },
   )
-  .command("get-party", "Get OCPI party entry listed in the registry", getPartyBuilder, async (args) => {
+  .command("get-party <address>", "Get OCPI party entry listed in the registry", getPartyBuilder, async (args) => {
     const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
     let result: PartyDetails | undefined;
     if (args.address) {
