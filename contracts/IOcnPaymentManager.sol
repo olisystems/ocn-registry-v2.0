@@ -22,7 +22,7 @@ interface IOcnPaymentManager {
     /*            FUNCTIONS               */
     /* ********************************** */
 
-    function initialize(address _euroStablecoin, uint256 _fundingYearlyAmount) external;
+    function initialize(address _euroStablecoin, uint256 _fundingYearlyAmount, address _operator) external;
     function pay(address party) external;
     function withdrawToRegistryOperator(address party) external;
     function getPaymentStatus(address party) external view returns (PaymentStatus);

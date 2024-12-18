@@ -52,7 +52,7 @@ export class OcnPaymentManagerCli extends ContractWrapper {
 
   public async withdraw(address: string): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
-    const tx = await this.contract.withdraw(address);
+    const tx = await this.contract.withdrawToRegistryOperator(address);
     await tx.wait();
     return tx;
   }
