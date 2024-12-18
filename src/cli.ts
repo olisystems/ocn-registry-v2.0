@@ -23,6 +23,7 @@ import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilde
 import { PartyDetails, Role } from "./lib/types";
 import { networks } from "./networks";
 import { getOverrides, bigIntToString } from "./lib/helpers";
+import { ethers } from "ethers";
 
 yargs
   .option("network", {
@@ -42,7 +43,7 @@ yargs
     describe: "Data owner's private key. Required for modifying contract state.",
   })
   .option("ocn-registry", {
-    alias: "r",
+    alias: "a",
     string: true,
     describe: "Specific contract address of a pre deployed Ocn Registry. By default it uses the one from deployments folder",
   })
@@ -51,6 +52,26 @@ yargs
     string: true,
     describe: "Spender's private key. Required for sending raw transactions.",
   })
+  .command(
+    "get-registry-contract-address",
+    "Get the current OcnRegistry contract address deployed in the current network",
+    () => {},
+    async (args) => {
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
+
+      console.log(registry.getAddress());
+    },
+  )
+  .command(
+    "get-payment-contract-address",
+    "Get the current OcnPaymentManager contract address deployed in the current network",
+    () => {},
+    async (args) => {
+      const ocnPayment = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+
+      console.log(ocnPayment.getAddress());
+    },
+  )
   .command(
     "get-node <address>",
     "Get OCN Node operator entry by their wallet address",
@@ -71,12 +92,75 @@ yargs
     "Get all OCN Nodes listed in registry",
     () => {},
     async (args) => {
-      console.log("############ list-nodes called.  I M HERE");
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllNodes();
       console.log(JSON.stringify(result, null, 2));
     },
   )
+  .command(
+    "is-node-registered",
+    "Get all OCN Nodes listed in registry contract and verify if the address of current signer is contained |",
+    () => {},
+    async (args) => {
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
+      const result = await registry.getAllNodes();
+      const signerPrivateKey = process.env.SIGNER || args.signer;
+      if (signerPrivateKey) {
+        const wallet = new ethers.Wallet(signerPrivateKey);
+        const signerAddress = wallet.address;
+
+        const isRegistered = result.some((node: { operator: string; url: string }) => node.operator.toLowerCase() === signerAddress.toLowerCase());
+
+        if (isRegistered) {
+          console.log(`true`);
+        } else {
+          console.log(`false`);
+        }
+      } else {
+        console.log("No signer private key provided.");
+      }
+    },
+  )
+  .command(
+    "get-signer-address",
+    "Get address of the signer ",
+    () => {},
+    async (args) => {
+      const signerPrivateKey = process.env.SIGNER || args.signer;
+      if (signerPrivateKey) {
+        const wallet = new ethers.Wallet(signerPrivateKey);
+        const signerAddress = wallet.address;
+        console.log(signerAddress);
+      } else {
+        console.log("No signer private key provided.");
+      }
+    },
+  )
+
+  .command(
+    "is-party-registered",
+    "Get all OCN Parties listed in registry contract and verify if the address of current signer is contained |",
+    () => {},
+    async (args) => {
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
+      const result = await registry.getAllParties();
+      const signerPrivateKey = process.env.SIGNER || args.signer;
+      if (signerPrivateKey) {
+        const wallet = new ethers.Wallet(signerPrivateKey);
+        const signerAddress = wallet.address;
+        const isRegistered = result.some((node: { address: string; url: string }) => node.address.toLowerCase() === signerAddress.toLowerCase());
+
+        if (isRegistered) {
+          console.log(`true`);
+        } else {
+          console.log(`false`);
+        }
+      } else {
+        console.log("No signer private key provided.");
+      }
+    },
+  )
+
   .command(
     "set-node <domain>",
     "Create or update OCN Node operator entry",

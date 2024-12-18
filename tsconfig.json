@@ -9,12 +9,13 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
   }
   ,
   "include": [
-    "src/**/*.ts"
+    "src/**/*"
   ],
   "exclude": [
-    "test/**/*"
+    "test/**/*", "node_modules"
   ]
 }

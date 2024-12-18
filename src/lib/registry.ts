@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { ethers, Wallet } from "ethers";
+import { Addressable, ethers, Wallet } from "ethers";
 import { URL } from "url";
 import * as sign from "./sign";
 import * as types from "./types";
@@ -30,6 +30,10 @@ export class Registry extends ContractWrapper {
     const ocnRegistryJson: any = require(absolutePath);
     const ocnRegistryContract: Contract = { ...ocnRegistryJson };
     super(ocnRegistryContract, environment, signer, environmentOptions, specifContractAddress);
+  }
+
+  getAddress(): string | Addressable {
+    return this.contract.target;
   }
 
   /**

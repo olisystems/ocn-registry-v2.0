@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { ethers, Wallet } from "ethers";
+import { Addressable, ethers, Wallet } from "ethers";
 import { Network, Contract } from "../types/network";
 import { ContractWrapper } from "./contract-wrapper";
 import path from "path";
@@ -26,6 +26,10 @@ export class OcnPaymentManagerCli extends ContractWrapper {
     const ocnPaymentManagerJson: any = require(absolutePath);
     const ocnPaymentManagerContract: Contract = { ...ocnPaymentManagerJson };
     super(ocnPaymentManagerContract, environment, signer, environmentOptions);
+  }
+
+  getAddress(): string | Addressable {
+    return this.contract.target;
   }
 
   /**
