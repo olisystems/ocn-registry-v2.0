@@ -64,7 +64,7 @@
     "viem": "^2.7.6"
   },
   "scripts": {
-    "build-and-publish": "yarn build && yarn publish",
+    "build-and-publish": "yarn build && yarn version --patch && yarn publish",
     "build": "tsc && yarn copy-json",
     "copy-json": "cpx 'src/**/*.json' dist",
     "test": "yarn hardhat test --network localhost",

@@ -105,6 +105,12 @@ ETHERSCAN_API_KEY=
 
 - Deploy and setup Smart Contracts: `sh run-deploy.sh <NETWORK>`, example: `sh run-deploy.sh localhost`
 
+### Publish deployed Smart Contract Address
+
+The deployed smart contract address are desined to be packaged inside the dist/deployment folder and published in the npmjs repolitory to be accessed publicly. Only members of the oli-systems organizations in npmjs have access to publish, to do it run:
+
+- `yarn build-and-publish`
+
 ### Verify Contracts (Polygon testnet only)
 
 - Verify the OcnVoteToken SmartContract example in polygon scan:
