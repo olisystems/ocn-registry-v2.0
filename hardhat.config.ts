@@ -20,11 +20,11 @@ require("fs")
     require(tasksFolder + file);
   });
 
-const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
-const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
-const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
-const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
-const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
+const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "0x0000000000000000000000000000000000000000";
+const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "0x0000000000000000000000000000000000000000";
+const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "0x0000000000000000000000000000000000000000";
+const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "0x0000000000000000000000000000000000000000";
+const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "0x0000000000000000000000000000000000000000";
 const minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_URL || "http://hardhat.default.svc.cluster.local:8555";
 
 const config = {
