@@ -13,8 +13,6 @@ fi
 if [ -f proposals.json ]; then
   echo "Removing proposals.json..."
   rm proposals.json
-else
-  echo "No proposals.json file found."
 fi
 
 # Assign the network parameter to a variable

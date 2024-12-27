@@ -1,10 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
-const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
-const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
-const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
+const randomPk: string = "2d70b3cc7f8d71da4ca2b3a37dbd45d622d6b1bcf79b093ebfb62ecac3b4073d";
+const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
+const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
+const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;
+const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || randomPk;
 
 const config = {
   defaultNetwork: "hardhat",

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { ethers, Wallet } from "ethers";
+import { Addressable, ethers, Wallet } from "ethers";
 import { URL } from "url";
 import * as sign from "./sign";
 import * as types from "./types";
@@ -25,11 +25,15 @@ import path from "path";
  * Registry contract wrapper
  */
 export class Registry extends ContractWrapper {
-  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>) {
-    const absolutePath = path.resolve(__dirname, `../../deployments/${environment}/OcnRegistry.json`);
+  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>, specifContractAddress?: string) {
+    const absolutePath = path.resolve(__dirname, `../deployments/${environment}/OcnRegistry.json`);
     const ocnRegistryJson: any = require(absolutePath);
     const ocnRegistryContract: Contract = { ...ocnRegistryJson };
-    super(ocnRegistryContract, environment, signer, environmentOptions);
+    super(ocnRegistryContract, environment, signer, environmentOptions, specifContractAddress);
+  }
+
+  getAddress(): string | Addressable {
+    return this.contract.target;
   }
 
   /**
@@ -77,7 +81,7 @@ export class Registry extends ContractWrapper {
       throw new Error("Signer address is needed to verify for existing node registration");
     }
     await this.checkForExistingNode(this.wallet);
-    const tx = await this.contract.setNode(url.href);
+    const tx = await this.contract.setNode(url.origin);
     await tx.wait();
     return tx;
   }

@@ -20,11 +20,14 @@ require("fs")
     require(tasksFolder + file);
   });
 
-const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
-const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
-const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
-const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
-const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
+// to avoid errors when private keys are not passed as parameters (real deployments)
+const randomPk: string = "2d70b3cc7f8d71da4ca2b3a37dbd45d622d6b1bcf79b093ebfb62ecac3b4073d";
+const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
+const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
+const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;
+const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || randomPk;
+const etherScanApiKey = process.env.ETHERSCAN_API_KEY || randomPk;
+const minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_URL || "http://hardhat.default.svc.cluster.local:8555";
 
 const config = {
   sourcify: {
@@ -78,6 +81,14 @@ const config = {
       live: false,
       saveDeployments: true,
       tags: ["test"],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
+      loggingEnabled: true,
+    },
+    minikube: {
+      url: minikubeHardhatURL,
+      chainId: 31337,
+      live: false,
+      saveDeployments: true,
       accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
       loggingEnabled: true,
     },

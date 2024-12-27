@@ -15,6 +15,10 @@
 */
 
 import { Network } from "./types/network";
+import dotenv from "dotenv";
+dotenv.config();
+
+var minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_HOST || "hardhat.default.svc.cluster.local";
 
 export const networks: Record<string, Network> = {
   ganache: {
@@ -22,6 +26,15 @@ export const networks: Record<string, Network> = {
       protocol: "http",
       host: "localhost",
       port: 8544,
+      network_id: "1337",
+      gas: 8000000,
+    },
+  },
+  minikube: {
+    provider: {
+      protocol: "http",
+      host: minikubeHardhatURL,
+      port: 8555,
       network_id: "1337",
       gas: 8000000,
     },

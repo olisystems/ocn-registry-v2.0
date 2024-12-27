@@ -1,7 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { networkExtraConfig } from "../helper-hardhat-config";
+import { networkExtraConfig, deploymentsDefaultDir, deploymentsDestDir } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
+import copyDeployments from "../helper/copyDeploymentsToSrc";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "OcnRegistry";
@@ -18,6 +19,9 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
     log: true,
     waitConfirmations: networkExtraConfig[network.name].blockConfirmations || 1,
   });
+
+  log("Copying deployments to src...");
+  copyDeployments(deploymentsDefaultDir, deploymentsDestDir);
 
   const timelockContract: any = await ethers.getContract("Timelock", deployer);
   const deployedContract: any = await ethers.getContract(contractName, deployer);

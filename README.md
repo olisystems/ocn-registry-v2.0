@@ -69,6 +69,24 @@ yarn install
 
 ## Development
 
+### Environment variables
+
+create evm compatible wallets and insert them in a .env file like this or attribute straight in memory (`export DEPLOYER_PRIVATE_KEY="PRIVATE_KEY"`) , optionally you can insert polygonscan and etherscan api for smart contract verification (last three variables):
+
+```
+DEPLOYER_PRIVATE_KEY=
+DEPLOYER_ADDRESS=
+NODE_PRIVATE_KEY=
+NODE_WALLET_ADDRESS=
+CPO_PRIVATE_KEY=
+CPO_WALLET_ADDRESS=
+EMSP_PRIVATE_KEY=
+EMSP_WALLET_ADDRESS=
+MUMBAI_ALCHEMY_URL=
+POLYGON_ALCHEMY_URL=
+ETHERSCAN_API_KEY=
+```
+
 ### How to initiate hadhat local network
 
 - `yarn localhost`
@@ -87,11 +105,23 @@ yarn install
 
 - Deploy and setup Smart Contracts: `sh run-deploy.sh <NETWORK>`, example: `sh run-deploy.sh localhost`
 
+### Publish deployed Smart Contract Address
+
+The deployed smart contract address are desined to be packaged inside the dist/deployment folder and published in the npmjs repolitory to be accessed publicly. Only members of the oli-systems organizations in npmjs have access to publish, to do it run:
+
+- `yarn build-and-publish`
+
+### Verify Contracts (Polygon testnet only)
+
+- Verify the OcnVoteToken SmartContract example in polygon scan:
+  `SC=OcnVoteToken yarn hardhat deploy --network amoy --tags verify`  
+  Result: https://amoy.polygonscan.com/address/0xe69907c318B0Ca7F04d0849BCC2558d65BB2a61A#code
+
 ### Governance
 
 #### [Localhost Only] Propose, vote, queue and execute a proposal at once
 
-- `sh run-governance.sh localhost`
+- `sh run-governance-example.sh localhost`
 
 #### How to make a proposal
 
@@ -405,7 +435,7 @@ yarn cli set-party --credentials CH MSP \
 Use the following command to remove a party listing from the registry:
 
 ```
-yarn cli delete-party
+yarn cli delete-party -s PARTY_PRIVATE_KEY
 ```
 
 And with raw transaction (setting including signer and spender PKs):
@@ -418,15 +448,20 @@ yarn cli delete-party-raw
 
 ---
 
-### [TypeScript Library](#typescript-library)
+## [Java Library](#java-library)
 
-TODO: To be implemented
+How To Generate Java classes from Smart Contracts to be used by OCN Node
 
-### [Java Library](#java-library)
+### Compile smart contracts
 
-TODO TO be implemented
+- install solc select: `brew install solc-select`
+- install right solidity compiler version: `solc-select install 0.8.24`
+- generate bin and abi files: `solc --abi --bin -o wrapped-java-classes/build --base-path . --include-path ./node_modules  contracts/OcnRegistry.sol`
 
-## TODOs
+### Generata Java files
 
-- Generate Java classes for the Smart Contracts using web3j
-- Publish package in the npmjs to replace @shareandcharge/ocn-registry
+- install sdkman: `curl -s "https://get.sdkman.io" | bash`
+- `source "$HOME/.sdkman/bin/sdkman-init.sh"`
+- set java version using sdkman: `sdk use java 17.0.10-amzn`
+- generate files:`sh web3j-1.6.1/bin/web3j generate solidity -a build/OcnRegistry.abi -b build/OcnRegistry.bin -o src/main/java -p com.oli-systems.ocn-registry-v2.0`
+- verify a file OcnRegistry.java was created in wrapped-java-classes/src/main/java/com/oli-systems/ocn-registry-v2/0

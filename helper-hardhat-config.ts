@@ -17,11 +17,14 @@ export const networkExtraConfig: networkConfigInfo = {
   ganache: {},
   amoy: {},
   volta: {},
+  minikube: {},
 };
 
 export const developmentChains = ["hardhat", "localhost", "ganache"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
+export const deploymentsDefaultDir: string = "deployments";
+export const deploymentsDestDir: string = "src/deployments";
 export const deployerPk = process.env.DEPLOYER_PRIVATE_KEY || "";
 export const nodeOperatorPk = process.env.NODE_PRIVATE_KEY || "";
 export const cpoOperatorPk = process.env.CPO_PRIVATE_KEY || "";
@@ -40,6 +43,6 @@ export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 // export const NEW_YEARLY_AMOUNT = Math.floor(Math.random() * Math.pow(2, 16));
 export const DEFAULT_YEARLY_AMOUNT = 100;
-export const NEW_YEARLY_AMOUNT = 104;
+export const NEW_YEARLY_AMOUNT = 150;
 export const FUNC = "setFundingYearlyAmount";
 export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_YEARLY_AMOUNT + " in the Box!";
