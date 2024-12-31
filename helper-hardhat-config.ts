@@ -17,6 +17,7 @@ export const networkExtraConfig: networkConfigInfo = {
   ganache: {},
   amoy: {},
   volta: {},
+  gnosisChiado: {},
 };
 
 export const developmentChains = ["hardhat", "localhost", "ganache"];
