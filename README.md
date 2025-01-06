@@ -71,7 +71,7 @@ yarn install
 
 ### Environment variables
 
-create evm compatible wallets and insert them in a .env file like this or attribute straight in memory (`export DEPLOYER_PRIVATE_KEY="PRIVATE_KEY"`) , optionally you can insert polygonscan and etherscan api for smart contract verification (last three variables):
+for development purposes rename .env-example to .env, or create yourself evm compatible wallets and insert them in a .env file or attribute straight in memory (`export DEPLOYER_PRIVATE_KEY="PRIVATE_KEY"`) , optionally you can insert polygonscan and etherscan api for smart contract verification (last three variables):
 
 ```
 DEPLOYER_PRIVATE_KEY=
