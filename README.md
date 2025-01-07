@@ -111,6 +111,11 @@ The deployed smart contract address are desined to be packaged inside the dist/d
 
 - `yarn build-and-publish`
 
+### How to get the Address of the Ocn Registry Smart Conctract
+
+you can use the following cli command for that:
+`yarn cli get-registry-contract-address  -n <NETWORK>`
+
 ### Verify Contracts (Polygon testnet only)
 
 - Verify the OcnVoteToken SmartContract example in polygon scan:

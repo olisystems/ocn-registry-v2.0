@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { ethers } from "ethers";
+import { ethers, hexlify, toUtf8Bytes } from "ethers";
 import { toHex } from "web3-utils";
 import { networks } from "../networks";
 import { Contract, Network, Provider } from "../types/network";
@@ -85,7 +85,7 @@ export class ContractWrapper {
     }
   }
 
-  protected toHex(str: string): string {
-    return toHex(str.toUpperCase());
+  protected toBytes(str: string): string {
+    return hexlify(toUtf8Bytes(str));
   }
 }

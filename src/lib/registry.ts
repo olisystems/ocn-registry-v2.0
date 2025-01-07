@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { Addressable, ethers, Wallet } from "ethers";
+import { Addressable, ethers, hexlify, toUtf8Bytes, Wallet } from "ethers";
 import { URL } from "url";
 import * as sign from "./sign";
 import * as types from "./types";
@@ -145,10 +145,10 @@ export class Registry extends ContractWrapper {
     this.verifyStringLen(countryCode, 2);
     this.verifyStringLen(partyId, 3);
 
-    const country = this.toHex(countryCode);
-    const id = this.toHex(partyId);
+    const countryCodeBytes = this.toBytes(countryCode);
+    const partyIdBytes = this.toBytes(partyId);
 
-    const details = await this.contract.getPartyDetailsByOcpi(country, id);
+    const details = await this.contract.getPartyDetailsByOcpi(countryCodeBytes, partyIdBytes);
     const result = this.toPartyDetails(details);
     return result.node.operator !== "0x0000000000000000000000000000000000000000" ? result : undefined;
   }
@@ -183,7 +183,9 @@ export class Registry extends ContractWrapper {
     this.verifyAddress(operator);
     this.verifyUrl(url);
 
-    const tx = await this.contract.setParty(this.toHex(countryCode), this.toHex(partyId), roles, operator, name, url);
+    const countryCodeBytes = this.toBytes(countryCode);
+    const partyIdBytes = this.toBytes(partyId);
+    const tx = await this.contract.setParty(countryCodeBytes, partyIdBytes, roles, operator, name, url);
     await tx.wait();
     return tx;
   }
@@ -204,8 +206,8 @@ export class Registry extends ContractWrapper {
     this.verifyStringLen(partyId, 3);
     this.verifyAddress(operator);
 
-    const country = this.toHex(countryCode);
-    const id = this.toHex(partyId);
+    const country = this.toBytes(countryCode);
+    const id = this.toBytes(partyId);
 
     const wallet = new ethers.Wallet(signer);
     const sig = await sign.setPartyRaw(country, id, roles, operator, name, url, wallet);
