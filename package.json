@@ -1,6 +1,6 @@
 {
   "license": "MIT",
-  "version": "2.0.29",
+  "version": "2.0.30",
   "description": "Oli-systems OCN registry smart contracts",
   "name": "ocn-registry",
   "directories": {
@@ -64,8 +64,9 @@
     "viem": "^2.7.6"
   },
   "scripts": {
-    "build-and-publish": "yarn version --patch && yarn build && yarn publish --non-interactive",
+    "build-and-publish": "yarn version --patch && yarn build && yarn publish --non-interactive && yarn push",
     "build": "tsc && yarn copy-json",
+    "push": "git push --follow-tags",
     "copy-json": "cpx 'src/**/*.json' dist",
     "test": "yarn hardhat test --network localhost",
     "ocn-tests": "HARDHAT_CONFIG=ocn-tests.hardhat.config.ts yarn hardhat node",
