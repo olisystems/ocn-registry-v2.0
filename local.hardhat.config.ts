@@ -6,7 +6,7 @@ const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
 const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;
 const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || randomPk;
-const cdrAdapterPrivateKey = process.env.CD_ADAPTER_PRIVATE_KEY || randomPk;
+const cdrAdapterPrivateKey = process.env.CDR_ADAPTER_PRIVATE_KEY || randomPk;
 const billingPrivateKey = process.env.BILLING_PRIVATE_KEY || randomPk;
 const nspPrivateKey = process.env.NSP_PRIVATE_KEY || randomPk;
 
