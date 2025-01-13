@@ -18,4 +18,4 @@ COPY ./local.hardhat.config.ts .
 EXPOSE 8555
 
 # start blockchain
-ENTRYPOINT ["bash", "-c", "yarn localhost"]
+ENTRYPOINT ["bash", "-c", "yarn localhost --port 8555"]
