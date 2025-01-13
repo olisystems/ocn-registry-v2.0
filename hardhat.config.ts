@@ -26,6 +26,7 @@ const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
 const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;
 const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || randomPk;
+const cdrAdapterPrivateKey = process.env.CD_ADAPTER_PRIVATE_KEY || randomPk;
 const nspPrivateKey = process.env.NSP_PRIVATE_KEY || randomPk;
 const billingPrivateKey = process.env.BILLING_PRIVATE_KEY || randomPk;
 const etherScanApiKey = process.env.ETHERSCAN_API_KEY || randomPk;
@@ -64,7 +65,7 @@ const config = {
     },
     ganache: {
       url: `http://127.0.0.1:8544`,
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, nspPrivateKey, billingPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       chainId: 1337,
     },
     hardhat: {
@@ -73,6 +74,7 @@ const config = {
         { privateKey: nodePrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: cpoPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: emspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: cdrAdapterPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: nspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: billingPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
       ],
@@ -85,7 +87,7 @@ const config = {
       live: false,
       saveDeployments: true,
       tags: ["test"],
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, nspPrivateKey, billingPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       loggingEnabled: true,
     },
     minikube: {
@@ -93,7 +95,7 @@ const config = {
       chainId: 31337,
       live: false,
       saveDeployments: true,
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, nspPrivateKey, billingPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       loggingEnabled: true,
     },
   },
