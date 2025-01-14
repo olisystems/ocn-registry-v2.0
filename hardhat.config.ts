@@ -63,6 +63,12 @@ const config = {
       accounts: [deployerPrivateKey],
       chainId: 73799,
     },
+    chiado: {
+      // energy web chain testnet
+      url: "https://gnosis-chiado-rpc.publicnode.com",
+      accounts: [deployerPrivateKey],
+      chainId: 10200,
+    },
     ganache: {
       url: `http://127.0.0.1:8544`,
       accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],

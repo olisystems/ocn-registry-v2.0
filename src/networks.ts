@@ -57,6 +57,15 @@ export const networks: Record<string, Network> = {
       gasPrice: 100,
     },
   },
+  chiado: {
+    provider: {
+      protocol: "https",
+      host: "gnosis-chiado-rpc.publicnode.com",
+      port: 443,
+      network_id: "10200",
+    },
+  },
+
   prod: {
     provider: {
       protocol: "https",
