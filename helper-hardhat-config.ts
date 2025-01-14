@@ -17,6 +17,7 @@ export const networkExtraConfig: networkConfigInfo = {
   ganache: {},
   amoy: {},
   volta: {},
+  gnosisChiado: {},
 };
 
 export const developmentChains = ["hardhat", "localhost", "ganache"];
@@ -41,5 +42,6 @@ export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 // export const NEW_YEARLY_AMOUNT = Math.floor(Math.random() * Math.pow(2, 16));
 export const DEFAULT_YEARLY_AMOUNT = 100;
 export const NEW_YEARLY_AMOUNT = 104;
-export const FUNC = "setFundingYearlyAmount";
+export const FUNC_SET_FUNDING_YEARLY_AMOUNT = "setFundingYearlyAmount";
+export const FUNC_SET_OPERATOR = "setOperator";
 export const PROPOSAL_DESCRIPTION = "Proposal " + NEW_YEARLY_AMOUNT + " in the Box!";

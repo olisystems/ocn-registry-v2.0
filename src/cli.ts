@@ -19,10 +19,11 @@
 import yargs from "yargs";
 import { Registry } from "./lib/registry";
 import { OcnPaymentManagerCli } from "./lib/ocnPaymentManager";
-import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder } from "./cli/builders";
-import { PartyDetails, Role } from "./lib/types";
+import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder, getOracleProviderBuilder, setOracleProviderBuilder, getOracleProvidersBuilder } from "./cli/builders";
+import { PartyDetails, Role, RoleDetails, EmpCertificate, CpoCertificate } from "./lib/types";
 import { networks } from "./networks";
-import { getOverrides, bigIntToString } from "./lib/helpers";
+import { getOverrides, bigIntToString, readJsonCertificates, encodeEmpCertificate, encodeCertificateSignature, encodeCpoCertificate } from "./lib/helpers";
+import { OracleCli, OracleType } from "./lib/oracle";
 
 yargs
   .option("network", {
@@ -143,10 +144,28 @@ yargs
     const signer = process.env.SIGNER || args.signer;
     const registry = new Registry(args.network, signer, getOverrides(args["network-file"]));
     const [countryCode, partyId] = args.credentials as string[];
-    const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
+    const certificatePaths: string[] = args.certificates as string[];
+    const certificates = await readJsonCertificates(certificatePaths);
+    const roleDetails: RoleDetails[] = certificates.map((certificate) => {
+      if (certificate.role === "EMSP") {
+        let { role, ...certificateData } = certificate;
+        return {
+          certificateData: encodeEmpCertificate(certificateData.certificate as unknown as EmpCertificate),
+          signature: encodeCertificateSignature(certificateData.signature),
+          role: Role.EMSP,
+        };
+      } else {
+        let { role, ...certificateData } = certificate;
+        return {
+          certificateData: encodeCpoCertificate(certificateData.certificate as unknown as CpoCertificate),
+          signature: encodeCertificateSignature(certificateData.signature),
+          role: Role[role as keyof typeof Role],
+        };
+      }
+    });
     const name: string = args.name as string;
     const url: string = args.url as string;
-    const result = await registry.setParty(countryCode, partyId, roles, args.operator as string, name, url);
+    const result = await registry.setParty(countryCode, partyId, roleDetails, args.operator as string, name, url);
     console.log(result);
   })
   .command("set-party-raw", "Create or update OCPI party entry using raw transaction", setPartyBuilder, async (args) => {
@@ -154,10 +173,28 @@ yargs
     const spender = process.env.SPENDER || args.spender;
     const registry = new Registry(args.network, spender, getOverrides(args["network-file"]));
     const [countryCode, partyId] = args.credentials as string[];
-    const roles: Role[] = Array.from(new Set(args.roles as string[])).map((role) => Role[role as keyof typeof Role]);
+    const certificatePaths: string[] = args.certificates as string[];
+    const certificates = await readJsonCertificates(certificatePaths);
+    const roleDetails: RoleDetails[] = certificates.map((certificate) => {
+      if (certificate.role === "EMSP") {
+        let { role, ...certificateData } = certificate;
+        return {
+          certificateData: encodeEmpCertificate(certificateData.certificate as unknown as EmpCertificate),
+          signature: encodeCertificateSignature(certificateData.signature),
+          role: Role.EMSP,
+        };
+      } else {
+        let { role, ...certificateData } = certificate;
+        return {
+          certificateData: encodeCpoCertificate(certificateData.certificate as unknown as CpoCertificate),
+          signature: encodeCertificateSignature(certificateData.signature),
+          role: Role[role as keyof typeof Role],
+        };
+      }
+    });
     const name: string = args.name as string;
     const url: string = args.url as string;
-    const result = await registry.setPartyRaw(countryCode, partyId, roles, args.operator as string, name, url, signer as string);
+    const result = await registry.setPartyRaw(countryCode, partyId, roleDetails, args.operator as string, name, url, signer as string);
     console.log(result);
   })
   .command(
@@ -188,7 +225,6 @@ yargs
     const result = await ocnPaymentManager.getPaymentStatus(args.address as string);
     console.log(result);
   })
-
   .command(
     "get-funding-yearly-amount",
     "Get funding yearly amount",
@@ -201,11 +237,40 @@ yargs
   )
   .command("pay", "Pay the funding yearly amount", getPayBuilder, async (args) => {
     const signer = process.env.SIGNER || args.signer;
+    const partyAddress = args.partyAddress as string;
     const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
-    const result = await ocnPaymentManager.pay();
+    const result = await ocnPaymentManager.pay(partyAddress);
     console.log(result);
   })
-
+  .command("withdraw", "Withdraw yearly funding from party to OCN operator", getWithdrawBuilder, async (args) => {
+    const signer = process.env.SIGNER || args.signer;
+    const partyAddress = args.partyAddress as string;
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
+    const result = await ocnPaymentManager.withdraw(partyAddress);
+    console.log(result);
+  })
+  .command("get-all-providers", "Check all provider status from the oracle", getOracleProvidersBuilder, async (args) => {
+    const role = args.role as OracleType;
+    const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));
+    const details = await oracle.getAllProviders();
+    console.log(details);
+  })
+  .command("get-provider", "Check provider status from the oracle", getOracleProviderBuilder, async (args) => {
+    const role = args.role as OracleType;
+    const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));
+    const [countryCode, partyId] = args.credentials as string[];
+    const details = await oracle.getProvider(countryCode + " " + partyId);
+    console.log(details);
+  })
+  .command("set-provider", "Set provider status from the oracle", setOracleProviderBuilder, async (args) => {
+    const role = args.role as OracleType;
+    const signer = process.env.SIGNER || args.signer;
+    const [countryCode, partyId] = args.credentials as string[];
+    const tag = args.tag as string;
+    const oracle = new OracleCli(args.network, role, signer, getOverrides(args["network-file"]));
+    const details = await oracle.setProvider(countryCode + " " + partyId, tag);
+    console.log(details);
+  })
   .demandCommand(1, "You need to specify at least one command.")
   .strict()
   .fail((msg, err, yargs) => {
