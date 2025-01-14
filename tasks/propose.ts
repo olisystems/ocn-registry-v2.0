@@ -1,6 +1,6 @@
 import { task } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { developmentChains, VOTING_DELAY, FUNC, PROPOSAL_DESCRIPTION, NEW_YEARLY_AMOUNT } from "../helper-hardhat-config";
+import { developmentChains, VOTING_DELAY, FUNC_SET_FUNDING_YEARLY_AMOUNT, PROPOSAL_DESCRIPTION, NEW_YEARLY_AMOUNT } from "../helper-hardhat-config";
 import { OcnGovernor, OcnPaymentManager } from "../typechain";
 import { moveBlocks } from "../helper/moveBlocks";
 import { ProposalStorage } from "../helper/storeProposals";
@@ -58,5 +58,5 @@ task("propose", "Proposes a new yearly funding amount")
     const amount = taskArgs.amount ? taskArgs.amount : NEW_YEARLY_AMOUNT;
     const description = taskArgs.descr ? taskArgs.descr : PROPOSAL_DESCRIPTION;
     // Call the propose function with appropriate parameters
-    return await propose([amount], FUNC, description);
+    return await propose([amount], FUNC_SET_FUNDING_YEARLY_AMOUNT, description);
   });

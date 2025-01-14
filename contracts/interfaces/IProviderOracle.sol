@@ -7,5 +7,9 @@ interface IProviderOracle {
         string identifier;
     }
 
-    function getProvider(string memory identifier) external view returns (Provider memory);
+    function getProvider(
+        string memory identifier
+    ) external view returns (Provider memory);
+
+    function addProvider(Provider memory provider) external;
 }

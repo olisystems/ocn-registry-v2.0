@@ -436,6 +436,11 @@
         "internalType": "uint256",
         "name": "_fundingYearlyAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_operator",
+        "type": "address"
       }
     ],
     "name": "initialize",

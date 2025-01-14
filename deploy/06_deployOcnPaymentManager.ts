@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper/verify";
-import { networkExtraConfig, developmentChains, DEFAULT_YEARLY_AMOUNT } from "../helper-hardhat-config";
+import { networkExtraConfig, developmentChains, DEFAULT_YEARLY_AMOUNT, ADDRESS_ZERO } from "../helper-hardhat-config";
 import { artifacts, ethers } from "hardhat";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -14,8 +14,10 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
   const euroStableCoinDeplyedContract = await ethers.getContract("EuroStableCoin", deployer);
 
+  const defaultOperator = process.env.DEFAULT_OPERATOR || ADDRESS_ZERO;
+
   const OcnPaymentManager = await ethers.getContractFactory(contractName);
-  const deployedContract = await upgrades.deployProxy(OcnPaymentManager, [euroStableCoinDeplyedContract.target, DEFAULT_YEARLY_AMOUNT]);
+  const deployedContract = await upgrades.deployProxy(OcnPaymentManager, [euroStableCoinDeplyedContract.target, DEFAULT_YEARLY_AMOUNT, defaultOperator]);
   await deployedContract.waitForDeployment();
 
   await save(contractName, {

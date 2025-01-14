@@ -32,9 +32,10 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
     /*          INITIALIZER               */
     /* ********************************** */
 
-    function initialize(address _euroStablecoin, uint256 _fundingYearlyAmount) public initializer {
+    function initialize(address _euroStablecoin, uint256 _fundingYearlyAmount, address _operator) public initializer {
         UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
         euroStablecoin = IERC20(_euroStablecoin);
+        operatorAddress = _operator;
         fundingYearlyAmount = _fundingYearlyAmount * 1e18;
         stakingPeriodInBlocks = 2102400;
 
