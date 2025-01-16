@@ -86,6 +86,6 @@ export class ContractWrapper {
   }
 
   protected toBytes(str: string): string {
-    return hexlify(toUtf8Bytes(str.toUpperCase());
+    return hexlify(toUtf8Bytes(str.toUpperCase()));
   }
 }
