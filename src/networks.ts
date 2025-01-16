@@ -65,6 +65,14 @@ export const networks: Record<string, Network> = {
       network_id: "10200",
     },
   },
+  gnosis: {
+    provider: {
+      protocol: "https",
+      host: "rpc.gnosischain.com",
+      port: 443,
+      network_id: "100",
+    },
+  },
 
   prod: {
     provider: {

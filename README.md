@@ -39,6 +39,23 @@ Providers) to link their services to a registered node.
 Note that the registry listing must be done by the OCPI party before an OCN Node accepts their credentials
 registration, so that the OCN Node can ensure the party has correctly linked themselves to that node in the registry.
 
+#### Party Certificates
+
+As a goal of having an open and non-discrimanatory registry, the OCN registry supports party registration through
+certificates, which are issued by a trusted party that verifies off-chain that the party is not being impersonated by
+a malicious actor.
+
+These certificates are based on a ECDSA signature issued by a trusty third-party which then need to be registered as valid
+verifiers on the registry.
+
+#### Oracles
+
+This is an optional feature which manages the status of the OCPI parties registered on the node, while integrating certificates
+ensures that parties are valid the registry still needs a way to check if the party is valid in the future.
+
+Oracles enable a way to constantly check if an OCPI party has a valid and active role off-chain, in this way the OCN Node can
+constantly check the status of the parties and act accordingly.
+
 ##### Example OCPI Party connection steps:
 
 1. Operator signs a transaction stating they run the OCN Node on domain `https://node.ocn.org`. The address of their
@@ -372,10 +389,13 @@ yarn cli get-party --credentials CH CPO
 To list a party, the following information is required:
 
 - `country_code` and `party_id`
-- role
+- role details (role with certificate metadata)
 - OCN Node operator wallet address
 - name
 - url of the sercice
+
+#### Role Details
+In order to register into the ocn-registry the party needs a valid certificate signed by a allowed verifier, this certificate can be generated following the instructions on: https://github.com/olisystems/banula-provider-credentials
 
 The following commands can be used to both create and update the party information.
 

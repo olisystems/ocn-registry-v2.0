@@ -14,9 +14,49 @@
     limitations under the License.
 */
 
+export interface JsonCertificate {
+  role: string,
+  certificate: {
+    [x: string]: string
+  },
+  signature: {
+    r: string;
+    s: string;
+    v: number;
+  }
+}
+
+export interface EmpCertificate {
+  identifier: string;
+  name: string;
+  marktfunktion: string;
+  lieferant: string;
+  bilanzkreis: string;
+  owner: string;
+}
+
+export interface CpoCertificate {
+  identifier: string;
+  name: string;
+  owner: string;
+}
+
 export interface Node {
   operator: string;
   url: string;
+}
+
+export interface SignResult {
+  r: string;
+  s: string;
+  v: number;
+  hash: Uint8Array;
+};
+
+export interface RoleDetails {
+  certificateData: string;
+  signature: string;
+  role: number;
 }
 
 export interface PartyDetails {
@@ -51,7 +91,6 @@ export enum ProposalState {
 export enum Role {
   CPO,
   EMSP,
-  HUB,
   NAP,
   NSP,
   OTHER,

@@ -47,16 +47,16 @@ export class OcnPaymentManagerCli extends ContractWrapper {
     return fundingYearlyAmount || undefined;
   }
 
-  public async pay(): Promise<ethers.TransactionReceipt> {
+  public async pay(address: string): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
-    const tx = await this.contract.pay();
+    const tx = await this.contract.pay(address);
     await tx.wait();
     return tx;
   }
 
-  public async withdraw(): Promise<ethers.TransactionReceipt> {
+  public async withdraw(address: string): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
-    const tx = await this.contract.withdraw();
+    const tx = await this.contract.withdrawToRegistryOperator(address);
     await tx.wait();
     return tx;
   }

@@ -69,6 +69,13 @@ const config = {
       accounts: [deployerPrivateKey],
       chainId: 10200,
     },
+    gnosis: {
+      // Gnosis chain mainnet
+      url: "https://rpc.gnosischain.com",
+      accounts: [deployerPrivateKey],
+      chainId: 100,
+    },
+
     ganache: {
       url: `http://127.0.0.1:8544`,
       accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
