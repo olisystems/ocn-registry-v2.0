@@ -1,13 +1,15 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { networkExtraConfig } from "../helper-hardhat-config";
+import { deploymentsDefaultDir, deploymentsDestDir, networkExtraConfig } from "../helper-hardhat-config";
 import * as CertificateVerifierABI from "../test/certificates/CertificateVerifier.json";
+import { artifacts, ethers } from "hardhat";
+import copyDeployments from "../helper/copyDeploymentsToSrc";
 
 const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "CertificateVerifier";
   const { deployer } = await hre.getNamedAccounts();
   const { deployments, network } = hre;
-  const { deploy, log } = deployments;
+  const { deploy, log, save } = deployments;
 
   log("----------------------------------------------------");
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
@@ -20,9 +22,14 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
     contract: {
       abi: CertificateVerifierABI.abi,
       bytecode: CertificateVerifierABI.bytecode,
-      deployedBytecode: CertificateVerifierABI.deployedBytecode
-    }
+      deployedBytecode: CertificateVerifierABI.deployedBytecode,
+    },
   });
+
+  const deployedContract: any = await ethers.getContract(contractName, deployer);
+
+  log("Copying deployments to src...");
+  copyDeployments(deploymentsDefaultDir, deploymentsDestDir);
 };
 
 export default deployCertificateVerifier;

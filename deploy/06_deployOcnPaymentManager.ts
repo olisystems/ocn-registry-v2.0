@@ -1,8 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper/verify";
-import { networkExtraConfig, developmentChains, DEFAULT_YEARLY_AMOUNT, ADDRESS_ZERO } from "../helper-hardhat-config";
+import { deploymentsDefaultDir, deploymentsDestDir, DEFAULT_YEARLY_AMOUNT, ADDRESS_ZERO } from "../helper-hardhat-config";
 import { artifacts, ethers } from "hardhat";
+import copyDeployments from "../helper/copyDeploymentsToSrc";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "OcnPaymentManager";
@@ -24,6 +25,9 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
     address: await deployedContract.getAddress(),
     abi: artifacts.readArtifactSync(contractName).abi,
   });
+
+  log("Copying deployments to src...");
+  copyDeployments(deploymentsDefaultDir, deploymentsDestDir);
 
   const timelockContract: any = await ethers.getContract("Timelock", deployer);
   log(`Transferring ownership of ${contractName} to TimeLock at ${timelockContract.target}...`);

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { ethers } from "ethers";
+import { ethers, hexlify, toUtf8Bytes } from "ethers";
 import { toHex } from "web3-utils";
 import { networks } from "../networks";
 import { Contract, Network, Provider } from "../types/network";
@@ -30,7 +30,7 @@ export class ContractWrapper {
    */
   public mode: "r" | "r+w";
 
-  constructor(contract: Contract, environment: string, signer?: string, overrides?: Partial<Network>) {
+  constructor(contract: Contract, environment: string, signer?: string, overrides?: Partial<Network>, specifContractAddress?: string) {
     if (!networks[environment]) {
       throw new Error(`Option \"${environment}\" not found in configured networks.`);
     }
@@ -49,8 +49,12 @@ export class ContractWrapper {
     } else {
       this.mode = "r";
     }
-
-    this.contract = new ethers.Contract(contract.address, contract.abi, this.wallet || this.provider);
+    if (specifContractAddress) {
+      this.verifyAddress(specifContractAddress);
+      this.contract = new ethers.Contract(specifContractAddress, contract.abi, this.wallet || this.provider);
+    } else {
+      this.contract = new ethers.Contract(contract.address, contract.abi, this.wallet || this.provider);
+    }
   }
 
   protected verifyAddress(address: string): void {
@@ -81,7 +85,7 @@ export class ContractWrapper {
     }
   }
 
-  protected toHex(str: string): string {
-    return ethers.hexlify(ethers.toUtf8Bytes(str.toUpperCase()));
+  protected toBytes(str: string): string {
+    return hexlify(toUtf8Bytes(str.toUpperCase());
   }
 }

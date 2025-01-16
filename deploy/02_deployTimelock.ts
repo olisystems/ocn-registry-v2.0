@@ -1,8 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper/verify";
-import { networkExtraConfig, developmentChains, MIN_DELAY } from "../helper-hardhat-config";
+import { networkExtraConfig, deploymentsDefaultDir, deploymentsDestDir, MIN_DELAY } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
+import copyDeployments from "../helper/copyDeploymentsToSrc";
 
 const deployTimelock: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const contractName = "Timelock";
@@ -19,6 +20,9 @@ const deployTimelock: DeployFunction = async function (hre: HardhatRuntimeEnviro
     log: true,
     waitConfirmations: networkExtraConfig[network.name].blockConfirmations || 1,
   });
+
+  log("Copying deployments to src...");
+  copyDeployments(deploymentsDefaultDir, deploymentsDestDir);
 };
 
 export default deployTimelock;

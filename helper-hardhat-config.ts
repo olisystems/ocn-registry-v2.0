@@ -17,12 +17,16 @@ export const networkExtraConfig: networkConfigInfo = {
   ganache: {},
   amoy: {},
   volta: {},
-  gnosisChiado: {},
+  minikube: {},
+  chiado: {},
+  gnosis: {},
 };
 
 export const developmentChains = ["hardhat", "localhost", "ganache"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
+export const deploymentsDefaultDir: string = "deployments";
+export const deploymentsDestDir: string = "src/deployments";
 export const deployerPk = process.env.DEPLOYER_PRIVATE_KEY || "";
 export const nodeOperatorPk = process.env.NODE_PRIVATE_KEY || "";
 export const cpoOperatorPk = process.env.CPO_PRIVATE_KEY || "";
