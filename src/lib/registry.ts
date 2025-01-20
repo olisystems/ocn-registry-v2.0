@@ -183,8 +183,8 @@ export class Registry extends ContractWrapper {
     this.verifyAddress(operator);
     this.verifyUrl(url);
 
-    const countryCodeBytes = this.toBytes2(countryCode);
-    const partyIdBytes = this.toBytes3(partyId);
+    const countryCodeBytes = this.toBytes(countryCode);
+    const partyIdBytes = this.toBytes(partyId);
     const tx = await this.contract.setParty(countryCodeBytes, partyIdBytes, roles, operator, name, url);
     await tx.wait();
     return tx;
