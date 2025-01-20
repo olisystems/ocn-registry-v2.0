@@ -395,6 +395,7 @@ To list a party, the following information is required:
 - url of the sercice
 
 #### Role Details
+
 In order to register into the ocn-registry the party needs a valid certificate signed by a allowed verifier, this certificate can be generated following the instructions on: https://github.com/olisystems/banula-provider-credentials
 
 The following commands can be used to both create and update the party information.
@@ -487,6 +488,7 @@ How To Generate Java classes from Smart Contracts to be used by OCN Node
 
 - install sdkman: `curl -s "https://get.sdkman.io" | bash`
 - `source "$HOME/.sdkman/bin/sdkman-init.sh"`
+- `cd wrapped-java-classes`
 - set java version using sdkman: `sdk use java 17.0.10-amzn`
 - generate files:`sh web3j-1.6.1/bin/web3j generate solidity -a build/OcnRegistry.abi -b build/OcnRegistry.bin -o src/main/java -p com.oli-systems.ocn-registry-v2.0`
 - verify a file OcnRegistry.java was created in wrapped-java-classes/src/main/java/com/oli-systems/ocn-registry-v2/0
