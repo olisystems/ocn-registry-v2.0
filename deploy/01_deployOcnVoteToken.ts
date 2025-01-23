@@ -1,7 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper/verify";
-import { networkExtraConfig, developmentChains } from "../helper-hardhat-config";
+import copyDeployments from "../helper/copyDeploymentsToSrc";
+import { networkExtraConfig, deploymentsDefaultDir, deploymentsDestDir } from "../helper-hardhat-config";
 import { ethers } from "hardhat";
 
 //TODO resesarch deployments using Ignition
@@ -24,6 +25,9 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   log(`Delegating to ${deployer}`);
   await delegate(deployedContract.address, deployer);
   log("Delegated!");
+
+  log("Copying deployments to src...");
+  copyDeployments(deploymentsDefaultDir, deploymentsDestDir);
 };
 
 const delegate = async (governanceTokenAddress: string, delegatedAccount: string) => {

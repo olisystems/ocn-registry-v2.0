@@ -1,14 +1,15 @@
 {
   "license": "MIT",
-  "version": "2.0.0",
+  "version": "2.0.40",
   "description": "Oli-systems OCN registry smart contracts",
+  "name": "ocn-registry",
   "directories": {
     "test": "test"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
-  "main": "dist/library.js",
+  "main": "dist/cli.js",
   "bin": {
     "ocn-registry": "dist/cli.js"
   },
@@ -16,6 +17,16 @@
     "*.json",
     "dist/*"
   ],
+  "author": {
+    "name": "Matheus Rosendo"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
+    "fs-extra": "^11.2.0",
+    "web3-utils": "^4.3.1",
+    "yargs": "^17.7.2"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.2",
     "@nomicfoundation/hardhat-ignition": "^0.15.0",
@@ -36,10 +47,7 @@
     "@types/node": ">=18.0.0",
     "@types/yargs": "^17.0.33",
     "chai": "^4.2.0",
-    "dotenv": "^16.4.5",
-    "ethers": "^6.13.2",
-    "fs": "^0.0.1-security",
-    "fs-extra": "^11.2.0",
+    "cpx": "^1.5.0",
     "hardhat": "^2.22.9",
     "hardhat-abi-exporter": "^2.10.1",
     "hardhat-deploy": "^0.12.4",
@@ -53,16 +61,27 @@
     "ts-node": ">=8.0.0",
     "typechain": "^8.3.2",
     "typescript": "~5.0.4",
-    "viem": "^2.7.6",
-    "web3-utils": "^4.3.1",
-    "yargs": "^17.7.2"
+    "viem": "^2.7.6"
   },
   "scripts": {
-    "build": "tsc",
-    "localhost": "HARDHAT_CONFIG=local.hardhat.config.ts yarn hardhat node",
+    "build-and-publish": "yarn version --patch && yarn build && yarn publish --non-interactive && yarn push",
+    "build": "tsc && yarn copy-json",
+    "push": "git push --follow-tags",
+    "copy-json": "cpx 'src/**/*.json' dist",
+    "test": "yarn hardhat test --network localhost",
+    "ocn-tests": "HARDHAT_CONFIG=ocn-tests.hardhat.config.ts yarn hardhat node",
+    "localhost": "HARDHAT_CONFIG=local.hardhat.config.ts yarn hardhat node ",
     "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
     "lint": "solhint 'contracts/*.sol'",
     "debug-cli": "node --inspect -r ts-node/register  src/cli ",
     "cli": "ts-node src/cli"
-  }
+  },
+  "keywords": [
+    "smart-contracts",
+    "registry",
+    "blockchain",
+    "ocn",
+    "oli-systems",
+    "ocpi"
+  ]
 }

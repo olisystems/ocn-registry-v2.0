@@ -14,5 +14,15 @@
     ],
     "name": "StringsInsufficientHexLength",
     "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "StringsInvalidAddressFormat",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "StringsInvalidChar",
+    "type": "error"
   }
 ]

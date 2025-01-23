@@ -20,11 +20,17 @@ require("fs")
     require(tasksFolder + file);
   });
 
-const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || "";
-const nodePrivateKey = process.env.NODE_PRIVATE_KEY || "";
-const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || "";
-const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || "";
-const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
+// to avoid errors when private keys are not passed as parameters (real deployments)
+const randomPk: string = "2d70b3cc7f8d71da4ca2b3a37dbd45d622d6b1bcf79b093ebfb62ecac3b4073d";
+const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
+const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
+const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;
+const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || randomPk;
+const cdrAdapterPrivateKey = process.env.CD_ADAPTER_PRIVATE_KEY || randomPk;
+const nspPrivateKey = process.env.NSP_PRIVATE_KEY || randomPk;
+const billingPrivateKey = process.env.BILLING_PRIVATE_KEY || randomPk;
+const etherScanApiKey = process.env.ETHERSCAN_API_KEY || randomPk;
+const minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_URL || "http://hardhat.default.svc.cluster.local:8555";
 
 const config = {
   sourcify: {
@@ -57,14 +63,22 @@ const config = {
       accounts: [deployerPrivateKey],
       chainId: 73799,
     },
-    gnosisChiado: {
+    chiado: {
+      // energy web chain testnet
       url: "https://gnosis-chiado-rpc.publicnode.com",
       accounts: [deployerPrivateKey],
       chainId: 10200,
     },
+    gnosis: {
+      // Gnosis chain mainnet
+      url: "https://rpc.gnosischain.com",
+      accounts: [deployerPrivateKey],
+      chainId: 100,
+    },
+
     ganache: {
       url: `http://127.0.0.1:8544`,
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       chainId: 1337,
     },
     hardhat: {
@@ -73,6 +87,9 @@ const config = {
         { privateKey: nodePrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: cpoPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
         { privateKey: emspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: cdrAdapterPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: nspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
+        { privateKey: billingPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
       ],
       chainId: 31337,
       live: false,
@@ -83,7 +100,15 @@ const config = {
       live: false,
       saveDeployments: true,
       tags: ["test"],
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey],
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
+      loggingEnabled: true,
+    },
+    minikube: {
+      url: minikubeHardhatURL,
+      chainId: 31337,
+      live: false,
+      saveDeployments: true,
+      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       loggingEnabled: true,
     },
   },

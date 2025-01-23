@@ -1,7 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { networkExtraConfig } from "../helper-hardhat-config";
+import { deploymentsDefaultDir, deploymentsDestDir, networkExtraConfig } from "../helper-hardhat-config";
 import * as ProvidersOracleABI from "../test/oracles/ProvidersOracle.json";
+import copyDeployments from "../helper/copyDeploymentsToSrc";
 
 const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let contractName = "EMSPOracle";
@@ -19,8 +20,8 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
     contract: {
       abi: ProvidersOracleABI.abi,
       bytecode: ProvidersOracleABI.bytecode,
-      deployedBytecode: ProvidersOracleABI.deployedBytecode
-    }
+      deployedBytecode: ProvidersOracleABI.deployedBytecode,
+    },
   });
 
   contractName = "CPOOracle";
@@ -34,9 +35,12 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
     contract: {
       abi: ProvidersOracleABI.abi,
       bytecode: ProvidersOracleABI.bytecode,
-      deployedBytecode: ProvidersOracleABI.deployedBytecode
-    }
+      deployedBytecode: ProvidersOracleABI.deployedBytecode,
+    },
   });
+
+  log("Copying deployments to src...");
+  copyDeployments(deploymentsDefaultDir, deploymentsDestDir);
 };
 
 export default deployCertificateVerifier;

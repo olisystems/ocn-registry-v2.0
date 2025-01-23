@@ -1,0 +1,18 @@
+{
+  "certificate": {
+    "bilanzkreis": "bilanzkreis",
+    "identifier": "DE OLI",
+    "lieferant": "lieferant",
+    "marktfunktion": "marktfunktion",
+    "name": "Name",
+    "owner": "0x2640750A1d9D9c3137C0096e7e59AE9C368bD4f3",
+    "signature": "KP95cAqgUnjTp1K8occBmZh4gpouWy21Mai/PlNI2nY5EfHBFWftZ0dtPloIOmg5Kyinwxk183f5+0LI74fvshw="
+  },
+  "role": "EMSP",
+  "signature": {
+    "message_hash": "0xbb1316f52d4b650ef98277fa66e562a6689582103499229efd24f08bc637c640",
+    "r": "0xb28c681ccda7f98bc42d25a530607d8ff2050938130034af1c523f4eb8a1fc3b",
+    "s": "0x660eb16be19c455304a84ea6abca45264ec0c735639ed066becc844336838ff1",
+    "v": 28
+  }
+}
