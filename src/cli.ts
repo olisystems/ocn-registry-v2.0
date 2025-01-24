@@ -99,7 +99,7 @@ yargs
     },
   )
   .command(
-    "is-signer-registered-as-party",
+    "is-signer-registered-as-node",
     "Get all OCN Nodes listed in registry contract and verify if the address of current signer is contained |",
     () => {},
     async (args) => {
