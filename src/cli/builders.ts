@@ -18,10 +18,10 @@ import * as yargs from "yargs";
 
 export const getPartyBuilder = (context: yargs.Argv) => {
   context
-    .example("get-party -a 0x9bC11...bfeB4", "Get a party by its wallet address")
+    .example("get-party -z 0x9bC11...bfeB4", "Get a party by its wallet address")
     .example("get-party -c DE CPO", "Get a party by its OCPI country_code and party_id")
     .option("address", {
-      alias: "a",
+      alias: "z",
       string: true,
       conflicts: "credentials",
       describe: "Wallet address of the party",

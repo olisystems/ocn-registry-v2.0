@@ -133,7 +133,7 @@ export class Registry extends ContractWrapper {
   public async getPartyByAddress(address: string): Promise<types.PartyDetails | undefined> {
     const details = await this.contract.getPartyDetailsByAddress(address);
     const result = this.toPartyDetails(details);
-    return result.node.operator !== "0x0000000000000000000000000000000000000000" ? result : undefined;
+    return result.operatorAddress !== "0x0000000000000000000000000000000000000000" ? result : undefined;
   }
 
   /**
@@ -150,7 +150,7 @@ export class Registry extends ContractWrapper {
 
     const details = await this.contract.getPartyDetailsByOcpi(countryCodeBytes, partyIdBytes);
     const result = this.toPartyDetails(details);
-    return result.node.operator !== "0x0000000000000000000000000000000000000000" ? result : undefined;
+    return result.operatorAddress !== "0x0000000000000000000000000000000000000000" ? result : undefined;
   }
 
   /**
@@ -242,17 +242,15 @@ export class Registry extends ContractWrapper {
 
   private toPartyDetails(input: any): types.PartyDetails {
     return {
-      address: input[0],
+      partyAddress: input[0],
       countryCode: ethers.toUtf8String(input[1]),
       partyId: ethers.toUtf8String(input[2]),
       roles: input[3].map((index: number) => types.Role[index]),
       paymentStatus: input[4],
-      node: {
-        operator: input[5],
-        url: input[6],
-      },
-      name: input[7],
-      url: input[8],
+      operatorAddress: input[5],
+      name: input[6],
+      url: input[7],
+      active: input[8],
     };
   }
 

@@ -1,0 +1,15 @@
+{
+  "certificate": {
+    "identifier": "DE LND",
+    "name": "DE LND",
+    "owner": "0x718d102F4C07E6500E4968F68f198d31E24712a3",
+    "signature": "Amo2NumGPnoODCCSBnb4qFngtLm4psi2nWW1Gvh31gwBiYVmpEeoWbzxZJx7RF6mYJEpXgFoiJjpmPUzj3HG6Bw="
+  },
+  "role": "OTHER",
+  "signature": {
+    "message_hash": "0xf5c4d7eb45deff398df267ee2e3f8c9cfa7814bde7200ac2acf717b0d8197427",
+    "r": "0xc2ce758d3072f5ba8f89e50e27ed9c0d05009b965166e86edec1000fe99b42f5",
+    "s": "0x1e21d87fc0ea330b4308402f6bea13205403cec64d1103b4a7d2b9a9ce5b0230",
+    "v": 27
+  }
+}
