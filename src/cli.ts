@@ -99,7 +99,7 @@ yargs
     },
   )
   .command(
-    "is-node-registered",
+    "is-signer-registered-as-node",
     "Get all OCN Nodes listed in registry contract and verify if the address of current signer is contained |",
     () => {},
     async (args) => {
@@ -123,6 +123,25 @@ yargs
     },
   )
   .command(
+    "is-node-registered <address>",
+    "Get OCN Node operator entry by their wallet address",
+    (yargs) => {
+      return yargs.positional("address", {
+        type: "string",
+        describe: "The address of the node operator",
+      });
+    },
+    async (args) => {
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
+      const result = await registry.getNode(args.address as string);
+      if (result) {
+        console.log(`true`);
+      } else {
+        console.log(`false`);
+      }
+    },
+  )
+  .command(
     "get-signer-address",
     "Get address of the signer ",
     () => {},
@@ -139,7 +158,7 @@ yargs
   )
 
   .command(
-    "is-party-registered",
+    "is-signer-registered-as-party",
     "Get all OCN Parties listed in registry contract and verify if the address of current signer is contained |",
     () => {},
     async (args) => {
@@ -149,7 +168,7 @@ yargs
       if (signerPrivateKey) {
         const wallet = new ethers.Wallet(signerPrivateKey);
         const signerAddress = wallet.address;
-        const isRegistered = result.some((node: { address: string; url: string }) => node.address.toLowerCase() === signerAddress.toLowerCase());
+        const isRegistered = result.some((details) => details.partyAddress.toLowerCase() === signerAddress.toLowerCase());
 
         if (isRegistered) {
           console.log(`true`);
@@ -218,6 +237,21 @@ yargs
       result = await registry.getPartyByOcpi(countryCode, partyId);
     }
     console.log(result ? JSON.stringify(result, bigIntToString, 2) : "OCPI Party not listed in registry.");
+  })
+  .command("is-party-registered [address]", "Get OCPI party entry listed in the registry", getPartyBuilder, async (args) => {
+    const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
+    let result: PartyDetails | undefined;
+    if (args.address) {
+      result = await registry.getPartyByAddress(args.address as string);
+    } else {
+      const [countryCode, partyId] = args.credentials as string[];
+      result = await registry.getPartyByOcpi(countryCode, partyId);
+    }
+    if (result) {
+      console.log(`true`);
+    } else {
+      console.log(`false`);
+    }
   })
   .command(
     "list-parties",
