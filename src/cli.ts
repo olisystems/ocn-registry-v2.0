@@ -48,6 +48,11 @@ yargs
     string: true,
     describe: "Specific contract address of a pre deployed Ocn Registry. By default it uses the one from deployments folder",
   })
+  .option("ocn-payment-manager", {
+    alias: "pm",
+    string: true,
+    describe: "Specific contract address of a pre deployed Ocn Payment Manager. By default it uses the one from deployments folder",
+  })
   .option("spender", {
     alias: "x",
     string: true,
@@ -344,7 +349,7 @@ yargs
     },
   )
   .command("get-payment-status", "Get payment status of the party", getPaymentStatusBuilder, async (args) => {
-    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
     const result = await ocnPaymentManager.getPaymentStatus(args.address as string);
     console.log(result);
   })
@@ -353,7 +358,7 @@ yargs
     "Get funding yearly amount",
     () => {},
     async (args) => {
-      const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+      const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
       const result = await ocnPaymentManager.getFundingYearlyAmount();
       console.log(result);
     },
@@ -361,7 +366,7 @@ yargs
   .command("pay", "Pay the funding yearly amount", getPayBuilder, async (args) => {
     const signer = process.env.SIGNER || args.signer;
     const partyAddress = args.partyAddress as string;
-    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
     const result = await ocnPaymentManager.pay(partyAddress);
     console.log(result);
   })

@@ -21,11 +21,11 @@ import path from "path";
 import { PaymentStatus } from "./types";
 
 export class OcnPaymentManagerCli extends ContractWrapper {
-  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>) {
+  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>, specifContractAddress?: string) {
     const absolutePath = path.resolve(__dirname, `../deployments/${environment}/OcnPaymentManager.json`);
     const ocnPaymentManagerJson: any = require(absolutePath);
     const ocnPaymentManagerContract: Contract = { ...ocnPaymentManagerJson };
-    super(ocnPaymentManagerContract, environment, signer, environmentOptions);
+    super(ocnPaymentManagerContract, environment, signer, environmentOptions, specifContractAddress);
   }
 
   getAddress(): string | Addressable {
@@ -37,8 +37,8 @@ export class OcnPaymentManagerCli extends ContractWrapper {
    * @param operator Ethereum address of the operator.
    * @returns enum PAYMENT STATUS.
    */
-  public async getPaymentStatus(operator: string): Promise<PaymentStatus | undefined> {
-    const status: any = await this.contract.getPaymentStatus(operator);
+  public async getPaymentStatus(party: string): Promise<PaymentStatus | undefined> {
+    const status: any = await this.contract.getPaymentStatus(party);
     return status === undefined ? undefined : PaymentStatus[status as keyof typeof PaymentStatus];
   }
 

@@ -1,5 +1,9 @@
 {
+<<<<<<< Updated upstream
   "address": "0x8B42018D6B8Ae0507ddEd9bB60aDc0E4103FD27f",
+=======
+  "address": "0x3ac91AaCC1AFF63e6aD3eafF8f34F87914975655",
+>>>>>>> Stashed changes
   "abi": [
     {
       "inputs": [
@@ -1202,6 +1206,7 @@
       "type": "function"
     }
   ],
+<<<<<<< Updated upstream
   "transactionHash": "0x11539e70676202f09a28ba365f2d4e0b7d44761ba7fb071e59cdf7dc88f2c239",
   "receipt": {
     "to": null,
@@ -1218,6 +1223,24 @@
         "blockNumber": 30713977,
         "transactionHash": "0x11539e70676202f09a28ba365f2d4e0b7d44761ba7fb071e59cdf7dc88f2c239",
         "address": "0x8B42018D6B8Ae0507ddEd9bB60aDc0E4103FD27f",
+=======
+  "transactionHash": "0x1b7cbeb99193c2a47d261eed10e23092bcc3d8c4d08b6ea5a4c4d1731075601c",
+  "receipt": {
+    "to": null,
+    "from": "0xdD3D370a673cfdCfB0c4cA2a3fE313e1559d1fdc",
+    "contractAddress": "0x3ac91AaCC1AFF63e6aD3eafF8f34F87914975655",
+    "transactionIndex": 0,
+    "gasUsed": "4017699",
+    "logsBloom": "0x00000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000020100000000000000000800000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000001000000000000000000000000000000000000000000000000000000000000100000000000020000000000000000000000000000000000000200000000000000000000000000000",
+    "blockHash": "0xbf757b932d5a17170dc9784501374a0c5cb3d9b6e871c1eac37471abfc9ee5d1",
+    "transactionHash": "0x1b7cbeb99193c2a47d261eed10e23092bcc3d8c4d08b6ea5a4c4d1731075601c",
+    "logs": [
+      {
+        "transactionIndex": 0,
+        "blockNumber": 30775937,
+        "transactionHash": "0x1b7cbeb99193c2a47d261eed10e23092bcc3d8c4d08b6ea5a4c4d1731075601c",
+        "address": "0x3ac91AaCC1AFF63e6aD3eafF8f34F87914975655",
+>>>>>>> Stashed changes
         "topics": [
           "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d",
           "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -1226,16 +1249,27 @@
         ],
         "data": "0x",
         "logIndex": 0,
+<<<<<<< Updated upstream
         "blockHash": "0xdf580d50d642c787224462b8bee9370da5d18f1270e4f6c9e559d27d33e3d984"
       }
     ],
     "blockNumber": 30713977,
+=======
+        "blockHash": "0xbf757b932d5a17170dc9784501374a0c5cb3d9b6e871c1eac37471abfc9ee5d1"
+      }
+    ],
+    "blockNumber": 30775937,
+>>>>>>> Stashed changes
     "cumulativeGasUsed": "4017699",
     "status": 1,
     "byzantium": true
   },
   "args": [
+<<<<<<< Updated upstream
     "0x1212D2b4b1fd43F163b7ea069AE8050723c1b4d0",
+=======
+    "0x0B648F8Af9042c437103fB1d66D0ec3Bc7Ed399E",
+>>>>>>> Stashed changes
     "0x789Ee7dA07388810a4B32Ec53ede3Bb6204f76F4"
   ],
   "numDeployments": 1,
