@@ -185,7 +185,7 @@ contract OcnRegistry is AccessControl {
             revert EmptyOperator("Cannot set empty operator. Use deleteParty method instead.");
         }
 
-        Role[] memory verifiedRoles;
+        Role[] memory verifiedRoles = new Role[](roles.length);
         address credentialOwner = address(0);
 
         // VC verification (All roles must be verified)

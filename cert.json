@@ -1,0 +1,22 @@
+{
+  "certificate": {
+    "identifier": "DE ABC",
+    "information": {
+      "address": "Address",
+      "contactPerson": "Diego Rosales",
+      "email": "diego.rosales@my-oli.com",
+      "node": "0xB43253229b9d16cE16e9c836B472D84269338808",
+      "partyUrl": "http://oli.com"
+    },
+    "name": "Diego",
+    "owner": "0xC167FaB18E82f7a8C241F20f0FDAD5cc93A87bC0",
+    "signature": "o5kBuvB/3yViTnpNa5/ZAi4+By4vGwUqQHwB7LGpPXYVUYsogI1ALEu6/1ewzXAxIx2x3TZU4qFvxCampz2/pBw="
+  },
+  "role": "CPO",
+  "signature": {
+    "message_hash": "0x3412b478cca9fbcbed9133f8893136817ddf930b436b9b01ab4319aae4bb60a7",
+    "r": "0xe5131ee73f3bd8aa639898e495331d885593e1e4db3144c48df902cb4a6cc2c3",
+    "s": "0x4e03de0e115fe277942c1aa6ea06a443660a8891b08efdca845a4631ba8543ad",
+    "v": 27
+  }
+}
