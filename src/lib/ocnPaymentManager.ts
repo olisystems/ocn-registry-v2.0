@@ -66,78 +66,77 @@ export class OcnPaymentManagerCli extends ContractWrapper {
   }
 
   protected async handleContractError(error: any): Promise<never> {
-      // If error has custom error data, try to decode it
-      if (error.info?.error?.message) {
-        try {
-          const decodedError = this.contract.interface.parseError(error.info.error.message.split(" ")[1]);
-          if (decodedError) {
-            // Map known error signatures to readable messages
-            switch (decodedError.name) {
-              case "StakeAlreadyDeposited":
-                throw new RecognizedError("Stake has already been deposited for this party");
+    // If error has custom error data, try to decode it
+    if (error.info?.error?.message) {
+      try {
+        const decodedError = this.contract.interface.parseError(error.info.error.message.split(" ")[1]);
+        if (decodedError) {
+          // Map known error signatures to readable messages
+          switch (decodedError.name) {
+            case "StakeAlreadyDeposited":
+              throw new RecognizedError("Stake has already been deposited for this party");
 
-              case "InsufficientAllowance":
-                throw new RecognizedError("Insufficient allowance for token transfer");
+            case "InsufficientAllowance":
+              throw new RecognizedError("Insufficient allowance for token transfer");
 
-              case "TransferFailed":
-                throw new RecognizedError("Token transfer failed - check balance and allowance");
+            case "TransferFailed":
+              throw new RecognizedError("Token transfer failed - check balance and allowance");
 
-              case "NoFundsStaked":
-                throw new RecognizedError("No funds staked for this party");
+            case "NoFundsStaked":
+              throw new RecognizedError("No funds staked for this party");
 
-              case "WithdrawalNotAllowed":
-                throw new RecognizedError("Withdrawal is not allowed at this time");
+            case "WithdrawalNotAllowed":
+              throw new RecognizedError("Withdrawal is not allowed at this time");
 
-              case "AccessControlUnauthorizedAccount":
-                throw new RecognizedError(`Account ${decodedError.args[0]} is missing required role ${decodedError.args[1]}`);
+            case "AccessControlUnauthorizedAccount":
+              throw new RecognizedError(`Account ${decodedError.args[0]} is missing required role ${decodedError.args[1]}`);
 
-              default:
-                throw new RecognizedError(`Contract error: ${decodedError.name} ${decodedError.args?.join(", ")}`);
-            }
+            default:
+              throw new RecognizedError(`Contract error: ${decodedError.name} ${decodedError.args?.join(", ")}`);
           }
-        } catch (parseError) {
-          if (parseError instanceof RecognizedError) {
-            throw parseError;
-          }
-          // If we can't decode the error, provide a more generic error message
-          throw new Error(this.getReadableErrorMessage(error));
         }
+      } catch (parseError) {
+        if (parseError instanceof RecognizedError) {
+          throw parseError;
+        }
+        // If we can't decode the error, provide a more generic error message
+        throw new Error(this.getReadableErrorMessage(error));
       }
-
-      // Handle other common errors
-      throw new Error(this.getReadableErrorMessage(error));
     }
 
-    private getReadableErrorMessage(error: any): string {
-      const errorMessage = error.message?.toLowerCase() || "";
+    // Handle other common errors
+    throw new Error(this.getReadableErrorMessage(error));
+  }
 
-      // Common error patterns and their human-readable versions
-      const errorPatterns: Record<string, string> = {
-        "insufficient funds": "Insufficient funds in wallet to complete this transaction",
-        "nonce too low": "Transaction nonce is too low - try resetting your wallet nonce",
-        "gas required exceeds allowance": "Transaction would exceed gas limit",
-        "user rejected": "Transaction was rejected by the user",
-        "execution reverted": "Transaction was reverted by the contract",
-        "transfer amount exceeds balance": "Token transfer amount exceeds available balance",
-        "transfer amount exceeds allowance": "Token transfer amount exceeds approved allowance",
-        "network error": "Network connection error - please check your connection",
-        "deadline expired": "Transaction deadline expired - please try again",
-        "replacement fee too low": "Gas price too low for replacement - increase gas price",
-        "transaction underpriced": "Gas price too low - increase gas price",
-        "invalid operator": "Invalid operator address provided",
-        "already initialized": "Contract has already been initialized",
-        "zero address": "Zero address is not allowed for this operation",
-      };
+  private getReadableErrorMessage(error: any): string {
+    const errorMessage = error.message?.toLowerCase() || "";
 
-      // Check if the error matches any known patterns
-      for (const [pattern, readable] of Object.entries(errorPatterns)) {
-        if (errorMessage.includes(pattern)) {
-          return readable;
-        }
+    // Common error patterns and their human-readable versions
+    const errorPatterns: Record<string, string> = {
+      "insufficient funds": "Insufficient funds in wallet to complete this transaction",
+      "nonce too low": "Transaction nonce is too low - try resetting your wallet nonce",
+      "gas required exceeds allowance": "Transaction would exceed gas limit",
+      "user rejected": "Transaction was rejected by the user",
+      "execution reverted": "Transaction was reverted by the contract",
+      "transfer amount exceeds balance": "Token transfer amount exceeds available balance",
+      "transfer amount exceeds allowance": "Token transfer amount exceeds approved allowance",
+      "network error": "Network connection error - please check your connection",
+      "deadline expired": "Transaction deadline expired - please try again",
+      "replacement fee too low": "Gas price too low for replacement - increase gas price",
+      "transaction underpriced": "Gas price too low - increase gas price",
+      "invalid operator": "Invalid operator address provided",
+      "already initialized": "Contract has already been initialized",
+      "zero address": "Zero address is not allowed for this operation",
+    };
+
+    // Check if the error matches any known patterns
+    for (const [pattern, readable] of Object.entries(errorPatterns)) {
+      if (errorMessage.includes(pattern)) {
+        return readable;
       }
-
-      // If no pattern matches, return a cleaned up version of the original error
-      return `Transaction failed: ${error.message || "Unknown error"}`;
     }
+
+    // If no pattern matches, return a cleaned up version of the original error
+    return `Transaction failed: ${error.message || "Unknown error"}`;
   }
 }
