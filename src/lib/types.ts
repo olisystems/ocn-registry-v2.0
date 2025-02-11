@@ -14,6 +14,14 @@
     limitations under the License.
 */
 
+export class RecognizedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CustomError";
+    Object.setPrototypeOf(this, RecognizedError.prototype);
+  }
+}
+
 export interface JsonCertificate {
   role: string;
   certificate: {

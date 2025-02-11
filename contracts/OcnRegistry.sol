@@ -212,8 +212,6 @@ contract OcnRegistry is AccessControl {
             verifiedRoles[i] = roleDetails.role;
         }
 
-        bool partyExists = partyOf[credentialOwner].active;
-
         address registeredParty = uniqueParties[countryCode][partyId];
         if (registeredParty != address(0) && registeredParty != credentialOwner) {
             revert PartyAlreadyRegistered("Party with country_code/party_id already registered under different address.");
