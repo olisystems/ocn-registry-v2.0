@@ -58,6 +58,11 @@ yargs
     string: true,
     describe: "Spender's private key. Required for sending raw transactions.",
   })
+  .option("no-verbose", {
+    alias: "nv",
+    boolean: true,
+    describe: "Set to disable verbose output",
+  })
   .command(
     "get-registry-contract-address",
     "Get the current OcnRegistry contract address deployed in the current network",
@@ -377,6 +382,17 @@ yargs
     const result = await ocnPaymentManager.withdraw(partyAddress);
     console.log(result);
   })
+  .command(
+    "get-ocn-payment-manager",
+    "Check the address of the OCN payment manager",
+    () => {},
+    async (args) => {
+      const signer = process.env.SIGNER || args.signer;
+      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"], !args["no-verbose"]);
+      const result = await registry.getOcnPaymentManager();
+      console.log(result);
+    },
+  )
   .command("get-all-providers", "Check all provider status from the oracle", getOracleProvidersBuilder, async (args) => {
     const role = args.role as OracleType;
     const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));

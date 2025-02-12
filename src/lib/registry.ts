@@ -25,11 +25,11 @@ import path from "path";
  * Registry contract wrapper
  */
 export class Registry extends ContractWrapper {
-  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>, specifContractAddress?: string) {
+  constructor(environment: string, signer?: string, environmentOptions?: Partial<Network>, specifContractAddress?: string, verbose: boolean = true) {
     const absolutePath = path.resolve(__dirname, `../deployments/${environment}/OcnRegistry.json`);
     const ocnRegistryJson: any = require(absolutePath);
     const ocnRegistryContract: Contract = { ...ocnRegistryJson };
-    super(ocnRegistryContract, environment, signer, environmentOptions, specifContractAddress);
+    super(ocnRegistryContract, environment, signer, environmentOptions, specifContractAddress, verbose);
   }
 
   getAddress(): string | Addressable {
@@ -137,6 +137,19 @@ export class Registry extends ContractWrapper {
       const tx = await this.contract.deleteNodeRaw(wallet.address, sig.v, sig.r, sig.s);
       await tx.wait();
       return tx;
+    } catch (error) {
+      return this.handleContractError(error);
+    }
+  }
+
+  /**
+   * Get the address of the OCN Payment Manager
+   * @param address the wallet address of the party
+   */
+  public async getOcnPaymentManager(): Promise<string | undefined> {
+    try {
+      const address = await this.contract.paymentManager();
+      return address;
     } catch (error) {
       return this.handleContractError(error);
     }
