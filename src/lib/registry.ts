@@ -75,8 +75,8 @@ export class Registry extends ContractWrapper {
    * @param domain the domain name/url to link to the operator's Etheruem wallet.
    */
   public async setNode(domain: string): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
     try {
-      this.verifyWritable();
       const url = new URL(domain);
       if (!this.wallet) {
         throw new Error("Signer address is needed to verify for existing node registration");
@@ -97,8 +97,8 @@ export class Registry extends ContractWrapper {
    * constructor is the "spender": they send and pay for the transaction on the network.
    */
   public async setNodeRaw(domain: string, signer: string): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
     try {
-      this.verifyWritable();
       const wallet = new ethers.Wallet(signer);
       await this.checkForExistingNode(wallet);
       const sig = await sign.setNodeRaw(domain, wallet);
@@ -114,8 +114,8 @@ export class Registry extends ContractWrapper {
    * Remove the registry listing linked to the signer's wallet.
    */
   public async deleteNode(): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
     try {
-      this.verifyWritable();
       const tx = await this.contract.deleteNode();
       await tx.wait();
       return tx;
@@ -130,8 +130,8 @@ export class Registry extends ContractWrapper {
    * constructor is the "spender": they send and pay for the transaction on the network.
    */
   public async deleteNodeRaw(signer: string): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
     try {
-      this.verifyWritable();
       const wallet = new ethers.Wallet(signer);
       const sig: any = await sign.deleteNodeRaw(wallet);
       const tx = await this.contract.deleteNodeRaw(wallet.address, sig.v, sig.r, sig.s);
@@ -175,10 +175,9 @@ export class Registry extends ContractWrapper {
    * @param partyId OCPI "party_id" of party (ISO-15118).
    */
   public async getPartyByOcpi(countryCode: string, partyId: string): Promise<types.PartyDetails | undefined> {
+    this.verifyStringLen(countryCode, 2);
+    this.verifyStringLen(partyId, 3);
     try {
-      this.verifyStringLen(countryCode, 2);
-      this.verifyStringLen(partyId, 3);
-
       const countryCodeBytes = this.toBytes(countryCode);
       const partyIdBytes = this.toBytes(partyId);
 
@@ -214,13 +213,12 @@ export class Registry extends ContractWrapper {
    * @param operator the operator address of the OCN Node used by the party.
    */
   public async setParty(countryCode: string, partyId: string, roles: types.RoleDetails[], operator: string, name: string, url: string): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
+    this.verifyStringLen(countryCode, 2);
+    this.verifyStringLen(partyId, 3);
+    this.verifyAddress(operator);
+    this.verifyUrl(url);
     try {
-      this.verifyWritable();
-      this.verifyStringLen(countryCode, 2);
-      this.verifyStringLen(partyId, 3);
-      this.verifyAddress(operator);
-      this.verifyUrl(url);
-
       const countryCodeBytes = this.toBytes(countryCode);
       const partyIdBytes = this.toBytes(partyId);
       const tx = await this.contract.setParty(countryCodeBytes, partyIdBytes, roles, operator, name, url);
@@ -242,12 +240,11 @@ export class Registry extends ContractWrapper {
    * constructor is the "spender": they send and pay for the transaction on the network.
    */
   public async setPartyRaw(countryCode: string, partyId: string, roles: types.RoleDetails[], operator: string, name: string, url: string, signer: string): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
+    this.verifyStringLen(countryCode, 2);
+    this.verifyStringLen(partyId, 3);
+    this.verifyAddress(operator);
     try {
-      this.verifyWritable();
-      this.verifyStringLen(countryCode, 2);
-      this.verifyStringLen(partyId, 3);
-      this.verifyAddress(operator);
-
       const country = this.toBytes(countryCode);
       const id = this.toBytes(partyId);
 
@@ -265,8 +262,8 @@ export class Registry extends ContractWrapper {
    * Direct transaction by signer to delete a party from the OCN Registry.
    */
   public async deleteParty(): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
     try {
-      this.verifyWritable();
       const tx = await this.contract.deleteParty();
       await tx.wait();
       return tx;
@@ -281,8 +278,8 @@ export class Registry extends ContractWrapper {
    * constructor is the "spender": they send and pay for the transaction on the network.
    */
   public async deletePartyRaw(signer: string): Promise<ethers.TransactionReceipt> {
+    this.verifyWritable();
     try {
-      this.verifyWritable();
       const wallet = new ethers.Wallet(signer);
       const sig = await sign.deletePartyRaw(wallet);
       const tx = await this.contract.deletePartyRaw(wallet.address, sig.v, sig.r, sig.s);
