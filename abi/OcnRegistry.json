@@ -813,6 +813,11 @@
         "internalType": "bool",
         "name": "active",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stakingBlock",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

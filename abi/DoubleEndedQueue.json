@@ -1,0 +1,17 @@
+[
+  {
+    "inputs": [],
+    "name": "QueueEmpty",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "QueueFull",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "QueueOutOfBounds",
+    "type": "error"
+  }
+]

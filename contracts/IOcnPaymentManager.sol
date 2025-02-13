@@ -26,6 +26,7 @@ interface IOcnPaymentManager {
     function pay(address party) external;
     function withdrawToRegistryOperator(address party) external;
     function getPaymentStatus(address party) external view returns (PaymentStatus);
+    function getPaymentBlock(address party) external view returns (uint256, uint256);
 
     /* ********************************** */
     /*       STORAGE VARIABLES            */

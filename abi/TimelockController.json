@@ -48,7 +48,7 @@
   },
   {
     "inputs": [],
-    "name": "FailedCall",
+    "name": "FailedInnerCall",
     "type": "error"
   },
   {

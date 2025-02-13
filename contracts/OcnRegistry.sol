@@ -304,13 +304,14 @@ contract OcnRegistry is AccessControl {
         active = details.active;
     }
 
-    function getPartyDetailsByOcpi(bytes2 _countryCode, bytes3 _partyId) public view returns (address partyAddress, bytes2 countryCode, bytes3 partyId, Role[] memory roles, IOcnPaymentManager.PaymentStatus paymentStatus, address operatorAddress, string memory name, string memory url, bool active) {
+    function getPartyDetailsByOcpi(bytes2 _countryCode, bytes3 _partyId) public view returns (address partyAddress, bytes2 countryCode, bytes3 partyId, Role[] memory roles, IOcnPaymentManager.PaymentStatus paymentStatus, address operatorAddress, string memory name, string memory url, bool active, uint256 stakingBlock) {
         partyAddress = uniqueParties[_countryCode][_partyId];
+        (stakingBlock, ) = paymentManager.getPaymentBlock(partyAddress);
         PartyDetails storage details = partyOf[partyAddress];
         countryCode = details.countryCode;
         partyId = details.partyId;
         roles = details.roles;
-        paymentStatus = details.paymentStatus;
+        paymentStatus = paymentManager.getPaymentStatus(partyAddress);
         operatorAddress = operatorOf[partyAddress];
         name = details.name;
         url = details.url;
