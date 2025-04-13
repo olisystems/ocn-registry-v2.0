@@ -22,7 +22,6 @@ COPY ./contracts ./contracts
 RUN mkdir -p /data/hardhat/chains
 
 # Copy any deployment scripts if needed
-COPY ./scripts ./scripts
 COPY ./deploy ./deploy
 
 # Expose ports
