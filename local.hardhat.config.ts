@@ -26,6 +26,7 @@ const config = {
       ],
       saveDeployments: true,
       chainId: 31337,
+      dbDir: '/data/hardhat/chains',
     },
   },
 };
