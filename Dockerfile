@@ -13,9 +13,20 @@ RUN yarn install
 
 # Copy Hardhat configuration and environment files
 COPY ./local.hardhat.config.ts .
+COPY ./helper-hardhat-config.ts .
+
+# Copy contracts folder for contract interaction
+COPY ./contracts ./contracts
+
+# Create necessary directories for persistent blockchain storage
+RUN mkdir -p /data/hardhat/chains
+
+# Copy any deployment scripts if needed
+COPY ./scripts ./scripts
+COPY ./deploy ./deploy
 
 # Expose ports
 EXPOSE 8555
 
-# start blockchain
-ENTRYPOINT ["bash", "-c", "yarn localhost --port 8555"]
+# start blockchain with persistent storage
+ENTRYPOINT ["bash", "-c", "yarn hardhat node --config local.hardhat.config.ts --hostname 0.0.0.0 --port 8555"]
