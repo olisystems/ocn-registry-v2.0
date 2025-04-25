@@ -1,0 +1,294 @@
+enum Role {
+  CPO
+  EMSP
+  NAP
+  NSP
+  OTHER
+  SCSP
+  HUB
+}
+
+enum PaymentStatus {
+  NOT_PAID
+  PAID
+  PENDING
+}
+
+enum CvStatus {
+  NOT_VERIFIED
+  VERIFIED
+  PENDING
+}
+
+
+type OperatorUpdate @entity(immutable: true) {
+  id: Bytes!
+  operator: Bytes! # address
+  domain: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Operator @entity(immutable: false) {
+  id: String!
+  domain: String! # string
+  parties: [Party!]! @derivedFrom(field: "operator")
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  oldAdmin: Bytes! # address
+  newAdmin: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PartyDelete @entity(immutable: true) {
+  id: Bytes!
+  countryCode: String! # bytes2
+  partyId: String! # bytes3
+  partyAddress: String! # address
+  roles: [Role!]! # uint8[]
+  name: String! # string
+  url: String! # string
+  paymentStatus: PaymentStatus! # uint8
+  cvStatus: CvStatus! # uint8
+  active: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PartyUpdate @entity(immutable: true) {
+  id: Bytes!
+  countryCode: String! # bytes2
+  partyId: String! # bytes3
+  partyAddress: String! # address
+  roles: [Role!]! # uint8[]
+  name: String! # string
+  url: String! # string
+  paymentStatus: PaymentStatus! # uint8
+  cvStatus: CvStatus! # uint8
+  active: Boolean! # bool
+  operatorAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Party @entity(immutable: false) {
+  id: String!
+  countryCode: String! # bytes2
+  partyId: String! # bytes3
+  partyAddress: String! # address
+  roles: [Role!]! # uint8[]
+  name: String! # string
+  url: String! # string
+  paymentStatus: PaymentStatus! # uint8
+  cvStatus: CvStatus! # uint8
+  active: Boolean! # bool
+  deleted: Boolean! # bool
+  operator: Operator!
+}
+
+# type PartyChanges @entity(timeseries: true) {
+#   id: Int8!
+#   timestamp: Timestamp!
+#   party: PartyUpdate!
+#   blockNumber: BigInt!
+# }
+
+# # Aggregations over TokenData
+# type PartyStats @aggregation(intervals: ["hour", "day"], source: "PartyChanges") {
+#   id: Int8!
+#   timestamp: Timestamp! 
+#   count: Int8! @aggregate(fn: "count", cumulative: true)
+#   party: PartyUpdate!
+#   blockNumber: BigInt! @aggregate(fn: "last", arg: "blockNumber")
+# }
+
+type RoleAdminChanged @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  previousAdminRole: Bytes! # bytes32
+  newAdminRole: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleGranted @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleRevoked @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProviderOracle @entity(immutable: true) {
+  id: ID! # address
+  role: Role! # roleOracle mapping
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+
+type Upgraded @entity(immutable: true) {
+  id: Bytes!
+  implementation: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  spender: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type EIP712DomainChanged @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalCanceled @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalCreated @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  proposer: Bytes! # address
+  targets: [Bytes!]! # address[]
+  values: [BigInt!]! # uint256[]
+  signatures: [String!]! # string[]
+  calldatas: [Bytes!]! # bytes[]
+  voteStart: BigInt! # uint256
+  voteEnd: BigInt! # uint256
+  description: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalExecuted @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalQueued @entity(immutable: true) {
+  id: Bytes!
+  proposalId: BigInt! # uint256
+  etaSeconds: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProposalThresholdSet @entity(immutable: true) {
+  id: Bytes!
+  oldProposalThreshold: BigInt! # uint256
+  newProposalThreshold: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuorumNumeratorUpdated @entity(immutable: true) {
+  id: Bytes!
+  oldQuorumNumerator: BigInt! # uint256
+  newQuorumNumerator: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TimelockChange @entity(immutable: true) {
+  id: Bytes!
+  oldTimelock: Bytes! # address
+  newTimelock: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VoteCast @entity(immutable: true) {
+  id: Bytes!
+  voter: Bytes! # address
+  proposalId: BigInt! # uint256
+  support: Int! # uint8
+  weight: BigInt! # uint256
+  reason: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VoteCastWithParams @entity(immutable: true) {
+  id: Bytes!
+  voter: Bytes! # address
+  proposalId: BigInt! # uint256
+  support: Int! # uint8
+  weight: BigInt! # uint256
+  reason: String! # string
+  params: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VotingDelaySet @entity(immutable: true) {
+  id: Bytes!
+  oldVotingDelay: BigInt! # uint256
+  newVotingDelay: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VotingPeriodSet @entity(immutable: true) {
+  id: Bytes!
+  oldVotingPeriod: BigInt! # uint256
+  newVotingPeriod: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
