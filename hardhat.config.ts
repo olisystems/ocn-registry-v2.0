@@ -50,10 +50,6 @@ const config = {
     outDir: "typechain",
     target: "ethers-v6",
   },
-  paths: {
-    cache: "/data/hardhat/cache",
-    artifacts: "/data/hardhat/artifacts",
-  },
   networks: {
     amoy: {
       // polygon testnet
@@ -114,7 +110,6 @@ const config = {
       saveDeployments: true,
       accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       loggingEnabled: true,
-      customChainPaths: ["/data/hardhat/chains"],
     },
   },
   abiExporter: {
