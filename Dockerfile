@@ -28,4 +28,4 @@ COPY ./deploy ./deploy
 EXPOSE 8555
 
 # start blockchain with persistent storage
-ENTRYPOINT ["bash", "-c", "yarn hardhat node --config local.hardhat.config.ts --hostname 0.0.0.0 --port 8555"]
+ENTRYPOINT ["bash", "-c", "yarn hardhat node --config local.hardhat.config.ts --hostname 0.0.0.0 --port 8555"] 
