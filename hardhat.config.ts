@@ -114,7 +114,7 @@ const config = {
       saveDeployments: true,
       accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       loggingEnabled: true,
-      paths: ["/data/hardhat/chains"],
+      customChainPaths: ["/data/hardhat/chains"],
     },
   },
   abiExporter: {
