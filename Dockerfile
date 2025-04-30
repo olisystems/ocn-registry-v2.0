@@ -18,7 +18,9 @@ COPY ./helper-hardhat-config.ts .
 # Copy contracts folder for contract interaction
 COPY ./contracts ./contracts
 
-# Create necessary directories for persistent blockchain storage
+# Create necessary directories for persistent blockchain storage. 
+#TODO it still does not work in the minikube, if hardhat pod is deleted all blockchain state is gonna, and all smart contracts need to be deployed again. 
+# Try again later or remove all related to pvn volume and /data/hardhat in this repo and transit-local-services repo
 RUN mkdir -p /data/hardhat/chains
 
 # Copy any deployment scripts if needed
