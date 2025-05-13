@@ -14,7 +14,7 @@ NETWORK=$1
 
 # register a node and a party
 yarn cli set-node http://localhost:9999 -s 9df16a85d24a0dab6fb2bc5c57e1068ed47d56d7518e9b0eaf1712cae718ded6 -n $NETWORK
-yarn cli set-party -c DE OLI --cert ./example/emp_certificate.json -s 2881dee3e96e383a222c39687dee395d5ba70965fd9caa7a1d686c4d78adc93d -o 0xB43253229b9d16cE16e9c836B472D84269338808  -n $NETWORK  --name 'local emp example' --url http://emp.example.com
+yarn cli set-party -c DE OLI --cert ../certificate_example/emsp_certificate.json -s 2881dee3e96e383a222c39687dee395d5ba70965fd9caa7a1d686c4d78adc93d -o 0xB43253229b9d16cE16e9c836B472D84269338808  -n $NETWORK  --name 'local emp example' --url http://emp.example.com
 
 # payment
 yarn hardhat send-stable-coins --network $NETWORK
