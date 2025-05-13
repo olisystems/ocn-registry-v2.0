@@ -30,7 +30,7 @@ export class ContractWrapper {
    */
   public mode: "r" | "r+w";
 
-  constructor(contract: Contract, environment: string, signer?: string, overrides?: Partial<Network>, specifContractAddress?: string) {
+  constructor(contract: Contract, environment: string, signer?: string, overrides?: Partial<Network>, specifContractAddress?: string, verbose: boolean = true) {
     if (!networks[environment]) {
       throw new Error(`Option \"${environment}\" not found in configured networks.`);
     }
@@ -39,7 +39,9 @@ export class ContractWrapper {
       ...overrides?.provider,
     };
 
-    console.log(`connecting to ${provider.protocol}://${provider.host}:${provider.port}`);
+    if (verbose) {
+      console.log(`connecting to ${provider.protocol}://${provider.host}:${provider.port}`);
+    }
 
     this.provider = new ethers.JsonRpcProvider(`${provider.protocol}://${provider.host}:${provider.port}`);
 

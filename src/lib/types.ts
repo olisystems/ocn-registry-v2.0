@@ -14,16 +14,24 @@
     limitations under the License.
 */
 
+export class RecognizedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CustomError";
+    Object.setPrototypeOf(this, RecognizedError.prototype);
+  }
+}
+
 export interface JsonCertificate {
-  role: string,
+  role: string;
   certificate: {
-    [x: string]: string
-  },
+    [x: string]: string;
+  };
   signature: {
     r: string;
     s: string;
     v: number;
-  }
+  };
 }
 
 export interface EmpCertificate {
@@ -51,7 +59,7 @@ export interface SignResult {
   s: string;
   v: number;
   hash: Uint8Array;
-};
+}
 
 export interface RoleDetails {
   certificateData: string;
@@ -60,14 +68,15 @@ export interface RoleDetails {
 }
 
 export interface PartyDetails {
+  partyAddress: string;
   countryCode: string;
   partyId: string;
   roles: Role[];
   paymentStatus: PaymentStatus;
-  address: string;
-  node: Node;
+  operatorAddress: string;
   name: string;
   url: string;
+  active: boolean;
 }
 
 export enum PaymentStatus {

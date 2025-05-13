@@ -48,10 +48,20 @@ yargs
     string: true,
     describe: "Specific contract address of a pre deployed Ocn Registry. By default it uses the one from deployments folder",
   })
+  .option("ocn-payment-manager", {
+    alias: "pm",
+    string: true,
+    describe: "Specific contract address of a pre deployed Ocn Payment Manager. By default it uses the one from deployments folder",
+  })
   .option("spender", {
     alias: "x",
     string: true,
     describe: "Spender's private key. Required for sending raw transactions.",
+  })
+  .option("no-verbose", {
+    alias: "nv",
+    boolean: true,
+    describe: "Set to disable verbose output",
   })
   .command(
     "get-registry-contract-address",
@@ -99,7 +109,7 @@ yargs
     },
   )
   .command(
-    "is-node-registered",
+    "is-signer-registered-as-node",
     "Get all OCN Nodes listed in registry contract and verify if the address of current signer is contained |",
     () => {},
     async (args) => {
@@ -123,6 +133,25 @@ yargs
     },
   )
   .command(
+    "is-node-registered <address>",
+    "Get OCN Node operator entry by their wallet address",
+    (yargs) => {
+      return yargs.positional("address", {
+        type: "string",
+        describe: "The address of the node operator",
+      });
+    },
+    async (args) => {
+      const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
+      const result = await registry.getNode(args.address as string);
+      if (result) {
+        console.log(`true`);
+      } else {
+        console.log(`false`);
+      }
+    },
+  )
+  .command(
     "get-signer-address",
     "Get address of the signer ",
     () => {},
@@ -139,7 +168,7 @@ yargs
   )
 
   .command(
-    "is-party-registered",
+    "is-signer-registered-as-party",
     "Get all OCN Parties listed in registry contract and verify if the address of current signer is contained |",
     () => {},
     async (args) => {
@@ -149,7 +178,7 @@ yargs
       if (signerPrivateKey) {
         const wallet = new ethers.Wallet(signerPrivateKey);
         const signerAddress = wallet.address;
-        const isRegistered = result.some((node: { address: string; url: string }) => node.address.toLowerCase() === signerAddress.toLowerCase());
+        const isRegistered = result.some((details) => details.partyAddress.toLowerCase() === signerAddress.toLowerCase());
 
         if (isRegistered) {
           console.log(`true`);
@@ -218,6 +247,21 @@ yargs
       result = await registry.getPartyByOcpi(countryCode, partyId);
     }
     console.log(result ? JSON.stringify(result, bigIntToString, 2) : "OCPI Party not listed in registry.");
+  })
+  .command("is-party-registered [address]", "Get OCPI party entry listed in the registry", getPartyBuilder, async (args) => {
+    const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
+    let result: PartyDetails | undefined;
+    if (args.address) {
+      result = await registry.getPartyByAddress(args.address as string);
+    } else {
+      const [countryCode, partyId] = args.credentials as string[];
+      result = await registry.getPartyByOcpi(countryCode, partyId);
+    }
+    if (result) {
+      console.log(`true`);
+    } else {
+      console.log(`false`);
+    }
   })
   .command(
     "list-parties",
@@ -310,7 +354,7 @@ yargs
     },
   )
   .command("get-payment-status", "Get payment status of the party", getPaymentStatusBuilder, async (args) => {
-    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
     const result = await ocnPaymentManager.getPaymentStatus(args.address as string);
     console.log(result);
   })
@@ -319,7 +363,7 @@ yargs
     "Get funding yearly amount",
     () => {},
     async (args) => {
-      const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
+      const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
       const result = await ocnPaymentManager.getFundingYearlyAmount();
       console.log(result);
     },
@@ -327,7 +371,7 @@ yargs
   .command("pay", "Pay the funding yearly amount", getPayBuilder, async (args) => {
     const signer = process.env.SIGNER || args.signer;
     const partyAddress = args.partyAddress as string;
-    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]));
+    const ocnPaymentManager = new OcnPaymentManagerCli(args.network, signer, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
     const result = await ocnPaymentManager.pay(partyAddress);
     console.log(result);
   })
@@ -338,6 +382,17 @@ yargs
     const result = await ocnPaymentManager.withdraw(partyAddress);
     console.log(result);
   })
+  .command(
+    "get-ocn-payment-manager",
+    "Check the address of the OCN payment manager",
+    () => {},
+    async (args) => {
+      const signer = process.env.SIGNER || args.signer;
+      const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"], !args["no-verbose"]);
+      const result = await registry.getOcnPaymentManager();
+      console.log(result);
+    },
+  )
   .command("get-all-providers", "Check all provider status from the oracle", getOracleProvidersBuilder, async (args) => {
     const role = args.role as OracleType;
     const oracle = new OracleCli(args.network, role, undefined, getOverrides(args["network-file"]));

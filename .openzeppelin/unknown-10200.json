@@ -2,30 +2,25 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x950De399eeC0edF0407f850B6db0009b541F3A25",
-      "txHash": "0x391a6bbe142e8a05c85163ae908811d035f20b6b9c7227da21e11848aacb1371",
+      "address": "0xa622694f4E25Ed310170ee9a36Bb75C79C302790",
+      "txHash": "0xfc3afe9c7a66f4fea7104edb6ebf2de489dc1bcbd0c3cecfd921bb040e7e9272",
       "kind": "uups"
     },
     {
-      "address": "0x88a6359F627512aD1Af1186300Bf971DA8e24A65",
-      "txHash": "0x3f4d3b447b947828bb40e7b8c326203c3d63a622204d35b4fd0f9d4ac6ff666f",
+      "address": "0x20dbE2Dcf5DBA87DA5A0F8CE7EE9b5B7c8E2A99E",
+      "txHash": "0x7a5e3e2905a19d141f846d0b50c63b326525cef226e4bc4270d6c5d94617a644",
       "kind": "uups"
     },
     {
-      "address": "0x2408654081b7B7D6119e61B2197D60d53cbE35cF",
-      "txHash": "0x09a0a9d7a5b3694b34d27cd5a959c5c8d89cb3dc39b0ab86b57e696703a8689f",
-      "kind": "uups"
-    },
-    {
-      "address": "0xFC0B456f9a066Ec29d31c9D8Caf329E75C758679",
-      "txHash": "0x5eac89c3ba16ef03d24f7cc75bc5aa84241d83bd45ec631a4a70d334124eb087",
+      "address": "0x0b3D77c65F5df04b33f200405ee94DBfD7d316fA",
+      "txHash": "0x5bafda5aa09538715f56a9d349fa4248770fc176472e5d7bb13957385deb6cb0",
       "kind": "uups"
     }
   ],
   "impls": {
-    "849d8d68420e1892ad6f199cc87617ff9c99683ca82da3c86b14e73bce5c1855": {
-      "address": "0x8EA40eC49FCF0F5f20D7a429fD7dBb5B6DE4D973",
-      "txHash": "0xa0b33ef3df73a1dfc1d83211b50d4f032ed50e02360e744d0fe4c9b52d121bbc",
+    "ae1fc3f63ec68b5d2f6ad559bf944a08ff5369f743b2ccb0e719940eaa0682e5": {
+      "address": "0xC5BF4f0506c855c417fFc04D391fa12a8D528A7C",
+      "txHash": "0x864bae6afdcc9557533905e667e9ff0321432a69998ced729be16a6fe3136593",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
@@ -35,7 +30,7 @@
             "slot": "0",
             "type": "t_bytes32",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:17"
+            "src": "contracts/OcnPaymentManager.sol:16"
           },
           {
             "label": "version",
@@ -43,7 +38,7 @@
             "slot": "1",
             "type": "t_uint256",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:18"
+            "src": "contracts/OcnPaymentManager.sol:17"
           },
           {
             "label": "currentBaseContract",
@@ -51,7 +46,7 @@
             "slot": "2",
             "type": "t_address",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:19"
+            "src": "contracts/OcnPaymentManager.sol:18"
           },
           {
             "label": "fundingYearlyAmount",
@@ -59,15 +54,15 @@
             "slot": "3",
             "type": "t_uint256",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:21"
+            "src": "contracts/OcnPaymentManager.sol:20"
           },
           {
             "label": "euroStablecoin",
             "offset": 0,
             "slot": "4",
-            "type": "t_contract(IERC20)7695",
+            "type": "t_contract(IERC20)1664",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:22"
+            "src": "contracts/OcnPaymentManager.sol:21"
           },
           {
             "label": "operatorAddress",
@@ -75,7 +70,7 @@
             "slot": "5",
             "type": "t_address",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:23"
+            "src": "contracts/OcnPaymentManager.sol:22"
           },
           {
             "label": "stakingPeriodInBlocks",
@@ -83,7 +78,7 @@
             "slot": "6",
             "type": "t_uint256",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:24"
+            "src": "contracts/OcnPaymentManager.sol:23"
           },
           {
             "label": "stakingBlock",
@@ -91,7 +86,7 @@
             "slot": "7",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:26"
+            "src": "contracts/OcnPaymentManager.sol:25"
           },
           {
             "label": "stakedFunds",
@@ -99,7 +94,7 @@
             "slot": "8",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:27"
+            "src": "contracts/OcnPaymentManager.sol:26"
           },
           {
             "label": "__gap",
@@ -107,7 +102,7 @@
             "slot": "9",
             "type": "t_array(t_uint256)50_storage",
             "contract": "OcnPaymentManager",
-            "src": "contracts/OcnPaymentManager.sol:29"
+            "src": "contracts/OcnPaymentManager.sol:28"
           }
         ],
         "types": {
@@ -143,7 +138,7 @@
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(InitializableStorage)145_storage": {
+          "t_struct(InitializableStorage)158_storage": {
             "label": "struct Initializable.InitializableStorage",
             "members": [
               {
@@ -187,7 +182,7 @@
             "label": "uint256[50]",
             "numberOfBytes": "1600"
           },
-          "t_contract(IERC20)7695": {
+          "t_contract(IERC20)1664": {
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },

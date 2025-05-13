@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPSUpgradeable {
-
     /* ********************************** */
     /*  STORAGE VARIABLES                 */
     /* ********************************** */
@@ -18,13 +17,13 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
     uint public version;
     address currentBaseContract;
 
-    uint256 public fundingYearlyAmount;                     // Assuming the stablecoin has 18 decimals
-    IERC20  public euroStablecoin;                          // ERC20 token contract address
-    address public operatorAddress;                         // Address to receive the deposited yearly stakes
-    uint256 public stakingPeriodInBlocks;                   // Amount of blocks to wait before withdrawing the stakes
+    uint256 public fundingYearlyAmount; // Assuming the stablecoin has 18 decimals
+    IERC20 public euroStablecoin; // ERC20 token contract address
+    address public operatorAddress; // Address to receive the deposited yearly stakes
+    uint256 public stakingPeriodInBlocks; // Amount of blocks to wait before withdrawing the stakes
 
-    mapping(address => uint256) public stakingBlock;        // Block when stake started by part
-    mapping(address => uint256) public stakedFunds;         // Amount staked by party
+    mapping(address => uint256) public stakingBlock; // Block when stake started by part
+    mapping(address => uint256) public stakedFunds; // Amount staked by party
 
     uint256[50] __gap;
 
@@ -49,11 +48,7 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
     /**
      * Called when Base Contract upgrades: iterate version
      */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyRole(UPGRADER_ROLE)
-        override
-    {
+    function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {
         currentBaseContract = newImplementation;
         version++;
     }
@@ -115,8 +110,8 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
 
     /**
      * @notice Sets the operator address to withdraw to
-    **/
-    function setOperator(address _operatorAddress) onlyRole(DEFAULT_ADMIN_ROLE) external {
+     **/
+    function setOperator(address _operatorAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
         operatorAddress = _operatorAddress;
     }
 
@@ -137,23 +132,31 @@ contract OcnPaymentManager is IOcnPaymentManager, AccessControlUpgradeable, UUPS
     }
 
     /**
+     * @notice Returns the payment block for a party
+     * (Block of the staking, current block)
+     */
+    function getPaymentBlock(address party) external view returns (uint256, uint256) {
+        return (stakingBlock[party], block.number);
+    }
+
+    /**
      * @notice Sets the yearly required stake amount for the parties
-    **/
-    function setFundingYearlyAmount(uint256 _fundingYearlyAmount) onlyRole(DEFAULT_ADMIN_ROLE) external {
+     **/
+    function setFundingYearlyAmount(uint256 _fundingYearlyAmount) external onlyRole(DEFAULT_ADMIN_ROLE) {
         fundingYearlyAmount = _fundingYearlyAmount * 1e18;
     }
 
     /**
      * @notice Gets the current required stake amount for the parties
-    **/
+     **/
     function getFundingYearlyAmount() external view returns (uint256) {
         return fundingYearlyAmount / 1e18;
     }
 
     /**
      * @notice Updates the ERC20 used for staking
-    **/
-    function setStablecoinAddress(address _euroStablecoin) onlyRole(DEFAULT_ADMIN_ROLE) external {
+     **/
+    function setStablecoinAddress(address _euroStablecoin) external onlyRole(DEFAULT_ADMIN_ROLE) {
         euroStablecoin = IERC20(_euroStablecoin);
     }
 
