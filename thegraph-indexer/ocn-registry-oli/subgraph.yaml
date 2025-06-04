@@ -28,6 +28,9 @@ dataSources:
         - RoleAdminChanged
         - RoleGranted
         - RoleRevoked
+        - EMPVerified
+        - CPOVerified
+        - OtherVerified
       abis:
         - name: OCN_Registry_OLI
           file: ./abis/OCN_Registry_OLI.json
@@ -144,3 +147,29 @@ dataSources:
         - event: VotingPeriodSet(uint256,uint256)
           handler: handleVotingPeriodSet
       file: ./src/ocn-governor.ts
+  - kind: ethereum
+    name: OCN_Certificate_Verifier
+    network: gnosis
+    source: 
+      address: "0xc3f0e688bD8B4092c093Cb0f1099A7Dc9f7019c8"
+      abi: OCN_Certificate_Verifier
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - OtherVerified
+        - CPOVerified
+        - EMPVerified
+      abis:
+        - name: OCN_Certificate_Verifier
+          file: ./abis/OCN_Certificate_Verifier.json
+      eventHandlers:
+        - event: OtherVerified(indexed address,string,string,address)
+          handler: handleOtherVerified
+        - event: CPOVerified(indexed address,string,string,address)
+          handler: handleCPOVerified
+        - event: EMPVerified(indexed address,string,string,string,string,string,string,address)
+          handler: handleEMPVerified
+      file: ./src/ocn-certificate-verifier.ts
