@@ -1,0 +1,26 @@
+{
+  "gnosis": {
+    "OCN_Registry_OLI": {
+      "address": "0x3469aEcd209dC77AAE1c2b7D1BED360f5DBB1863",
+      "startBlock": 38273709
+    },
+    "ERC1967Proxy": {
+      "address": "0xf57f26d3CdDcef013db0fA4c0e4EF954dc5D6e5b"
+    },
+    "Euro Stable Coin": {
+      "address": "0x52c0Bc562b58b2818c19A04124C49a35Cc28078B"
+    },
+    "EuroStableCoin": {
+      "address": "0x52c0Bc562b58b2818c19A04124C49a35Cc28078B"
+    },
+    "OCNGovernor": {
+      "address": "0xc3f0e688bD8B4092c093Cb0f1099A7Dc9f7019c8"
+    },
+    "OcnRegistryV2": {
+      "address": "0x3469aEcd209dC77AAE1c2b7D1BED360f5DBB1863"
+    },
+    "OcnRegistry": {
+      "address": "0x3469aEcd209dC77AAE1c2b7D1BED360f5DBB1863"
+    }
+  }
+}
