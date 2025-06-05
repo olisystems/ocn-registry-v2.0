@@ -15,6 +15,7 @@ interface ICertificateVerifier {
         string lieferant;
         string bilanzkreis;
         address owner;
+        string vatid;
     }
 
     struct CPOCertificate {
@@ -32,15 +33,15 @@ interface ICertificateVerifier {
     function verifyEMP(
         bytes memory certificateData,
         bytes memory signature
-    ) external view returns (address, EMPCertificate memory, Signature memory);
+    ) external returns (address, EMPCertificate memory, Signature memory);
 
     function verifyCPO(
         bytes memory certificateData,
         bytes memory signature
-    ) external view returns (address, CPOCertificate memory, Signature memory);
+    ) external returns (address, CPOCertificate memory, Signature memory);
 
     function verifyOther(
         bytes memory certificateData,
         bytes memory signature
-    ) external view returns (address, OtherCertificate memory, Signature memory);
+    ) external returns (address, OtherCertificate memory, Signature memory);
 }
