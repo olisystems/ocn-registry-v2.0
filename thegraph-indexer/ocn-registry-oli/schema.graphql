@@ -303,6 +303,7 @@ type EMPVerified @entity(immutable: true) {
   bilanzkreis: String!
   vatid: String!
   owner: Bytes! # address
+  blockNumber: BigInt!
 }
 
 type CPOVerified @entity(immutable: true) {
@@ -311,6 +312,7 @@ type CPOVerified @entity(immutable: true) {
   identifier: String!
   name: String!
   owner: Bytes! # address
+  blockNumber: BigInt!
 }
 
 type OtherVerified @entity(immutable: true) {
@@ -319,4 +321,5 @@ type OtherVerified @entity(immutable: true) {
   identifier: String!
   name: String!
   owner: Bytes! # address
+  blockNumber: BigInt!
 }

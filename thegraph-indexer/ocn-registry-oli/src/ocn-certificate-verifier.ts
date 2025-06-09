@@ -17,6 +17,7 @@ export function handleOtherVerified(event: OtherVerifiedEvent): void {
     entity.identifier = event.params.identifier
     entity.name = event.params.name
     entity.owner = event.params.owner
+    entity.blockNumber = event.block.number
 
     entity.save()
 }
@@ -29,6 +30,7 @@ export function handleCPOVerified(event: CPOVerifiedEvent): void {
     entity.identifier = event.params.identifier
     entity.name = event.params.name
     entity.owner = event.params.owner
+    entity.blockNumber = event.block.number
 
     entity.save()
 }
@@ -45,7 +47,7 @@ export function handleEMPVerified(event: EMPVerifiedEvent): void {
     entity.vatid = event.params.vatid
     entity.marktfunktion = event.params.marktfunktion
     entity.lieferant = event.params.lieferant
+    entity.blockNumber = event.block.number
 
     entity.save()
 }
-    
