@@ -8,9 +8,9 @@ dataSources:
     name: OCN_Registry_OLI
     network: gnosis
     source:
-      address: "0x3469aEcd209dC77AAE1c2b7D1BED360f5DBB1863"
       abi: OCN_Registry_OLI
-      startBlock: 38273709
+      address: "0x416A6B9123972f79691CFC23870b28D0f0aB79a9"
+      startBlock: 40460000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -28,6 +28,9 @@ dataSources:
         - RoleAdminChanged
         - RoleGranted
         - RoleRevoked
+        - EMPVerified
+        - CPOVerified
+        - OtherVerified
       abis:
         - name: OCN_Registry_OLI
           file: ./abis/OCN_Registry_OLI.json
@@ -36,7 +39,8 @@ dataSources:
           handler: handleOperatorUpdate
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: PartyDelete(bytes2,bytes3,indexed address,uint8[],string,string,uint8,uint8,bool)
+        - event: PartyDelete(bytes2,bytes3,indexed
+            address,uint8[],string,string,uint8,uint8,bool)
           handler: handlePartyDelete
         - event: PartyUpdate(bytes2,bytes3,indexed
             address,uint8[],string,string,uint8,uint8,bool,indexed address)
@@ -52,9 +56,9 @@ dataSources:
     name: ERC1967Proxy
     network: gnosis
     source:
-      address: "0xf57f26d3CdDcef013db0fA4c0e4EF954dc5D6e5b"
       abi: ERC1967Proxy
-      startBlock: 38273705
+      address: "0xf57f26d3CdDcef013db0fA4c0e4EF954dc5D6e5b"
+      startBlock: 40460000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -72,9 +76,9 @@ dataSources:
     name: EuroStableCoin
     network: gnosis
     source:
-      address: "0x52c0Bc562b58b2818c19A04124C49a35Cc28078B"
       abi: EuroStableCoin
-      startBlock: 38273702
+      address: "0x7f25bE68e747f12b3EDd3D99964fefe5c7aff2e1"
+      startBlock: 40460000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -95,9 +99,9 @@ dataSources:
     name: OCNGovernor
     network: gnosis
     source:
-      address: "0xc3f0e688bD8B4092c093Cb0f1099A7Dc9f7019c8"
       abi: OCNGovernor
-      startBlock: 38273692
+      address: "0xc3f0e688bD8B4092c093Cb0f1099A7Dc9f7019c8"
+      startBlock: 40460000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -144,3 +148,30 @@ dataSources:
         - event: VotingPeriodSet(uint256,uint256)
           handler: handleVotingPeriodSet
       file: ./src/ocn-governor.ts
+  - kind: ethereum
+    name: OCN_Certificate_Verifier
+    network: gnosis
+    source:
+      abi: OCN_Certificate_Verifier
+      address: "0xb1313002Fb2e6c21f4478cB180ecFeF10F477877"
+      startBlock: 40460000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - OtherVerified
+        - CPOVerified
+        - EMPVerified
+      abis:
+        - name: OCN_Certificate_Verifier
+          file: ./abis/OCN_Certificate_Verifier.json
+      eventHandlers:
+        - event: OtherVerified(indexed address,string,string,address)
+          handler: handleOtherVerified
+        - event: CPOVerified(indexed address,string,string,address)
+          handler: handleCPOVerified
+        - event: EMPVerified(indexed
+            address,string,string,string,string,string,string,address)
+          handler: handleEMPVerified
+      file: ./src/ocn-certificate-verifier.ts
