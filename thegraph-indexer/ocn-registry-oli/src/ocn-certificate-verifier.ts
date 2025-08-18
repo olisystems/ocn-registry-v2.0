@@ -47,6 +47,11 @@ export function handleEMPVerified(event: EMPVerifiedEvent): void {
     entity.vatid = event.params.vatid
     entity.marktfunktion = event.params.marktfunktion
     entity.lieferant = event.params.lieferant
+    entity.billingAddress = event.params.billingAddress
+    entity.billingCity = event.params.billingCity
+    entity.billingPostalCode = event.params.billingPostalCode
+    entity.billingCountry = event.params.billingCountry
+    entity.billingEmail = event.params.billingEmail
     entity.blockNumber = event.block.number
 
     entity.save()

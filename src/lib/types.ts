@@ -42,6 +42,11 @@ export interface EmpCertificate {
   bilanzkreis: string;
   owner: string;
   vatid: string;
+  billingAddress: string;
+  billingCity: string;
+  billingPostalCode: string;
+  billingCountry: string;
+  billingEmail: string;
 }
 
 export interface CpoCertificate {

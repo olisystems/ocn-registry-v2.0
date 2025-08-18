@@ -77,7 +77,7 @@ dataSources:
     network: gnosis
     source:
       abi: EuroStableCoin
-      address: "0x7f25bE68e747f12b3EDd3D99964fefe5c7aff2e1"
+      address: "0x8517672A4f7e8e78E33AF0c95Db0CbB61a61f7C6"
       startBlock: 40460000
     mapping:
       kind: ethereum/events
@@ -100,7 +100,7 @@ dataSources:
     network: gnosis
     source:
       abi: OCNGovernor
-      address: "0xc3f0e688bD8B4092c093Cb0f1099A7Dc9f7019c8"
+      address: "0x092337D035BffaAAc4D89E706df67BE8c7eF8e9c"
       startBlock: 40460000
     mapping:
       kind: ethereum/events
@@ -171,7 +171,6 @@ dataSources:
           handler: handleOtherVerified
         - event: CPOVerified(indexed address,string,string,address)
           handler: handleCPOVerified
-        - event: EMPVerified(indexed
-            address,string,string,string,string,string,string,address)
+        - event: EMPVerified(indexed address,string,string,string,string,string,string,address,string,string,string,string,string)
           handler: handleEMPVerified
       file: ./src/ocn-certificate-verifier.ts
