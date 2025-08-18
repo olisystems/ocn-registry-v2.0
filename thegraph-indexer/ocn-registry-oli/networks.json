@@ -1,15 +1,15 @@
 {
   "gnosis": {
     "OCN_Registry_OLI": {
-      "address": "0x3469aEcd209dC77AAE1c2b7D1BED360f5DBB1863",
-      "startBlock": 38273709
+      "address": "0xaA71738D916474d4fcD28Afba707d81777ddD26E",
+      "startBlock": 40460000
     },
     "ERC1967Proxy": {
       "address": "0xf57f26d3CdDcef013db0fA4c0e4EF954dc5D6e5b",
       "startBlock": 40460000
     },
     "Euro Stable Coin": {
-      "address": "0x7f25bE68e747f12b3EDd3D99964fefe5c7aff2e1",
+      "address": "0x9C17c736ea4bc5740A73fFAC8E160D9cbd32DaF8",
       "startBlock": 40460000
     },
     "EuroStableCoin": {

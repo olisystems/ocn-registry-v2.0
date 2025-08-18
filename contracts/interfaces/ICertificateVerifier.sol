@@ -35,9 +35,9 @@ interface ICertificateVerifier {
         address owner;
     }
 
-    function verifyEMP(bytes memory certificateData, bytes memory signature) external returns (address, EMPCertificate memory, Signature memory);
+    function verifyEMP(bytes memory certificateData, bytes memory signature) external view returns (address, EMPCertificate memory, Signature memory);
 
-    function verifyCPO(bytes memory certificateData, bytes memory signature) external returns (address, CPOCertificate memory, Signature memory);
+    function verifyCPO(bytes memory certificateData, bytes memory signature) external view returns (address, CPOCertificate memory, Signature memory);
 
-    function verifyOther(bytes memory certificateData, bytes memory signature) external returns (address, OtherCertificate memory, Signature memory);
+    function verifyOther(bytes memory certificateData, bytes memory signature) external view returns (address, OtherCertificate memory, Signature memory);
 }

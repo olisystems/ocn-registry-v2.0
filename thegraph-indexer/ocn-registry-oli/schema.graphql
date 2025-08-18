@@ -291,7 +291,7 @@ type VotingPeriodSet @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
-} 
+}
 
 type EMPVerified @entity(immutable: true) {
   id: Bytes!

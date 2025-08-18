@@ -9,7 +9,7 @@ dataSources:
     network: gnosis
     source:
       abi: OCN_Registry_OLI
-      address: "0x416A6B9123972f79691CFC23870b28D0f0aB79a9"
+      address: "0xAFd20ce1eDA2A3d58C3d49b4F5808777195F54d4"
       startBlock: 40460000
     mapping:
       kind: ethereum/events
