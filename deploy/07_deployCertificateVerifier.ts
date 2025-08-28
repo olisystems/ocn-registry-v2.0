@@ -18,7 +18,6 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
     args: [],
     log: true,
     waitConfirmations: networkExtraConfig[network.name].blockConfirmations || 1,
-    deterministicDeployment: true,
     contract: {
       abi: CertificateVerifierABI.abi,
       bytecode: CertificateVerifierABI.bytecode,
