@@ -64,7 +64,7 @@
         "type": "tuple"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -118,6 +118,11 @@
             "internalType": "address",
             "name": "owner",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "vatid",
+            "type": "string"
           }
         ],
         "internalType": "struct ICertificateVerifier.EMPCertificate",
@@ -147,7 +152,7 @@
         "type": "tuple"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -215,7 +220,7 @@
         "type": "tuple"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

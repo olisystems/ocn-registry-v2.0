@@ -41,6 +41,7 @@ export interface EmpCertificate {
   lieferant: string;
   bilanzkreis: string;
   owner: string;
+  vatid: string;
 }
 
 export interface CpoCertificate {

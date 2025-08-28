@@ -1,5 +1,5 @@
 {
-  "address": "0xf57f26d3CdDcef013db0fA4c0e4EF954dc5D6e5b",
+  "address": "0x5a8c6e3E88871891225e40E304bD3610A81A3461",
   "abi": [
     {
       "inputs": [],
@@ -51,7 +51,7 @@
     },
     {
       "inputs": [],
-      "name": "FailedCall",
+      "name": "FailedInnerCall",
       "type": "error"
     },
     {
@@ -338,6 +338,30 @@
       "inputs": [],
       "name": "getFundingYearlyAmount",
       "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "party",
+          "type": "address"
+        }
+      ],
+      "name": "getPaymentBlock",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
         {
           "internalType": "uint256",
           "name": "",

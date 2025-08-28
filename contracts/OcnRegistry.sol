@@ -384,7 +384,7 @@ contract OcnRegistry is AccessControl {
         roleOracle[role] = IProviderOracle(oracleAddress);
     }
 
-    function verifyCertificate(RoleDetails memory roleDetails) private view returns (string memory, address) {
+    function verifyCertificate(RoleDetails memory roleDetails) private returns (string memory, address) {
         if (roleDetails.role == Role.EMSP) {
             (address verifier, ICertificateVerifier.EMPCertificate memory certificate, ) = certificateVerifier.verifyEMP(roleDetails.certificateData, roleDetails.signature);
             if (!isAllowedVerifier(verifier)) {

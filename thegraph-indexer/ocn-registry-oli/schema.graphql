@@ -292,3 +292,34 @@ type VotingPeriodSet @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type EMPVerified @entity(immutable: true) {
+  id: Bytes!
+  signAddress: Bytes! # address
+  identifier: String!
+  name: String!
+  marktfunktion: String!
+  lieferant: String!
+  bilanzkreis: String!
+  vatid: String!
+  owner: Bytes! # address
+  blockNumber: BigInt!
+}
+
+type CPOVerified @entity(immutable: true) {
+   id: Bytes! 
+  signAddress: Bytes! # address
+  identifier: String!
+  name: String!
+  owner: Bytes! # address
+  blockNumber: BigInt!
+}
+
+type OtherVerified @entity(immutable: true) {
+  id: Bytes!
+  signAddress: Bytes! # address
+  identifier: String!
+  name: String!
+  owner: Bytes! # address
+  blockNumber: BigInt!
+}
