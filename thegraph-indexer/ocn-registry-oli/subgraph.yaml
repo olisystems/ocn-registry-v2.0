@@ -9,7 +9,7 @@ dataSources:
     network: gnosis
     source:
       abi: OCN_Registry_OLI
-      address: "0xAFd20ce1eDA2A3d58C3d49b4F5808777195F54d4"
+      address: "0xBD3e5d711a57Cb36dE2CD33EBD557CBe28C16E64"
       startBlock: 40460000
     mapping:
       kind: ethereum/events
@@ -77,7 +77,7 @@ dataSources:
     network: gnosis
     source:
       abi: EuroStableCoin
-      address: "0x8517672A4f7e8e78E33AF0c95Db0CbB61a61f7C6"
+      address: "0xc11412275DB51E77ab6021860F5D7668D0D90446"
       startBlock: 40460000
     mapping:
       kind: ethereum/events
@@ -100,7 +100,7 @@ dataSources:
     network: gnosis
     source:
       abi: OCNGovernor
-      address: "0x092337D035BffaAAc4D89E706df67BE8c7eF8e9c"
+      address: "0x298A3787aeA21f0a90A518547d2a6C4f855caE59"
       startBlock: 40460000
     mapping:
       kind: ethereum/events
@@ -153,7 +153,7 @@ dataSources:
     network: gnosis
     source:
       abi: OCN_Certificate_Verifier
-      address: "0xb1313002Fb2e6c21f4478cB180ecFeF10F477877"
+      address: "0xa71151752076A9F29270595c1890871b8630A4D5"
       startBlock: 40460000
     mapping:
       kind: ethereum/events

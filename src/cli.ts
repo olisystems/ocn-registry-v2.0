@@ -20,10 +20,10 @@ import yargs from "yargs";
 import { Registry } from "./lib/registry";
 import { OcnPaymentManagerCli } from "./lib/ocnPaymentManager";
 import { getPartyBuilder, setPartyBuilder, getPaymentStatusBuilder, getPayBuilder, getWithdrawBuilder, getOracleProviderBuilder, setOracleProviderBuilder, getOracleProvidersBuilder } from "./cli/builders";
-import { PartyDetails, Role, RoleDetails, EmpCertificate, CpoCertificate } from "./lib/types";
+import { PartyDetails, Role, RoleDetails, EmpCertificate, CpoCertificate, OtherCertificate } from "./lib/types";
 import { networks } from "./networks";
 import { ethers } from "ethers";
-import { getOverrides, bigIntToString, readJsonCertificates, encodeEmpCertificate, encodeCertificateSignature, encodeCpoCertificate } from "./lib/helpers";
+import { getOverrides, bigIntToString, readJsonCertificates, encodeEmpCertificate, encodeCertificateSignature, encodeCpoCertificate, encodeOtherCertificate } from "./lib/helpers";
 import { OracleCli, OracleType } from "./lib/oracle";
 
 yargs
@@ -66,7 +66,7 @@ yargs
   .command(
     "get-registry-contract-address",
     "Get the current OcnRegistry contract address deployed in the current network",
-    () => {},
+    () => { },
     async (args) => {
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]));
 
@@ -76,7 +76,7 @@ yargs
   .command(
     "get-payment-contract-address",
     "Get the current OcnPaymentManager contract address deployed in the current network",
-    () => {},
+    () => { },
     async (args) => {
       const ocnPayment = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]));
 
@@ -101,7 +101,7 @@ yargs
   .command(
     "list-nodes",
     "Get all OCN Nodes listed in registry",
-    () => {},
+    () => { },
     async (args) => {
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllNodes();
@@ -111,7 +111,7 @@ yargs
   .command(
     "is-signer-registered-as-node",
     "Get all OCN Nodes listed in registry contract and verify if the address of current signer is contained |",
-    () => {},
+    () => { },
     async (args) => {
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllNodes();
@@ -154,7 +154,7 @@ yargs
   .command(
     "get-signer-address",
     "Get address of the signer ",
-    () => {},
+    () => { },
     async (args) => {
       const signerPrivateKey = process.env.SIGNER || args.signer;
       if (signerPrivateKey) {
@@ -170,7 +170,7 @@ yargs
   .command(
     "is-signer-registered-as-party",
     "Get all OCN Parties listed in registry contract and verify if the address of current signer is contained |",
-    () => {},
+    () => { },
     async (args) => {
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllParties();
@@ -194,7 +194,7 @@ yargs
   .command(
     "set-node <domain>",
     "Create or update OCN Node operator entry",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
@@ -205,7 +205,7 @@ yargs
   .command(
     "set-node-raw <domain>",
     "Create or update OCN Node operator entry using raw transaction",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const spender = process.env.SPENDER || args.spender;
@@ -217,7 +217,7 @@ yargs
   .command(
     "delete-node",
     "Delete OCN Node operator entry",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
@@ -228,7 +228,7 @@ yargs
   .command(
     "delete-node-raw",
     "Delete OCN Node operator entry using raw transaction",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const spender = process.env.SPENDER || args.spender;
@@ -266,7 +266,7 @@ yargs
   .command(
     "list-parties",
     "List all OCPI parties listed in registry",
-    () => {},
+    () => { },
     async (args) => {
       const registry = new Registry(args.network, undefined, getOverrides(args["network-file"]), args["ocn-registry"]);
       const result = await registry.getAllParties();
@@ -287,10 +287,17 @@ yargs
           signature: encodeCertificateSignature(certificateData.signature),
           role: Role.EMSP,
         };
-      } else {
+      } else if (certificate.role === "CPO") {
         let { role, ...certificateData } = certificate;
         return {
           certificateData: encodeCpoCertificate(certificateData.certificate as unknown as CpoCertificate),
+          signature: encodeCertificateSignature(certificateData.signature),
+          role: Role[role as keyof typeof Role],
+        };
+      } else {
+        let { role, ...certificateData } = certificate;
+        return {
+          certificateData: encodeOtherCertificate(certificateData.certificate as unknown as OtherCertificate),
           signature: encodeCertificateSignature(certificateData.signature),
           role: Role[role as keyof typeof Role],
         };
@@ -333,7 +340,7 @@ yargs
   .command(
     "delete-party",
     "Remove OCPI party entry",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"]);
@@ -344,7 +351,7 @@ yargs
   .command(
     "delete-party-raw",
     "Remove OCPI party entry by raw transaction",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const spender = process.env.SPENDER || args.spender;
@@ -361,7 +368,7 @@ yargs
   .command(
     "get-funding-yearly-amount",
     "Get funding yearly amount",
-    () => {},
+    () => { },
     async (args) => {
       const ocnPaymentManager = new OcnPaymentManagerCli(args.network, undefined, getOverrides(args["network-file"]), args["ocn-payment-manager"]);
       const result = await ocnPaymentManager.getFundingYearlyAmount();
@@ -385,7 +392,7 @@ yargs
   .command(
     "get-ocn-payment-manager",
     "Check the address of the OCN payment manager",
-    () => {},
+    () => { },
     async (args) => {
       const signer = process.env.SIGNER || args.signer;
       const registry = new Registry(args.network, signer, getOverrides(args["network-file"]), args["ocn-registry"], !args["no-verbose"]);
