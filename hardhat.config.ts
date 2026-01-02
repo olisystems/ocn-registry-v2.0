@@ -9,7 +9,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import "./tasks/sendStablecoinsToParties";
 import "./tasks/propose";
-import { log } from "console";
 
 //import all tasks
 let tasksFolder = "./tasks/";
@@ -21,7 +20,7 @@ require("fs")
   });
 
 // to avoid errors when private keys are not passed as parameters (real deployments)
-const randomPk: string = "2d70b3cc7f8d71da4ca2b3a37dbd45d622d6b1bcf79b093ebfb62ecac3b4073d";
+const randomPk: string = "2d90b3cc7f8d71da4ca2b3a37dbd45d622d6b1bcf79b093ebfb62ecac3b4073d";
 const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
 const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
 const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;

@@ -1,0 +1,117 @@
+#!/bin/sh
+
+# Pre-commit hook to detect private keys and sensitive data
+# Prevents accidental commits of secrets in blockchain projects
+
+echo "🔍 Checking for private keys and sensitive data..."
+
+# Get staged files (excluding deleted files)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=d)
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "✅ No staged files to check"
+    exit 0
+fi
+
+FOUND_SECRETS=0
+
+# Function to check for patterns in staged files
+check_pattern() {
+    local pattern="$1"
+    local description="$2"
+    
+    # Search in staged file contents (not just filenames)
+    matches=$(git diff --cached --diff-filter=d -U0 | grep -E "^\+" | grep -v "^\+\+\+" | grep -iE "$pattern" || true)
+    
+    if [ -n "$matches" ]; then
+        echo ""
+        echo "❌ POTENTIAL $description DETECTED:"
+        echo "$matches" | head -10
+        if [ $(echo "$matches" | wc -l) -gt 10 ]; then
+            echo "   ... and more matches"
+        fi
+        FOUND_SECRETS=1
+    fi
+}
+
+# Check for Ethereum private keys (64 hex characters with common prefixes)
+# Matches: PRIVATE_KEY=0x..., privateKey: "0x...", etc.
+check_pattern '(private[_-]?key|secret[_-]?key|priv[_-]?key)\s*[:=]\s*["\x27]?0x[a-fA-F0-9]{64}' "ETHEREUM PRIVATE KEY"
+
+# Check for raw 64-character hex strings that look like private keys
+check_pattern '[:=]\s*["\x27]0x[a-fA-F0-9]{64}["\x27]' "HEX PRIVATE KEY"
+
+# Check for private keys without 0x prefix (64 hex chars in quotes)
+check_pattern '(private[_-]?key|secret[_-]?key)\s*[:=]\s*["\x27][a-fA-F0-9]{64}["\x27]' "RAW PRIVATE KEY"
+
+# Check for mnemonic seed phrases (12 or 24 word patterns)
+check_pattern '(mnemonic|seed[_-]?phrase|recovery[_-]?phrase)\s*[:=]' "MNEMONIC/SEED PHRASE"
+
+# Check for API keys and secrets
+check_pattern '(api[_-]?key|api[_-]?secret|auth[_-]?token)\s*[:=]\s*["\x27][a-zA-Z0-9]{20,}' "API KEY/SECRET"
+
+# Check for Infura/Alchemy project IDs with secrets
+check_pattern '(infura|alchemy)[_-]?(key|secret|id|api)\s*[:=]\s*["\x27][a-zA-Z0-9]{20,}' "INFURA/ALCHEMY KEY"
+
+# Check for AWS credentials
+check_pattern '(aws[_-]?access[_-]?key|aws[_-]?secret)\s*[:=]' "AWS CREDENTIALS"
+
+# Check for common test private keys that shouldn't be in production
+# These are well-known Hardhat/Ganache test keys
+KNOWN_TEST_KEYS=(
+    "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    "59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
+    "5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"
+)
+
+for key in "${KNOWN_TEST_KEYS[@]}"; do
+    matches=$(git diff --cached --diff-filter=d -U0 | grep -E "^\+" | grep -i "$key" || true)
+    if [ -n "$matches" ]; then
+        echo ""
+        echo "⚠️  KNOWN TEST PRIVATE KEY DETECTED (may be intentional for testing):"
+        echo "$matches" | head -3
+    fi
+done
+
+# Check if .env files are being committed (they shouldn't be)
+ENV_FILES=$(echo "$STAGED_FILES" | grep -E '\.env($|\.)' || true)
+if [ -n "$ENV_FILES" ]; then
+    echo ""
+    echo "❌ .ENV FILE STAGED FOR COMMIT:"
+    echo "$ENV_FILES"
+    echo "   These files typically contain secrets and should be in .gitignore"
+    FOUND_SECRETS=1
+fi
+
+# Check for hardcoded localhost private keys in non-test files
+NON_TEST_FILES=$(echo "$STAGED_FILES" | grep -v -E '(test|spec|\.test\.|\.spec\.)' || true)
+for file in $NON_TEST_FILES; do
+    if [ -f "$file" ]; then
+        content=$(git show ":$file" 2>/dev/null || true)
+        if echo "$content" | grep -qE '0x[a-fA-F0-9]{64}'; then
+            # Check if it's not a well-known zero address or test address
+            if ! echo "$content" | grep -qE '0x0{64}'; then
+                echo ""
+                echo "⚠️  Potential private key in non-test file: $file"
+                echo "   Please review this file manually"
+            fi
+        fi
+    fi
+done
+
+echo ""
+
+if [ $FOUND_SECRETS -eq 1 ]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🚫 COMMIT BLOCKED: Potential secrets detected!"
+    echo ""
+    echo "If these are intentional (e.g., test keys), you can:"
+    echo "  1. Add files to .gitignore"
+    echo "  2. Use environment variables instead"
+    echo "  3. Skip this check with: git commit --no-verify"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    exit 1
+else
+    echo "✅ No secrets detected in staged changes"
+    exit 0
+fi

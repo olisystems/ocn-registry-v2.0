@@ -54,6 +54,7 @@
     "hardhat-deploy": "^0.12.4",
     "hardhat-deploy-ethers": "^0.4.2",
     "hardhat-gas-reporter": "^1.0.8",
+    "husky": "^9.1.7",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.4.1",
     "solhint": "^5.0.3",
@@ -75,7 +76,8 @@
     "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
     "lint": "solhint 'contracts/*.sol'",
     "debug-cli": "node --inspect -r ts-node/register  src/cli ",
-    "cli": "ts-node src/cli"
+    "cli": "ts-node src/cli",
+    "prepare": "husky"
   },
   "keywords": [
     "smart-contracts",
