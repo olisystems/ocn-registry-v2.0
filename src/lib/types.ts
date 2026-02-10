@@ -55,6 +55,12 @@ export interface CpoCertificate {
   owner: string;
 }
 
+export interface OtherCertificate {
+  identifier: string;
+  name: string;
+  owner: string;
+}
+
 export interface Node {
   operator: string;
   url: string;

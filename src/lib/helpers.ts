@@ -1,7 +1,7 @@
 import path, { join, isAbsolute } from "path";
 import * as fs from 'fs/promises';
 import { Network } from "../types/network";
-import { CpoCertificate, EmpCertificate, JsonCertificate, SignResult } from "./types";
+import { CpoCertificate, EmpCertificate, JsonCertificate, OtherCertificate, SignResult } from "./types";
 import * as ethers from 'ethers';
 
 export const getOverrides = (networkFileName?: string): Partial<Network> => {
@@ -28,7 +28,7 @@ export function encodeEmpCertificate(certificate: EmpCertificate) {
       certificate.lieferant,
       certificate.bilanzkreis,
       certificate.owner,
-      certificate.vatid
+      certificate.vatid,
       certificate.billingAddress,
       certificate.billingCity,
       certificate.billingPostalCode,
@@ -39,6 +39,17 @@ export function encodeEmpCertificate(certificate: EmpCertificate) {
 }
 
 export function encodeCpoCertificate(certificate: CpoCertificate) {
+  return ethers.AbiCoder.defaultAbiCoder().encode(
+    ['tuple(string,string,address)'],
+    [[
+      certificate.identifier,
+      certificate.name,
+      certificate.owner
+    ]]
+  );
+}
+
+export function encodeOtherCertificate(certificate: OtherCertificate) {
   return ethers.AbiCoder.defaultAbiCoder().encode(
     ['tuple(string,string,address)'],
     [[
