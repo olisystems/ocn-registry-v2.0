@@ -8,6 +8,8 @@ proposals.json
 /cache
 /artifacts
 /deployments
+/src/deployments/localhost
+/src/deployments/minikube
 
 # TypeChain files
 /typechain

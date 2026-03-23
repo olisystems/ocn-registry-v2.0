@@ -1,0 +1,43 @@
+[
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "certificateData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          },
+          {
+            "internalType": "enum OcnRegistryTypes.Role",
+            "name": "role",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct OcnRegistryTypes.RoleDetails[]",
+        "name": "roles",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "validateRegistration",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "credentialOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "enum OcnRegistryTypes.Role[]",
+        "name": "verifiedRoles",
+        "type": "uint8[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

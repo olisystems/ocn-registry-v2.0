@@ -34,12 +34,46 @@ describe("Registry contract", function () {
     await deployments.fixture(); // Ensure a clean deployment environment
     const preDeployedRegistry = await deployments.get("OcnRegistry");
     registry = (await ethers.getContractAt("OcnRegistry", preDeployedRegistry.address)) as unknown as OcnRegistry;
+    const preDeployedValidator = await deployments.get("PartyRegistrationValidator");
+    const validator = (await ethers.getContractAt(
+      "PartyRegistrationValidator",
+      preDeployedValidator.address,
+    )) as unknown as any;
+    const certificateVerifier = (await ethers.getContract(
+      "CertificateVerifier",
+      deployer,
+    )) as unknown as any;
+    const timelock = await ethers.getContract("Timelock", deployer);
+    await ethers.provider.send("hardhat_setBalance", [
+      await timelock.getAddress(),
+      "0x1000000000000000000000000",
+    ]);
+    const timelockSigner = await ethers.getImpersonatedSigner(
+      await timelock.getAddress(),
+    );
 
+    const [cpoVerifier] = await certificateVerifier.verifyCPO.staticCall(
+      encodedCpoCertificate,
+      encodedCpoSignature,
+    );
+    const [empVerifier] = await certificateVerifier.verifyEMP.staticCall(
+      encodedEmpCertificate,
+      encodedEmpSignature,
+    );
     const preDeployedCpoOracle = await deployments.get("CPOOracle");
     const cpoOracle = new ethers.Contract(preDeployedCpoOracle.address, ProviderOracleABI.abi, deployer) as unknown as any;
 
     const preDeployedEmspOracle = await deployments.get("EMSPOracle");
     const emspOracle = new ethers.Contract(preDeployedEmspOracle.address, ProviderOracleABI.abi, deployer) as unknown as any;
+
+    if (!(await validator.isAllowedVerifier(cpoVerifier))) {
+      await validator.connect(timelockSigner).setVerifier(cpoVerifier);
+    }
+    if (!(await validator.isAllowedVerifier(empVerifier))) {
+      await validator.connect(timelockSigner).setVerifier(empVerifier);
+    }
+    await validator.connect(timelockSigner).setProviderOracle(0, preDeployedCpoOracle.address);
+    await validator.connect(timelockSigner).setProviderOracle(1, preDeployedEmspOracle.address);
 
     await cpoOracle.connect(deployer).addProvider({
       name: "OLI Systems GmbH",
@@ -47,8 +81,8 @@ describe("Registry contract", function () {
     });
 
     await emspOracle.connect(deployer).addProvider({
-      name: "bilanzkreis",
-      identifier: "bilanzkreis"
+      name: "OLI Systems GmbH",
+      identifier: "DE OLI"
     });
   });
 
@@ -244,33 +278,6 @@ describe("Registry contract", function () {
     expect(parties).to.deep.equal([cpoOperator.address]);
   });
 
-  it("setPartyRaw allows different wallet to register party", async () => {
-    const randomParty = new ethers.Wallet(ethers.Wallet.createRandom().privateKey);
-    const domain = "https://node.ocn.org";
-    await registry.connect(nodeOperator).setNode(domain);
-
-    const cpoRole = {
-      certificateData: encodedCpoCertificate,
-      signature: encodedCpoSignature,
-      role: 0
-    };
-
-    const { country, id, roles, name, url } = getTestPartyData();
-    const sig = await signHelper.setPartyRaw(country, id, [cpoRole], nodeOperator.address, name, url, randomParty);
-
-    await registry.connect(nodeOperator).setPartyRaw(randomParty.address, country, id, [cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
-
-    const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
-
-    expect(got.countryCode).to.equal(country);
-    expect(got.partyId).to.equal(id);
-    expect(got.roles.length).to.equal(1);
-    expect(got.operatorAddress).to.equal(nodeOperator.address);
-
-    const parties = await registry.getParties();
-    expect(parties).to.deep.equal([cpoOperator.address]);
-  });
-
   it("deleteParty allows deletion of ocpi party", async () => {
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);
@@ -296,39 +303,4 @@ describe("Registry contract", function () {
     expect(parties).to.deep.equal([]);
   });
 
-  // it("deletePartyRaw allows deletion of ocpi party", async () => {
-  //   const domain = "https://node.ocn.org";
-  //   await registry.connect(nodeOperator).setNode(domain);
-
-  //   const randomWallet = ethers.Wallet.createRandom();
-  //   const operator = new ethers.Wallet(randomWallet.privateKey);
-
-  //   const emspRole = {
-  //     certificateData: encodedEmpCertificate,
-  //     signature: encodedEmpSignature,
-  //     role: 1
-  //   };
-  //   const cpoRole = {
-  //     certificateData: encodedCpoCertificate,
-  //     signature: encodedCpoSignature,
-  //     role: 0
-  //   };
-
-  //   const { country, id, name, url } = getTestPartyData();
-  //   const sig = await signHelper.setPartyRaw(country, id, [cpoRole], cpoOperator.address, name, url, operator);
-
-  //   await registry.connect(cpoOperator).setPartyRaw(cpoOperator.address, country, id, [cpoRole], nodeOperator.address, name, url, sig.v, sig.r, sig.s);
-
-  //   const sig2 = await signHelper.deletePartyRaw(cpoOperator);
-  //   await registry.connect(cpoOperator).deletePartyRaw(cpoOperator.address, sig2.v, sig2.r, sig2.s);
-
-  //   const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
-  //   expect(got.countryCode).to.equal("0x0000");
-  //   expect(got.partyId).to.equal("0x000000");
-  //   expect(got.roles.length).to.equal(0);
-  //   expect(got.operatorAddress).to.equal("0x0000000000000000000000000000000000000000");
-  //   // since the deleted party index remains in the storage variable 'parties' as 0x000, a filter needs to be applied
-  //   const parties = (await registry.connect(cpoOperator).getParties()).filter((party) => party !== "0x0000000000000000000000000000000000000000");
-  //   expect(parties).to.deep.equal([]);
-  // });
 });

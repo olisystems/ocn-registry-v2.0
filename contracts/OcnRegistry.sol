@@ -3,12 +3,12 @@ pragma solidity 0.8.24;
 
 import {IOcnPaymentManager} from "./IOcnPaymentManager.sol";
 import {IOcnCvManager} from "./IOcnCvManager.sol";
-import "./interfaces/ICertificateVerifier.sol";
-import "./interfaces/IProviderOracle.sol";
+import "./OcnRegistryTypes.sol";
+import "./interfaces/IPartyRegistrationValidator.sol";
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract OcnRegistry is AccessControl {
+contract OcnRegistry is OcnRegistryTypes, AccessControl {
     /* ********************************** */
     /*       STORAGE VARIABLES            */
     /* ********************************** */
@@ -22,21 +22,6 @@ contract OcnRegistry is AccessControl {
     address[] private operators;
 
     // OCPI Party Listings
-    enum Role {
-        CPO,
-        EMSP,
-        NAP,
-        NSP,
-        OTHER,
-        SCSP
-    }
-
-    struct RoleDetails {
-        bytes certificateData;
-        bytes signature;
-        Role role;
-    }
-
     struct PartyDetails {
         bytes2 countryCode;
         bytes3 partyId;
@@ -53,14 +38,10 @@ contract OcnRegistry is AccessControl {
     mapping(address => bool) private uniquePartyAddresses;
     mapping(address => PartyDetails) private partyOf;
     mapping(address => address) private operatorOf;
-    mapping(address => bool) private allowedCertificateVerifiers;
     address[] private parties;
 
     IOcnPaymentManager public paymentManager;
-    ICertificateVerifier public certificateVerifier;
-
-    // Providers Oracle
-    mapping(Role => IProviderOracle) private roleOracle;
+    IPartyRegistrationValidator public partyRegistrationValidator;
 
     /* ********************************** */
     /*          CUSTOM ERRORS             */
@@ -83,6 +64,7 @@ contract OcnRegistry is AccessControl {
     /* ********************************** */
 
     event OwnershipTransferred(address indexed oldAdmin, address indexed newAdmin);
+    event PartyRegistrationValidatorUpdated(address indexed validator);
     event OperatorUpdate(address indexed operator, string domain);
     event PartyUpdate(bytes2 countryCode, bytes3 partyId, address indexed partyAddress, Role[] roles, string name, string url, IOcnPaymentManager.PaymentStatus paymentStatus, IOcnCvManager.CvStatus cvStatus, bool active, address indexed operatorAddress);
 
@@ -92,10 +74,12 @@ contract OcnRegistry is AccessControl {
     /*          INITIALIZER               */
     /* ********************************** */
 
-    constructor(address _paymentManager, address _certificateVerifier) {
+    constructor(address _paymentManager, address _partyRegistrationValidator) {
         prefix = "\u0019Ethereum Signed Message:\n32";
         paymentManager = IOcnPaymentManager(_paymentManager);
-        certificateVerifier = ICertificateVerifier(_certificateVerifier);
+        partyRegistrationValidator = IPartyRegistrationValidator(
+            _partyRegistrationValidator
+        );
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -113,6 +97,14 @@ contract OcnRegistry is AccessControl {
     function adminDeleteParty(bytes2 countryCode, bytes3 partyId) public onlyRole(DEFAULT_ADMIN_ROLE) {
         address party = uniqueParties[countryCode][partyId];
         deleteParty(party);
+    }
+
+    function setPartyRegistrationValidator(
+        address validator
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(validator != address(0), "Invalid party registration validator");
+        partyRegistrationValidator = IPartyRegistrationValidator(validator);
+        emit PartyRegistrationValidatorUpdated(validator);
     }
 
     function setNode(address operator, string memory domain) private {
@@ -185,32 +177,8 @@ contract OcnRegistry is AccessControl {
             revert EmptyOperator("Cannot set empty operator. Use deleteParty method instead.");
         }
 
-        Role[] memory verifiedRoles = new Role[](roles.length);
-        address credentialOwner = address(0);
-
-        // VC verification (All roles must be verified)
-        for (uint8 i = 0; i < roles.length; i++) {
-            RoleDetails memory roleDetails = roles[i];
-            (string memory certificateIdentifier, address owner) = verifyCertificate(roleDetails);
-
-            if (credentialOwner == address(0)) {
-                credentialOwner = owner;
-            }
-
-            if (credentialOwner != owner) {
-                revert CerificateOwnerMismatch("Certificates have different owners");
-            }
-
-            IProviderOracle oracle = roleOracle[roleDetails.role];
-            if (address(oracle) != address(0)) {
-                IProviderOracle.Provider memory provider = oracle.getProvider(certificateIdentifier);
-                if (!compareIdentifiers(certificateIdentifier, provider.identifier)) {
-                    revert ProviderNotFound(roleDetails.role, "Not active in oracle");
-                }
-            }
-
-            verifiedRoles[i] = roleDetails.role;
-        }
+        (address credentialOwner, Role[] memory verifiedRoles) = partyRegistrationValidator
+            .validateRegistration(roles);
 
         address registeredParty = uniqueParties[countryCode][partyId];
         if (registeredParty != address(0) && registeredParty != credentialOwner) {
@@ -238,21 +206,6 @@ contract OcnRegistry is AccessControl {
         emit PartyUpdate(details.countryCode, details.partyId, credentialOwner, details.roles, details.name, details.url, details.paymentStatus, details.cvStatus, details.active, operator);
     }
 
-    function setPartyRaw(address party, bytes2 countryCode, bytes3 partyId, RoleDetails[] memory roles, address operator, string memory name, string memory url, uint8 v, bytes32 r, bytes32 s) public {
-        bytes memory rolesBytes = "";
-        for (uint8 i = 0; i < roles.length; i++) {
-            RoleDetails memory roleDetails = roles[i];
-            rolesBytes = abi.encodePacked(rolesBytes, roleDetails.certificateData, roleDetails.signature, roleDetails.role);
-        }
-        bytes32 rolesHash = keccak256(rolesBytes);
-        bytes32 paramHash = keccak256(abi.encodePacked(party, countryCode, partyId, rolesHash, operator, name, url));
-        address signer = ecrecover(keccak256(abi.encodePacked(prefix, paramHash)), v, r, s);
-        if (signer != party) {
-            revert SignerMismatch("Signer and provided party address different.");
-        }
-        setParty(countryCode, partyId, roles, operator, name, url);
-    }
-
     function deleteParty(address party) private {
         if (operatorOf[party] == address(0)) {
             revert PartyNotRegistered("Cannot delete party that does not exist. No operator found for given party.");
@@ -269,15 +222,6 @@ contract OcnRegistry is AccessControl {
 
     function deleteParty() public {
         deleteParty(msg.sender);
-    }
-
-    function deletePartyRaw(address party, uint8 v, bytes32 r, bytes32 s) public {
-        bytes32 paramHash = keccak256(abi.encodePacked(party));
-        address signer = ecrecover(keccak256(abi.encodePacked(prefix, paramHash)), v, r, s);
-        if (signer != party) {
-            revert SignerMismatch("Signer and provided party address different.");
-        }
-        deleteParty(signer);
     }
 
     function getOperatorByAddress(address party) public view returns (address operator, string memory domain) {
@@ -362,51 +306,4 @@ contract OcnRegistry is AccessControl {
         return result;
     }
 
-    function setVerifier(address verifier) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(verifier != address(0), "Invalid verifier address");
-        require(!allowedCertificateVerifiers[verifier], "Verifier already allowed");
-
-        allowedCertificateVerifiers[verifier] = true;
-    }
-
-    function removeVerifier(address verifier) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(verifier != address(0), "Invalid verifier address");
-        require(allowedCertificateVerifiers[verifier], "Verifier not currently allowed");
-
-        allowedCertificateVerifiers[verifier] = false;
-    }
-
-    function isAllowedVerifier(address verifier) public view returns (bool) {
-        return allowedCertificateVerifiers[verifier];
-    }
-
-    function setProviderOracle(Role role, address oracleAddress) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        roleOracle[role] = IProviderOracle(oracleAddress);
-    }
-
-    function verifyCertificate(RoleDetails memory roleDetails) private returns (string memory, address) {
-        if (roleDetails.role == Role.EMSP) {
-            (address verifier, ICertificateVerifier.EMPCertificate memory certificate, ) = certificateVerifier.verifyEMP(roleDetails.certificateData, roleDetails.signature);
-            if (!isAllowedVerifier(verifier)) {
-                revert InvalidCertificate(verifier, "Invalid EMP certificate");
-            }
-            return (certificate.identifier, certificate.owner);
-        } else if (roleDetails.role == Role.CPO) {
-            (address verifier, ICertificateVerifier.CPOCertificate memory certificate, ) = certificateVerifier.verifyCPO(roleDetails.certificateData, roleDetails.signature);
-            if (!isAllowedVerifier(verifier)) {
-                revert InvalidCertificate(verifier, "Invalid CPO certificate");
-            }
-            return (certificate.identifier, certificate.owner);
-        } else {
-            (address verifier, ICertificateVerifier.OtherCertificate memory certificate, ) = certificateVerifier.verifyOther(roleDetails.certificateData, roleDetails.signature);
-            if (!isAllowedVerifier(verifier)) {
-                revert InvalidCertificate(verifier, "Invalid Other certificate");
-            }
-            return (certificate.identifier, certificate.owner);
-        }
-    }
-
-    function compareIdentifiers(string memory a, string memory b) private pure returns (bool) {
-        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
-    }
 }

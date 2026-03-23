@@ -230,59 +230,12 @@ export class Registry extends ContractWrapper {
   }
 
   /**
-   * List an OCPI party in the OCN registry using a raw transaction.
-   * @param countryCode OCPI "country_code" of party (ISO-3166 alpha-2).
-   * @param partyId OCPI "party_id" of party (ISO-15118).
-   * @param roles list of roles implemented by party (i.e. might only be CPO, or the same "platform" could implement
-   * EMSP and CPO roles under the same country_code/party_id).
-   * @param operator the operator address of the OCN Node used by the party.
-   * @param signer the private key of the owner of the registry listing. The signer configured in the
-   * constructor is the "spender": they send and pay for the transaction on the network.
-   */
-  public async setPartyRaw(countryCode: string, partyId: string, roles: types.RoleDetails[], operator: string, name: string, url: string, signer: string): Promise<ethers.TransactionReceipt> {
-    this.verifyWritable();
-    this.verifyStringLen(countryCode, 2);
-    this.verifyStringLen(partyId, 3);
-    this.verifyAddress(operator);
-    try {
-      const country = this.toBytes(countryCode);
-      const id = this.toBytes(partyId);
-
-      const wallet = new ethers.Wallet(signer);
-      const sig = await sign.setPartyRaw(country, id, roles, operator, name, url, wallet);
-      const tx = await this.contract.setPartyRaw(wallet.address, country, id, roles, operator, name, url, sig.v, sig.r, sig.s);
-      await tx.wait();
-      return tx;
-    } catch (error) {
-      return this.handleContractError(error);
-    }
-  }
-
-  /**
    * Direct transaction by signer to delete a party from the OCN Registry.
    */
   public async deleteParty(): Promise<ethers.TransactionReceipt> {
     this.verifyWritable();
     try {
       const tx = await this.contract.deleteParty();
-      await tx.wait();
-      return tx;
-    } catch (error) {
-      return this.handleContractError(error);
-    }
-  }
-
-  /**
-   * Raw transaction allowing another wallet to delete the signer's OCN Registry party listing.
-   * @param signer the private key of the owner of the registry listing. The signer configured in the
-   * constructor is the "spender": they send and pay for the transaction on the network.
-   */
-  public async deletePartyRaw(signer: string): Promise<ethers.TransactionReceipt> {
-    this.verifyWritable();
-    try {
-      const wallet = new ethers.Wallet(signer);
-      const sig = await sign.deletePartyRaw(wallet);
-      const tx = await this.contract.deletePartyRaw(wallet.address, sig.v, sig.r, sig.s);
       await tx.wait();
       return tx;
     } catch (error) {
@@ -316,70 +269,181 @@ export class Registry extends ContractWrapper {
   }
 
   protected async handleContractError(error: any): Promise<never> {
-    // If error has custom error data, try to decode it
-    if (error.info.error.message) {
+    // Resolve decoded revert: ethers v6 uses error.revert (name + args) or error.reason; v5/legacy uses error.info.error.message; raw error.data can be parsed
+    const decoded = this.getDecodedRevert(error);
+    if (decoded) {
       try {
-        const decodedError = this.contract.interface.parseError(error.info.error.message.split(" ")[1]);
-        if (decodedError) {
-          // Map known error signatures to readable messages
-          switch (decodedError.name) {
-            case "AccessControlUnauthorizedAccount":
-              throw new types.RecognizedError(`Account ${decodedError.args[0]} is missing required role ${decodedError.args[1]}`);
+        switch (decoded.name) {
+          case "AccessControlUnauthorizedAccount":
+            throw new types.RecognizedError(`Account ${decoded.args[0]} is missing required role ${decoded.args[1]}`);
 
-            case "CerificateOwnerMismatch":
-              throw new types.RecognizedError(`Certificate owner mismatch: ${decodedError.args[0]}`);
+          case "CerificateOwnerMismatch":
+            throw new types.RecognizedError(`Certificate owner mismatch: ${decoded.args[0]}`);
 
-            case "DomainNameAlreadyRegistered":
-              throw new types.RecognizedError(`Domain name already registered: ${decodedError.args[0]}`);
+          case "DomainNameAlreadyRegistered":
+            throw new types.RecognizedError(`Domain name already registered: ${decoded.args[0]}`);
 
-            case "EmptyCountryCode":
-              throw new types.RecognizedError(`Empty country code: ${decodedError.args[0]}`);
+          case "EmptyCountryCode":
+            throw new types.RecognizedError(`Empty country code: ${decoded.args[0]}`);
 
-            case "EmptyDomainName":
-              throw new types.RecognizedError(`Empty domain name: ${decodedError.args[0]}`);
+          case "EmptyDomainName":
+            throw new types.RecognizedError(`Empty domain name: ${decoded.args[0]}`);
 
-            case "EmptyOperator":
-              throw new types.RecognizedError(`Empty operator: ${decodedError.args[0]}`);
+          case "EmptyOperator":
+            throw new types.RecognizedError(`Empty operator: ${decoded.args[0]}`);
 
-            case "EmptyPartyId":
-              throw new types.RecognizedError(`Empty party ID: ${decodedError.args[0]}`);
+          case "EmptyPartyId":
+            throw new types.RecognizedError(`Empty party ID: ${decoded.args[0]}`);
 
-            case "InvalidCertificate":
-              throw new types.RecognizedError(`Invalid certificate from verifier ${decodedError.args[0]}: ${decodedError.args[1]}`);
+          case "InvalidCertificate":
+            throw new types.RecognizedError(`Invalid certificate from verifier ${decoded.args[0]}: ${decoded.args[1]}`);
 
-            case "NoRolesProvided":
-              throw new types.RecognizedError(`No roles provided: ${decodedError.args[0]}`);
+          case "NoRolesProvided":
+            throw new types.RecognizedError(`No roles provided: ${decoded.args[0]}`);
 
-            case "PartyAlreadyRegistered":
-              throw new types.RecognizedError(`Party already registered: ${decodedError.args[0]}`);
+          case "PartyAlreadyRegistered":
+            throw new types.RecognizedError(`Party already registered: ${decoded.args[0]}`);
 
-            case "PartyNotRegistered":
-              throw new types.RecognizedError(`Party not registered: ${decodedError.args[0]}`);
+          case "PartyNotRegistered":
+            throw new types.RecognizedError(`Party not registered: ${decoded.args[0]}`);
 
-            case "ProviderNotFound":
-              throw new types.RecognizedError(`Provider not found for role ${decodedError.args[0]}: ${decodedError.args[1]}`);
+          case "ProviderNotFound":
+            throw new types.RecognizedError(`Provider not found for role ${decoded.args[0]}: ${decoded.args[1]}`);
 
-            case "SignerMismatch":
-              throw new types.RecognizedError(`Signer mismatch: ${decodedError.args[0]}`);
+          case "SignerMismatch":
+            throw new types.RecognizedError(`Signer mismatch: ${decoded.args[0]}`);
 
-            default:
-              throw new types.RecognizedError(`Contract error: ${decodedError.name} ${decodedError.args?.join(", ")}`);
-          }
+          case "ProviderNotFound":
+            throw new types.RecognizedError(
+              `Provider not found in oracle: ${decoded.args[0]} for identifier "${decoded.args[1]}". Register the party in the CPO/EMSP oracle first.`,
+            );
+
+          default:
+            throw new types.RecognizedError(`Contract reverted: ${decoded.name}(${decoded.args?.join(", ") ?? ""})`);
         }
-      } catch (parseError) {
-        if (parseError instanceof types.RecognizedError) {
-          throw parseError;
-        }
-        // If we can't decode the error, provide a more generic error message
-        throw new Error(this.getReadableErrorMessage(error));
+      } catch (e) {
+        if (e instanceof types.RecognizedError) throw e;
+        throw new Error(`Contract reverted: ${decoded.name}(${decoded.args?.join(", ") ?? ""})`);
       }
     }
-    // Handle other common errors
+
+    // Ethers v6 CallExceptionError.reason is often the decoded revert string
+    if (error.reason && typeof error.reason === "string") {
+      throw new Error(`Transaction was reverted by the contract: ${error.reason}`);
+    }
+
     throw new Error(this.getReadableErrorMessage(error));
+  }
+
+  /** Standard Error(string) selector (require/revert string) */
+  private static readonly ERROR_STRING_SELECTOR = "0x08c379a0";
+
+  /** Extra ABIs for errors from contracts in the call path (e.g. oracle: ProviderNotFound(string,string) selector 0xf92634aa) */
+  private static readonly EXTRA_ERROR_ABI = [
+    "error ProviderNotFound(string reason, string identifier)",
+  ];
+
+  /**
+   * Decode standard Error(string) revert (require/revert("msg")) from raw data.
+   */
+  private decodeErrorStringFromData(rawData: string): string | null {
+    if (!rawData || typeof rawData !== "string" || !rawData.startsWith("0x") || rawData.length < 10) {
+      return null;
+    }
+    if (rawData.slice(0, 10).toLowerCase() !== Registry.ERROR_STRING_SELECTOR.toLowerCase()) {
+      return null;
+    }
+    try {
+      const argsHex = "0x" + rawData.slice(10);
+      const decoded = ethers.AbiCoder.defaultAbiCoder().decode(
+        ["string"],
+        ethers.getBytes(argsHex),
+      );
+      return decoded?.[0] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Extract decoded revert (name + args) from ethers v5/v6 error shapes.
+   */
+  private getDecodedRevert(error: any): { name: string; args: unknown[] } | null {
+    // Ethers v6: CallExceptionError.revert has { name, args, signature }
+    if (error.revert && typeof error.revert === "object" && error.revert.name) {
+      return {
+        name: error.revert.name,
+        args: Array.isArray(error.revert.args) ? error.revert.args : [],
+      };
+    }
+
+    // Raw revert data (ethers v6 .data or v5 .error.data): first 4 bytes are selector, rest is ABI-encoded args
+    const rawData = error.data ?? error.info?.error?.data;
+    if (rawData && typeof rawData === "string" && rawData.startsWith("0x") && rawData.length > 10) {
+      try {
+        const decoded = this.contract.interface.parseError(rawData);
+        if (decoded) return { name: decoded.name, args: decoded.args ?? [] };
+      } catch {
+        // ignore parse failure
+      }
+      // Fallback: try extra error ABIs (e.g. ProviderNotFound from oracle)
+      try {
+        const iface = new ethers.Interface(Registry.EXTRA_ERROR_ABI);
+        const decoded = iface.parseError(rawData);
+        if (decoded) return { name: decoded.name, args: decoded.args ?? [] };
+      } catch {
+        // ignore
+      }
+      // Fallback: standard Error(string) from require() / revert("message")
+      const errorString = this.decodeErrorStringFromData(rawData);
+      if (errorString) {
+        return { name: "Error", args: [errorString] };
+      }
+    }
+
+    // Legacy: error.info.error.message sometimes contains selector hex (e.g. "0x1234...")
+    const msg = error.info?.error?.message;
+    if (msg && typeof msg === "string") {
+      const selector = msg.split(" ")[1];
+      if (selector && selector.startsWith("0x")) {
+        try {
+          const decoded = this.contract.interface.parseError(selector);
+          if (decoded) return { name: decoded.name, args: decoded.args ?? [] };
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    return null;
   }
 
   private getReadableErrorMessage(error: any): string {
     const errorMessage = error.message?.toLowerCase() || "";
+
+    // For "execution reverted", include underlying reason if available so the user sees the real cause
+    if (errorMessage.includes("execution reverted")) {
+      const underlying = error.reason ?? this.getDecodedRevert(error);
+      if (error.reason && typeof error.reason === "string") {
+        return `Transaction was reverted by the contract: ${error.reason}`;
+      }
+      if (underlying && typeof underlying === "object" && "name" in underlying) {
+        const d = underlying as { name: string; args?: unknown[] };
+        return `Transaction was reverted by the contract: ${d.name}${d.args?.length ? `(${d.args.join(", ")})` : ""}`;
+      }
+      // Last resort: try raw data as Error(string) (e.g. from inner contract require/revert)
+      const rawData = error.data ?? error.info?.error?.data;
+      const errorString = rawData ? this.decodeErrorStringFromData(rawData) : null;
+      if (errorString) {
+        return `Transaction was reverted by the contract: ${errorString}`;
+      }
+      // Show revert selector so it can be looked up (e.g. custom error from another contract)
+      if (rawData && typeof rawData === "string" && rawData.length >= 10) {
+        const selector = rawData.slice(0, 10);
+        return `Transaction was reverted by the contract (revert selector: ${selector}; decode failed)`;
+      }
+      return "Transaction was reverted by the contract (no revert reason decoded)";
+    }
 
     // Common error patterns and their human-readable versions
     const errorPatterns: Record<string, string> = {
@@ -387,7 +451,6 @@ export class Registry extends ContractWrapper {
       "nonce too low": "Transaction nonce is too low - try resetting your wallet nonce",
       "gas required exceeds allowance": "Transaction would exceed gas limit",
       "user rejected": "Transaction was rejected by the user",
-      "execution reverted": "Transaction was reverted by the contract",
       "already registered": "This address is already registered",
       "network error": "Network connection error - please check your connection",
       "deadline expired": "Transaction deadline expired - please try again",
@@ -395,14 +458,10 @@ export class Registry extends ContractWrapper {
       "transaction underpriced": "Gas price too low - increase gas price",
     };
 
-    // Check if the error matches any known patterns
     for (const [pattern, readable] of Object.entries(errorPatterns)) {
-      if (errorMessage.includes(pattern)) {
-        return readable;
-      }
+      if (errorMessage.includes(pattern)) return readable;
     }
 
-    // If no pattern matches, return a cleaned up version of the original error
     return `Transaction failed: ${error.message || "Unknown error"}`;
   }
 }

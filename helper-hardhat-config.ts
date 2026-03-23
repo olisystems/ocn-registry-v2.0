@@ -22,7 +22,7 @@ export const networkExtraConfig: networkConfigInfo = {
   gnosis: {},
 };
 
-export const developmentChains = ["hardhat", "localhost", "ganache"];
+export const developmentChains = ["hardhat", "localhost", "ganache", "minikube"];
 export const proposalsFile = "proposals.json";
 export const proxiesFile = "proxies.json";
 export const deploymentsDefaultDir: string = "deployments";

@@ -154,7 +154,11 @@ async function main(): Promise<void> {
   const foundKeys: FoundKey[] = [];
   const checkedTokens = new Set<string>(); // Avoid checking duplicates
 
+  // Directories that only contain public blockchain data (tx hashes, block hashes, etc.)
+  const EXCLUDED_PATHS = ['src/deployments/'];
+
   for (const [file, changes] of fileChanges) {
+    if (EXCLUDED_PATHS.some(p => file.startsWith(p))) continue;
     for (const { lineNum, content } of changes) {
       const tokens = extractTokens(content);
       
