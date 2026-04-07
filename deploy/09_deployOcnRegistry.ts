@@ -12,7 +12,6 @@ import {
 } from "../test/certificates";
 
 const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const defaultVerifier = process.env.DEFAULT_VERIFIER || "";
   const contractName = "OcnRegistry";
   const { deployer } = await hre.getNamedAccounts();
   const { deployments, network } = hre;
@@ -58,8 +57,6 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
   if (allowedFromEnv.length > 0) {
     verifiersToAllow = allowedFromEnv;
     log(`Using ${verifiersToAllow.length} allowed verifier(s) from ALLOWED_VERIFIERS`);
-  } else if (defaultVerifier !== "") {
-    verifiersToAllow = [defaultVerifier];
   } else if (developmentChains.includes(network.name)) {
     const [cpoVerifier] = await certificateVerifierContract.verifyCPO.staticCall(
       encodedCpoCertificate,

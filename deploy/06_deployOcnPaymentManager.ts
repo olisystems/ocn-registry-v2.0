@@ -13,12 +13,28 @@ const deployVoteToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   log("----------------------------------------------------");
   log(`Deploying ${contractName} at ${network.name} and waiting for confirmations...`);
-  const euroStableCoinDeplyedContract = await ethers.getContract("EuroStableCoin", deployer);
+  const stablecoinAddressFromEnv = process.env.STABLECOIN_ADDRESS || "";
+  const stablecoinDeploymentName = process.env.STABLECOIN_DEPLOYMENT_NAME || "EuroStableCoin";
+  let stablecoinAddress: string;
+
+  if (stablecoinAddressFromEnv !== "") {
+    stablecoinAddress = stablecoinAddressFromEnv;
+    if (!ethers.isAddress(stablecoinAddress)) {
+      throw new Error(
+        `Invalid STABLECOIN_ADDRESS: "${stablecoinAddress}". Expected a valid 0x... Ethereum address.`,
+      );
+    }
+    log(`Using stablecoin address from STABLECOIN_ADDRESS: ${stablecoinAddress}`);
+  } else {
+    const deployedStablecoinContract = await ethers.getContract(stablecoinDeploymentName, deployer);
+    stablecoinAddress = await deployedStablecoinContract.getAddress();
+    log(`Using deployed stablecoin "${stablecoinDeploymentName}" at ${stablecoinAddress}`);
+  }
 
   const defaultOperator = process.env.DEFAULT_OPERATOR || ADDRESS_ZERO;
 
   const OcnPaymentManager = await ethers.getContractFactory(contractName);
-  const deployedContract = await upgrades.deployProxy(OcnPaymentManager, [euroStableCoinDeplyedContract.target, DEFAULT_YEARLY_AMOUNT, defaultOperator]);
+  const deployedContract = await upgrades.deployProxy(OcnPaymentManager, [stablecoinAddress, DEFAULT_YEARLY_AMOUNT, defaultOperator]);
   await deployedContract.waitForDeployment();
 
   await save(contractName, {

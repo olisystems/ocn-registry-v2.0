@@ -26,6 +26,21 @@ const KNOWN_TEST_KEYS = new Set([
   '5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a',
 ]);
 
+// Placeholder values that appear in sample config files.
+const KNOWN_PLACEHOLDER_KEYS = new Set([
+  '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+]);
+
+// JSON fields that store public on-chain hashes, not private keys.
+const SAFE_HASH_FIELDS = new Set([
+  'txHash',
+  'transactionHash',
+  'blockHash',
+  'blockhash',
+  'codeHash',
+  'storageHash',
+]);
+
 interface FoundKey {
   key: string;
   file: string;
@@ -73,6 +88,22 @@ function normalizeKey(key: string): string {
     cleaned = '0x' + cleaned;
   }
   return cleaned;
+}
+
+/**
+ * Detect whether a token is a known placeholder private key.
+ */
+function isKnownPlaceholderKey(token: string): boolean {
+  return KNOWN_PLACEHOLDER_KEYS.has(normalizeKey(token));
+}
+
+/**
+ * Detect lines like `"txHash": "0x..."` that should be ignored.
+ */
+function isSafeHashFieldLine(line: string): boolean {
+  const keyMatch = line.match(/^\s*"([^"]+)"\s*:/);
+  if (!keyMatch) return false;
+  return SAFE_HASH_FIELDS.has(keyMatch[1]);
 }
 
 /**
@@ -155,11 +186,12 @@ async function main(): Promise<void> {
   const checkedTokens = new Set<string>(); // Avoid checking duplicates
 
   // Directories that only contain public blockchain data (tx hashes, block hashes, etc.)
-  const EXCLUDED_PATHS = ['src/deployments/'];
+  const EXCLUDED_PATHS = ['src/deployments/', 'deployments/', '.openzeppelin/'];
 
   for (const [file, changes] of fileChanges) {
     if (EXCLUDED_PATHS.some(p => file.startsWith(p))) continue;
     for (const { lineNum, content } of changes) {
+      if (isSafeHashFieldLine(content)) continue;
       const tokens = extractTokens(content);
       
       for (const token of tokens) {
@@ -170,6 +202,7 @@ async function main(): Promise<void> {
         if (isValidPrivateKey(token)) {
           const normalized = normalizeKey(token);
           const isTestKey = KNOWN_TEST_KEYS.has(normalized);
+          if (isKnownPlaceholderKey(normalized)) continue;
           
           foundKeys.push({
             key: token,
@@ -219,7 +252,14 @@ async function main(): Promise<void> {
     .split('\n')
     .filter(Boolean);
   
-  const envFiles = stagedFiles.filter(f => /\.env($|\.)/.test(f));
+  const envFiles = stagedFiles.filter(f => {
+    const normalized = f.toLowerCase();
+    // Allow checked-in templates.
+    if (normalized.endsWith('.env.example') || normalized.endsWith('.env.sample')) {
+      return false;
+    }
+    return /\.env($|\.)/.test(normalized);
+  });
   if (envFiles.length > 0) {
     console.log(`${RED}❌ .ENV FILE STAGED FOR COMMIT:${RESET}`);
     envFiles.forEach(f => console.log(`   ${f}`));

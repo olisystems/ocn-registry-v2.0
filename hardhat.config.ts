@@ -19,17 +19,19 @@ require("fs")
     require(tasksFolder + file);
   });
 
-// to avoid errors when private keys are not passed as parameters (real deployments)
-const randomPk: string = "2d90b3cc7f8d71da4ca2b3a37dbd45d622d6b1bcf79b093ebfb62ecac3b4073d";
-const deployerPrivateKey: string = process.env.DEPLOYER_PRIVATE_KEY || randomPk;
-const nodePrivateKey = process.env.NODE_PRIVATE_KEY || randomPk;
-const cpoPrivateKey = process.env.CPO_PRIVATE_KEY || randomPk;
-const emspPrivateKey = process.env.EMSP_PRIVATE_KEY || randomPk;
-const cdrAdapterPrivateKey = process.env.CD_ADAPTER_PRIVATE_KEY || randomPk;
-const nspPrivateKey = process.env.NSP_PRIVATE_KEY || randomPk;
-const billingPrivateKey = process.env.BILLING_PRIVATE_KEY || randomPk;
-const etherScanApiKey = process.env.ETHERSCAN_API_KEY || randomPk;
-const minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_URL || "http://hardhat.default.svc.cluster.local:8555";
+if (!process.env.DEPLOYER_PRIVATE_KEY) {
+  throw new Error("DEPLOYER_PRIVATE_KEY must be set in .env file");
+}
+const rawDeployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY;
+const normalizedDeployerPrivateKey = rawDeployerPrivateKey.startsWith("0x")
+  ? rawDeployerPrivateKey
+  : `0x${rawDeployerPrivateKey}`;
+if (!/^0x[a-fA-F0-9]{64}$/.test(normalizedDeployerPrivateKey)) {
+  throw new Error("DEPLOYER_PRIVATE_KEY must be a 32-byte hex private key (0x prefix optional)");
+}
+
+const deployerPrivateKey: string = normalizedDeployerPrivateKey;
+const etherScanApiKey = process.env.ETHERSCAN_API_KEY || "";
 
 const config = {
   sourcify: {
@@ -74,40 +76,11 @@ const config = {
       accounts: [deployerPrivateKey],
       chainId: 100,
     },
-
-    ganache: {
-      url: `http://127.0.0.1:8544`,
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
-      chainId: 1337,
-    },
-    hardhat: {
-      accounts: [
-        { privateKey: deployerPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-        { privateKey: nodePrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-        { privateKey: cpoPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-        { privateKey: emspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-        { privateKey: cdrAdapterPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-        { privateKey: nspPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-        { privateKey: billingPrivateKey, balance: "10000000000000000000000" }, // example: 10,000 ETH
-      ],
-      chainId: 31337,
-      live: false,
-      saveDeployments: true,
-    },
     localhost: {
       chainId: 31337,
       live: false,
       saveDeployments: true,
       tags: ["test"],
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
-      loggingEnabled: true,
-    },
-    minikube: {
-      url: minikubeHardhatURL,
-      chainId: 31337,
-      live: false,
-      saveDeployments: true,
-      accounts: [deployerPrivateKey, nodePrivateKey, cpoPrivateKey, emspPrivateKey, cdrAdapterPrivateKey, nspPrivateKey, billingPrivateKey],
       loggingEnabled: true,
     },
   },
@@ -132,15 +105,6 @@ const config = {
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
-    },
-    nodeOperator: {
-      default: 1,
-    },
-    cpoOperator: {
-      default: 2,
-    },
-    emspOperator: {
-      default: 3,
     },
   },
   mocha: {
