@@ -75,7 +75,7 @@ contract PartyRegistrationValidator is
 
     function validateRegistration(
         RoleDetails[] memory roles
-    ) external returns (address credentialOwner, Role[] memory verifiedRoles) {
+    ) external override returns (address credentialOwner, Role[] memory verifiedRoles) {
         verifiedRoles = new Role[](roles.length);
 
         for (uint8 i = 0; i < roles.length; i++) {

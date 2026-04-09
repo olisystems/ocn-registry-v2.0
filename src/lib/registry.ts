@@ -308,15 +308,17 @@ export class Registry extends ContractWrapper {
             throw new types.RecognizedError(`Party not registered: ${decoded.args[0]}`);
 
           case "ProviderNotFound":
-            throw new types.RecognizedError(`Provider not found for role ${decoded.args[0]}: ${decoded.args[1]}`);
-
-          case "SignerMismatch":
-            throw new types.RecognizedError(`Signer mismatch: ${decoded.args[0]}`);
-
-          case "ProviderNotFound":
+            // Registry variant: ProviderNotFound(uint8 role, string reason)
+            // Oracle variant: ProviderNotFound(string identifier, string reason)
+            if (typeof decoded.args[0] === "number" || typeof decoded.args[0] === "bigint") {
+              throw new types.RecognizedError(`Provider not found for role ${decoded.args[0]}: ${decoded.args[1]}`);
+            }
             throw new types.RecognizedError(
               `Provider not found in oracle: ${decoded.args[0]} for identifier "${decoded.args[1]}". Register the party in the CPO/EMSP oracle first.`,
             );
+
+          case "SignerMismatch":
+            throw new types.RecognizedError(`Signer mismatch: ${decoded.args[0]}`);
 
           default:
             throw new types.RecognizedError(`Contract reverted: ${decoded.name}(${decoded.args?.join(", ") ?? ""})`);

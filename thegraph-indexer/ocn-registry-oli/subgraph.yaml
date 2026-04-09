@@ -9,8 +9,8 @@ dataSources:
     network: gnosis
     source:
       abi: OCN_Registry_OLI
-      address: "0x292E95F2c5fC460e5eE3E5268B791a4122371b0c"
-      startBlock: 45456442
+      address: "0x5b5403f4d7eCF46ffC78A1aA5696652fe9AF6A46"
+      startBlock: 45580388
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -55,8 +55,8 @@ dataSources:
     network: gnosis
     source:
       abi: ERC1967Proxy
-      address: "0xF42d45D1d8bE5c33145743614176Af923f08b724"
-      startBlock: 45456425
+      address: "0xB5e13F543c9D6C0fAFf3887ffC30Ea237418f98D"
+      startBlock: 45580372
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -75,8 +75,8 @@ dataSources:
     network: gnosis
     source:
       abi: EuroStableCoin
-      address: "0x89Da0E8b86d99d4a859A2A85A2ECd505016aEC5C"
-      startBlock: 45456431
+      address: "0xA1EC3F14DA14f31E20C9C06e73D803189e87EBe8"
+      startBlock: 45580378
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -98,8 +98,8 @@ dataSources:
     network: gnosis
     source:
       abi: OCNGovernor
-      address: "0x23f14c92E10E0e6c8a74f64401dC8f0D10E75dEf"
-      startBlock: 45456425
+      address: "0xEAf43Ee2c9472F05A02C34D19B9F4D3BF10eA442"
+      startBlock: 45580372
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
