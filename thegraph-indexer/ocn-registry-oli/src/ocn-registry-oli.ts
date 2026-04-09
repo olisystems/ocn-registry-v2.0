@@ -8,6 +8,7 @@ import {
   RoleRevoked as RoleRevokedEvent,
   OCN_Registry_OLI,
 } from "../generated/OCN_Registry_OLI/OCN_Registry_OLI"
+import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts"
 import {
   ProviderOracle,
   OperatorUpdate,
@@ -19,6 +20,9 @@ import {
   RoleRevoked,
   Party,
   Operator,
+  CPOVerified,
+  EMPVerified,
+  OtherVerified,
 } from "../generated/schema"
 
 enum Role {
@@ -42,6 +46,9 @@ enum CvStatus {
   VERIFIED = 1,
   PENDING = 2
 }
+
+const SET_PARTY_SELECTOR = "0x0799363d"
+const SET_PARTY_RAW_SELECTOR = "0xe1e64995"
 
 function getPaymentStatus(status: i32): string {
   if (status == 0) {
@@ -82,6 +89,106 @@ function getRole(role: i32): string {
     return "HUB"
   }
   return "UNKNOWN"
+}
+
+function createCertificateEntitiesFromPartyUpdate(event: PartyUpdateEvent): void {
+  if (event.transaction.input.length < 4) {
+    return
+  }
+
+  let selector = event.transaction.input.toHexString().slice(0, 10)
+  let paramsData = changetype<Bytes>(event.transaction.input.subarray(4))
+  let roles: Array<ethereum.Value> = []
+
+  if (selector == SET_PARTY_SELECTOR) {
+    let decoded = ethereum.decode(
+      "(bytes2,bytes3,(bytes,bytes,uint8)[],address,string,string)",
+      paramsData
+    )
+    if (decoded == null) {
+      log.warning("Failed to decode setParty calldata for tx {}", [event.transaction.hash.toHexString()])
+      return
+    }
+    roles = decoded.toTuple()[2].toArray()
+  } else if (selector == SET_PARTY_RAW_SELECTOR) {
+    let decoded = ethereum.decode(
+      "(address,bytes2,bytes3,(bytes,bytes,uint8)[],address,string,string,uint8,bytes32,bytes32)",
+      paramsData
+    )
+    if (decoded == null) {
+      log.warning("Failed to decode setPartyRaw calldata for tx {}", [event.transaction.hash.toHexString()])
+      return
+    }
+    roles = decoded.toTuple()[3].toArray()
+  } else {
+    return
+  }
+
+  for (let i = 0; i < roles.length; i++) {
+    let roleDetails = roles[i].toTuple()
+    let certificateData = roleDetails[0].toBytes()
+    let role = roleDetails[2].toI32()
+    let baseId = event.transaction.hash.concatI32(event.logIndex.toI32()).concatI32(i)
+
+    if (role == Role.EMSP) {
+      let decodedEmp = ethereum.decode(
+        "(string,string,string,string,string,address,string,string,string,string,string,string)",
+        certificateData
+      )
+      if (decodedEmp == null) {
+        log.warning("Failed to decode EMP certificate data for tx {}", [event.transaction.hash.toHexString()])
+        continue
+      }
+
+      let certificate = decodedEmp.toTuple()
+      let entity = new EMPVerified(baseId)
+      entity.signAddress = event.transaction.from
+      entity.identifier = certificate[0].toString()
+      entity.name = certificate[1].toString()
+      entity.marktfunktion = certificate[2].toString()
+      entity.lieferant = certificate[3].toString()
+      entity.bilanzkreis = certificate[4].toString()
+      entity.owner = certificate[5].toAddress()
+      entity.vatid = certificate[6].toString()
+      entity.billingAddress = certificate[7].toString()
+      entity.billingCity = certificate[8].toString()
+      entity.billingPostalCode = certificate[9].toString()
+      entity.billingCountry = certificate[10].toString()
+      entity.billingEmail = certificate[11].toString()
+      entity.blockNumber = event.block.number
+      entity.save()
+    } else if (role == Role.CPO) {
+      let decodedCpo = ethereum.decode("(string,string,address)", certificateData)
+      if (decodedCpo == null) {
+        log.warning("Failed to decode CPO certificate data for tx {}", [event.transaction.hash.toHexString()])
+        continue
+      }
+
+      let certificate = decodedCpo.toTuple()
+      let entity = new CPOVerified(baseId)
+      entity.signAddress = event.transaction.from
+      entity.identifier = certificate[0].toString()
+      entity.name = certificate[1].toString()
+      entity.owner = certificate[2].toAddress()
+      entity.blockNumber = event.block.number
+      entity.save()
+    } else {
+      let decodedOther = ethereum.decode("(string,string,address)", certificateData)
+      if (decodedOther == null) {
+        log.warning("Failed to decode OTHER certificate data for tx {}", [event.transaction.hash.toHexString()])
+        continue
+      }
+
+      let certificate = decodedOther.toTuple()
+      let entity = new OtherVerified(baseId)
+      entity.signAddress = event.transaction.from
+      entity.identifier = certificate[0].toString()
+      entity.name = certificate[1].toString()
+      entity.owner = certificate[2].toAddress()
+      entity.blockNumber = event.block.number
+      entity.save()
+    }
+  }
 }
 
 export function handleOperatorUpdate(event: OperatorUpdateEvent): void {

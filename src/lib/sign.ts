@@ -1,36 +1,8 @@
 import { Wallet, Signature, getBytes } from "ethers";
 import { soliditySha3 } from "web3-utils";
-import * as ethers from 'ethers';
-import { RoleDetails, SignResult } from "./types";
+import { SignResult } from "./types";
 
 // TODO unify with src/lib/sign.ts
-
-function encodeRoles(roles: RoleDetails[]): string {
-    let rolesBytes = ethers.hexlify('0x');
-
-    for (const roleDetails of roles) {
-        // Ensure certificateData and signature are properly formatted as hex strings
-        const certificateDataHex = ethers.isHexString(roleDetails.certificateData)
-            ? roleDetails.certificateData
-            : ethers.hexlify(roleDetails.certificateData);
-
-        const signatureHex = ethers.isHexString(roleDetails.signature)
-            ? roleDetails.signature
-            : ethers.hexlify(roleDetails.signature);
-
-        // Convert Role enum to bytes
-        const roleBytes = ethers.hexlify(ethers.toBeHex(roleDetails.role));
-
-        rolesBytes = ethers.concat([
-            rolesBytes,
-            certificateDataHex,
-            signatureHex,
-            roleBytes
-        ]);
-    }
-
-    return rolesBytes;
-}
 
 async function sign(txMsg: string, wallet: Wallet): Promise<SignResult> {
   const messageHashBytes = getBytes(txMsg);
@@ -54,20 +26,8 @@ async function deleteNodeRaw(wallet: Wallet): Promise<SignResult> {
   return sign(txMsg as string, wallet);
 }
 
-async function setPartyRaw(countryCode: string, partyId: string, roles: RoleDetails[], operator: string, name: string, url: string, wallet: Wallet): Promise<SignResult> {
-  const encodedRoles = encodeRoles(roles);
-  const rolesHash = soliditySha3(encodedRoles) || "";
-  const txMsg = soliditySha3(wallet.address, countryCode, partyId, rolesHash, operator, name, url);
-  return sign(txMsg as string, wallet);
-}
-
 async function setPartyModulesRaw(sender: string[], receiver: string[], wallet: Wallet): Promise<SignResult> {
   const txMsg = soliditySha3(wallet.address, ...sender, ...receiver);
-  return sign(txMsg as string, wallet);
-}
-
-async function deletePartyRaw(wallet: Wallet): Promise<SignResult> {
-  const txMsg = soliditySha3(wallet.address);
   return sign(txMsg as string, wallet);
 }
 
@@ -92,4 +52,4 @@ async function revokeAgreementRaw(provider: string, wallet: Wallet): Promise<Sig
   return sign(txMsg as string, wallet);
 }
 
-export { setNodeRaw, deleteNodeRaw, setPartyRaw, setPartyModulesRaw, deletePartyRaw, setServiceRaw, deleteServiceRaw, createAgreementRaw, revokeAgreementRaw };
+export { setNodeRaw, deleteNodeRaw, setPartyModulesRaw, setServiceRaw, deleteServiceRaw, createAgreementRaw, revokeAgreementRaw };

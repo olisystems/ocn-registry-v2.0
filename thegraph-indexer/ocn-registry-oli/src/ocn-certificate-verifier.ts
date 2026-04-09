@@ -3,7 +3,6 @@ import {
     OtherVerified as OtherVerifiedEvent,
     CPOVerified as CPOVerifiedEvent,
     EMPVerified as EMPVerifiedEvent,
-    OCN_Certificate_Verifier,
 } from "../generated/OCN_Certificate_Verifier/OCN_Certificate_Verifier"
 import { CPOVerified, EMPVerified, OtherVerified } from "../generated/schema"
 
