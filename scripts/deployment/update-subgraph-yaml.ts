@@ -52,11 +52,12 @@ type SubgraphManifest = {
 function updateDataSource(
   manifest: SubgraphManifest,
   dataSourceName: string,
+  manifestName: string,
   values: { network: string; address: string; startBlock: number },
 ): void {
   const dataSource = manifest.dataSources?.find((item) => item.name === dataSourceName);
   if (!dataSource) {
-    fail(`Datasource "${dataSourceName}" not found in subgraph.yaml.`);
+    fail(`Datasource "${dataSourceName}" not found in ${manifestName}.`);
   }
 
   dataSource.network = values.network;
@@ -68,27 +69,36 @@ function updateDataSource(
 }
 
 function main(): void {
-  const [, , networkArg, stablecoinOverrideArg] = process.argv;
+  const [, , networkArg, stablecoinOverrideArg, manifestPathArg] = process.argv;
   if (!networkArg) {
-    fail("Usage: ts-node scripts/deployment/update-subgraph-yaml.ts <network> [stablecoin-address]");
+    fail(
+      "Usage: ts-node scripts/deployment/update-subgraph-yaml.ts <network> [stablecoin-address] [manifest-path]",
+    );
   }
 
   const repoRoot = path.resolve(__dirname, "../..");
-  const subgraphYamlPath = path.join(repoRoot, "thegraph-indexer", "ocn-registry-oli", "subgraph.yaml");
+  const subgraphManifestPath =
+    manifestPathArg || process.env.SUBGRAPH_MANIFEST || "thegraph-indexer/ocn-registry-oli/subgraph.yaml";
+  const subgraphYamlPath = path.isAbsolute(subgraphManifestPath)
+    ? subgraphManifestPath
+    : path.join(repoRoot, subgraphManifestPath);
+  const subgraphManifestName = path.basename(subgraphYamlPath);
 
   if (!fs.existsSync(subgraphYamlPath)) {
-    fail(`subgraph.yaml not found at ${subgraphYamlPath}`);
+    fail(`${subgraphManifestName} not found at ${subgraphYamlPath}`);
   }
 
   const registry = readDeployment(repoRoot, networkArg, "OcnRegistry");
   const paymentManager = readDeployment(repoRoot, networkArg, "OcnPaymentManager");
   const governor = readDeployment(repoRoot, networkArg, "OcnGovernor");
+  const certificateVerifier = readDeployment(repoRoot, networkArg, "CertificateVerifier");
   const mockErc20 = readDeployment(repoRoot, networkArg, "MockERC20");
   const euroStable = readDeployment(repoRoot, networkArg, "EuroStableCoin");
 
   if (!registry) fail(`Missing deployment file for OcnRegistry on network "${networkArg}".`);
   if (!paymentManager) fail(`Missing deployment file for OcnPaymentManager on network "${networkArg}".`);
   if (!governor) fail(`Missing deployment file for OcnGovernor on network "${networkArg}".`);
+  if (!certificateVerifier) fail(`Missing deployment file for CertificateVerifier on network "${networkArg}".`);
 
   const stablecoinAddress =
     stablecoinOverrideArg || mockErc20?.address || euroStable?.address || "";
@@ -108,39 +118,45 @@ function main(): void {
   const yamlOriginal = fs.readFileSync(subgraphYamlPath, "utf8");
   const manifest = YAML.parse(yamlOriginal) as SubgraphManifest;
   if (!manifest?.dataSources || !Array.isArray(manifest.dataSources)) {
-    fail("Invalid subgraph.yaml format: dataSources array not found.");
+    fail(`Invalid ${subgraphManifestName} format: dataSources array not found.`);
   }
 
-  updateDataSource(manifest, "OCN_Registry_OLI", {
+  updateDataSource(manifest, "OCN_Registry_OLI", subgraphManifestName, {
     network: networkArg,
     address: registry.address,
     startBlock: registry.blockNumber || fallbackStartBlock,
   });
-  updateDataSource(manifest, "ERC1967Proxy", {
+  updateDataSource(manifest, "ERC1967Proxy", subgraphManifestName, {
     network: networkArg,
     address: paymentManager.address,
     startBlock: paymentManager.blockNumber || fallbackStartBlock,
   });
-  updateDataSource(manifest, "EuroStableCoin", {
+  updateDataSource(manifest, "EuroStableCoin", subgraphManifestName, {
     network: networkArg,
     address: stablecoinAddress,
     startBlock: mockErc20?.blockNumber || euroStable?.blockNumber || paymentManager.blockNumber || fallbackStartBlock,
   });
-  updateDataSource(manifest, "OCNGovernor", {
+  updateDataSource(manifest, "OCNGovernor", subgraphManifestName, {
     network: networkArg,
     address: governor.address,
     startBlock: governor.blockNumber || fallbackStartBlock,
+  });
+  updateDataSource(manifest, "OCN_Certificate_Verifier", subgraphManifestName, {
+    network: networkArg,
+    address: certificateVerifier.address,
+    startBlock: certificateVerifier.blockNumber || fallbackStartBlock,
   });
 
   const yamlUpdated = YAML.stringify(manifest, { lineWidth: 0 });
   fs.writeFileSync(subgraphYamlPath, yamlUpdated, "utf8");
 
-  console.log("Updated subgraph.yaml with latest deployment values:");
+  console.log(`Updated ${subgraphManifestName} with latest deployment values:`);
   console.log(`- network: ${networkArg}`);
   console.log(`- OCN_Registry_OLI: ${registry.address}`);
   console.log(`- ERC1967Proxy: ${paymentManager.address}`);
   console.log(`- EuroStableCoin: ${stablecoinAddress}`);
   console.log(`- OCNGovernor: ${governor.address}`);
+  console.log(`- OCN_Certificate_Verifier: ${certificateVerifier.address}`);
 }
 
 main();
