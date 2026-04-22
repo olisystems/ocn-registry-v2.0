@@ -4,6 +4,9 @@ node_modules
 proposals.json
 /certificates
 
+# Local dev config (symlinked from transit-local-services)
+local.hardhat.config.ts
+
 # Hardhat files
 /cache
 /artifacts
@@ -26,3 +29,8 @@ ignition/deployments/chain-31337
 .DS_Store
 .idea
 .vscode
+
+# Thegraph files
+thegraph-indexer/ocn-registry-oli/data
+thegraph-indexer/ocn-registry-oli/subgraph-dev.yaml
+thegraph-indexer/ocn-registry-oli/docker-compose.dev.yml
