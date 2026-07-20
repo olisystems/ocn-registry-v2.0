@@ -176,6 +176,10 @@ describe("Registry contract", function () {
     expect(got).to.deep.equal(domains);
   });
 
+  it("recognizes HUB as role value 6", async () => {
+    expect(await registry.getPartiesByRole(6)).to.deep.equal([]);
+  });
+
   it("setParty allows listing ocpi party", async () => {
     const domain = "https://node.ocn.org";
     await registry.connect(nodeOperator).setNode(domain);

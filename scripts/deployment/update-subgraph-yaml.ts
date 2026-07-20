@@ -150,7 +150,7 @@ function main(): void {
   const yamlUpdated = YAML.stringify(manifest, { lineWidth: 0 });
   fs.writeFileSync(subgraphYamlPath, yamlUpdated, "utf8");
 
-  console.log(`Updated ${subgraphManifestName} with latest deployment values:`);
+  console.log(`Updated ${path.relative(repoRoot, subgraphYamlPath)} with latest deployment values:`);
   console.log(`- network: ${networkArg}`);
   console.log(`- OCN_Registry_OLI: ${registry.address}`);
   console.log(`- ERC1967Proxy: ${paymentManager.address}`);

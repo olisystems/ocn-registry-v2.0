@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: OCN_Registry_OLI
-    network: gnosis
+    network: localhost
     source:
       abi: OCN_Registry_OLI
-      address: "0x5b5403f4d7eCF46ffC78A1aA5696652fe9AF6A46"
-      startBlock: 45580388
+      address: "0x5d5664283bCfD1Dfe2Ba70eA8004C21c45C343D4"
+      startBlock: 56
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -52,11 +52,11 @@ dataSources:
       file: ./src/ocn-registry-oli.ts
   - kind: ethereum
     name: ERC1967Proxy
-    network: gnosis
+    network: localhost
     source:
       abi: ERC1967Proxy
-      address: "0xB5e13F543c9D6C0fAFf3887ffC30Ea237418f98D"
-      startBlock: 45580372
+      address: "0x616F9d8a67a1061E87a1855B24011a21f320f9C8"
+      startBlock: 47
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -72,11 +72,11 @@ dataSources:
       file: ./src/erc-1967-proxy.ts
   - kind: ethereum
     name: EuroStableCoin
-    network: gnosis
+    network: localhost
     source:
       abi: EuroStableCoin
-      address: "0xA1EC3F14DA14f31E20C9C06e73D803189e87EBe8"
-      startBlock: 45580378
+      address: "0x485c454451cB9e6F566054b6E3E362794CEEF0D9"
+      startBlock: 51
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -95,11 +95,11 @@ dataSources:
       file: ./src/euro-stable-coin.ts
   - kind: ethereum
     name: OCNGovernor
-    network: gnosis
+    network: localhost
     source:
       abi: OCNGovernor
-      address: "0xEAf43Ee2c9472F05A02C34D19B9F4D3BF10eA442"
-      startBlock: 45580372
+      address: "0xf6AAC1D017328caEc0DC4f907109FbBfAfBDd35a"
+      startBlock: 47
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
