@@ -8,7 +8,8 @@ abstract contract OcnRegistryTypes {
         NAP,
         NSP,
         OTHER,
-        SCSP
+        SCSP,
+        HUB
     }
 
     struct RoleDetails {

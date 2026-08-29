@@ -116,4 +116,5 @@ export enum Role {
   NSP,
   OTHER,
   SCSP,
+  HUB,
 }
