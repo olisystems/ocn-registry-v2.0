@@ -5,6 +5,8 @@ import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import * as signHelper from "../src/lib/sign";
 import { encodedCpoCertificate, encodedCpoSignature, encodedEmpCertificate, encodedEmpSignature } from "./certificates";
 import ProviderOracleABI from "../test/oracles/ProvidersOracle.json";
+import { Role } from "../src/lib/types";
+import { encodeCertificateSignature, encodeOtherCertificate } from "../src/lib/helpers";
 
 describe("Registry contract", function () {
   let registry: OcnRegistry;
@@ -12,6 +14,9 @@ describe("Registry contract", function () {
   let nodeOperator: HardhatEthersSigner;
   let cpoOperator: HardhatEthersSigner;
   let emspOperator: HardhatEthersSigner;
+  let validator: any;
+  let certificateVerifier: any;
+  let timelockSigner: HardhatEthersSigner;
 
   const toHex = (str: string) => "0x" + Buffer.from(str).toString("hex");
 
@@ -35,11 +40,11 @@ describe("Registry contract", function () {
     const preDeployedRegistry = await deployments.get("OcnRegistry");
     registry = (await ethers.getContractAt("OcnRegistry", preDeployedRegistry.address)) as unknown as OcnRegistry;
     const preDeployedValidator = await deployments.get("PartyRegistrationValidator");
-    const validator = (await ethers.getContractAt(
+    validator = (await ethers.getContractAt(
       "PartyRegistrationValidator",
       preDeployedValidator.address,
     )) as unknown as any;
-    const certificateVerifier = (await ethers.getContract(
+    certificateVerifier = (await ethers.getContract(
       "CertificateVerifier",
       deployer,
     )) as unknown as any;
@@ -48,7 +53,7 @@ describe("Registry contract", function () {
       await timelock.getAddress(),
       "0x1000000000000000000000000",
     ]);
-    const timelockSigner = await ethers.getImpersonatedSigner(
+    timelockSigner = await ethers.getImpersonatedSigner(
       await timelock.getAddress(),
     );
 
@@ -176,8 +181,35 @@ describe("Registry contract", function () {
     expect(got).to.deep.equal(domains);
   });
 
-  it("recognizes HUB as role value 6", async () => {
-    expect(await registry.getPartiesByRole(6)).to.deep.equal([]);
+  it("setParty persists a HUB role that getPartiesByRole can query", async () => {
+    const domain = "https://node.ocn.org";
+    await registry.connect(nodeOperator).setNode(domain);
+
+    const issuer = ethers.Wallet.createRandom();
+    await validator.connect(timelockSigner).setVerifier(issuer.address);
+
+    const { country, id, name, url } = getTestPartyData();
+    const certificate = {
+      identifier: "DE BAN",
+      name: "Test Hub",
+      owner: cpoOperator.address,
+    };
+    const signature = await signOtherCertificate(
+      issuer,
+      await certificateVerifier.getAddress(),
+      certificate,
+    );
+    const hubRole = {
+      certificateData: encodeOtherCertificate(certificate),
+      signature: encodeCertificateSignature(signature),
+      role: Role.HUB,
+    };
+
+    await registry.connect(cpoOperator).setParty(country, id, [hubRole], nodeOperator.address, name, url);
+
+    const got = await registry.getPartyDetailsByAddress(cpoOperator.address);
+    expect(got.roles.map((role) => Number(role))).to.deep.equal([Role.HUB]);
+    expect(await registry.getPartiesByRole(Role.HUB)).to.deep.equal([cpoOperator.address]);
   });
 
   it("setParty allows listing ocpi party", async () => {
@@ -308,3 +340,30 @@ describe("Registry contract", function () {
   });
 
 });
+
+async function signOtherCertificate(
+  issuer: { signTypedData: (domain: any, types: any, value: any) => Promise<string> },
+  verifyingContract: string,
+  certificate: { identifier: string; name: string; owner: string },
+) {
+  const { chainId } = await ethers.provider.getNetwork();
+  const signature = await issuer.signTypedData(
+    {
+      name: "Banula",
+      version: "1",
+      chainId,
+      verifyingContract,
+      salt: ethers.encodeBytes32String("banulaocn"),
+    },
+    {
+      OtherCertificate: [
+        { name: "identifier", type: "string" },
+        { name: "name", type: "string" },
+        { name: "owner", type: "address" },
+      ],
+    },
+    certificate,
+  );
+  const { r, s, v } = ethers.Signature.from(signature);
+  return { r, s, v };
+}
