@@ -1,0 +1,22 @@
+{
+ "certificate": {
+  "identifier": "AA AAA",
+  "information": {
+   "address": "Address",
+   "contactPerson": "Diego Rosales",
+   "email": "diego.rosales@my-oli.com",
+   "node": "0xB43253229b9d16cE16e9c836B472D84269338808",
+   "partyUrl": "https://my-oli.com"
+  },
+  "name": "TEST PARTY",
+  "owner": "0x9c7f118878728720c1121D8FA3bC4eeaF09B0069",
+  "signature": "gpzv996J5zg3nneIjGMVm5p93yEorpwy1+fjEi8yFgZ/RORkSmYeSYmzETu1N5RsJlYLMZJaZMmNt+Xnzc4DSxs="
+ },
+ "role": "CPO",
+ "signature": {
+  "message_hash": "0xc1d7af428ac5b797cc3d7008bcf7eed9cef4cd41f780cc0b995328321fef7983",
+  "r": "0xfc07fb493e3e2e3505706560c305968f9cc0a92e029e4e23c1be1e5c9bcb1b0f",
+  "s": "0x24f651c91f80a337e91c16a37d935619c1baa5497c2509da54f341fbc177effd",
+  "v": 27
+ }
+}

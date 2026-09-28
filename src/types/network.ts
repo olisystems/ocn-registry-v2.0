@@ -23,6 +23,8 @@ export interface Provider {
   network_id: string;
   gas?: number;
   gasPrice?: number;
+  /** When set, used as the full RPC URL instead of protocol + host + port (e.g. for Docker: http://anvil:8545) */
+  url?: string;
 }
 
 export interface Contract {

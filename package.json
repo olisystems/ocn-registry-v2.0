@@ -1,6 +1,6 @@
 {
   "license": "MIT",
-  "version": "2.0.55",
+  "version": "2.0.60",
   "description": "Oli-systems OCN registry smart contracts",
   "name": "ocn-registry",
   "directories": {
@@ -26,6 +26,7 @@
     "ethers-decode-error": "^2.1.3",
     "fs-extra": "^11.2.0",
     "web3-utils": "^4.3.1",
+    "yaml": "^2.8.3",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
@@ -54,6 +55,7 @@
     "hardhat-deploy": "^0.12.4",
     "hardhat-deploy-ethers": "^0.4.2",
     "hardhat-gas-reporter": "^1.0.8",
+    "husky": "^9.1.7",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.4.1",
     "solhint": "^5.0.3",
@@ -75,7 +77,8 @@
     "debug-hardhat": "node --inspect node_modules/.bin/hardhat",
     "lint": "solhint 'contracts/*.sol'",
     "debug-cli": "node --inspect -r ts-node/register  src/cli ",
-    "cli": "ts-node src/cli"
+    "cli": "ts-node src/cli",
+    "prepare": "husky"
   },
   "keywords": [
     "smart-contracts",

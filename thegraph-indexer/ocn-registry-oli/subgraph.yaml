@@ -1,0 +1,174 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: OCN_Registry_OLI
+    network: localhost
+    source:
+      abi: OCN_Registry_OLI
+      address: "0x5d5664283bCfD1Dfe2Ba70eA8004C21c45C343D4"
+      startBlock: 56
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Party
+        - Operator
+        - CertificateVerifier
+        - ProviderOracle
+        - Registry
+        - OperatorUpdate
+        - OwnershipTransferred
+        - PartyDelete
+        - PartyUpdate
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+        - EMPVerified
+        - CPOVerified
+        - OtherVerified
+      abis:
+        - name: OCN_Registry_OLI
+          file: ./abis/OCN_Registry_OLI.json
+      eventHandlers:
+        - event: OperatorUpdate(indexed address,string)
+          handler: handleOperatorUpdate
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PartyDelete(bytes2,bytes3,indexed address,uint8[],string,string,uint8,uint8,bool)
+          handler: handlePartyDelete
+        - event: PartyUpdate(bytes2,bytes3,indexed address,uint8[],string,string,uint8,uint8,bool,indexed address)
+          handler: handlePartyUpdate
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+      file: ./src/ocn-registry-oli.ts
+  - kind: ethereum
+    name: ERC1967Proxy
+    network: localhost
+    source:
+      abi: ERC1967Proxy
+      address: "0x616F9d8a67a1061E87a1855B24011a21f320f9C8"
+      startBlock: 47
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Upgraded
+      abis:
+        - name: ERC1967Proxy
+          file: ./abis/ERC1967Proxy.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/erc-1967-proxy.ts
+  - kind: ethereum
+    name: EuroStableCoin
+    network: localhost
+    source:
+      abi: EuroStableCoin
+      address: "0x485c454451cB9e6F566054b6E3E362794CEEF0D9"
+      startBlock: 51
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: EuroStableCoin
+          file: ./abis/EuroStableCoin.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/euro-stable-coin.ts
+  - kind: ethereum
+    name: OCNGovernor
+    network: localhost
+    source:
+      abi: OCNGovernor
+      address: "0xf6AAC1D017328caEc0DC4f907109FbBfAfBDd35a"
+      startBlock: 47
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - EIP712DomainChanged
+        - ProposalCanceled
+        - ProposalCreated
+        - ProposalExecuted
+        - ProposalQueued
+        - ProposalThresholdSet
+        - QuorumNumeratorUpdated
+        - TimelockChange
+        - VoteCast
+        - VoteCastWithParams
+        - VotingDelaySet
+        - VotingPeriodSet
+      abis:
+        - name: OCNGovernor
+          file: ./abis/OCNGovernor.json
+      eventHandlers:
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalThresholdSet(uint256,uint256)
+          handler: handleProposalThresholdSet
+        - event: QuorumNumeratorUpdated(uint256,uint256)
+          handler: handleQuorumNumeratorUpdated
+        - event: TimelockChange(address,address)
+          handler: handleTimelockChange
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+        - event: VoteCastWithParams(indexed address,uint256,uint8,uint256,string,bytes)
+          handler: handleVoteCastWithParams
+        - event: VotingDelaySet(uint256,uint256)
+          handler: handleVotingDelaySet
+        - event: VotingPeriodSet(uint256,uint256)
+          handler: handleVotingPeriodSet
+      file: ./src/ocn-governor.ts
+  - kind: ethereum
+    name: OCN_Certificate_Verifier
+    network: gnosis
+    source:
+      abi: OCN_Certificate_Verifier
+      address: "0xB6eEfCC997522A6bFdf7FB04d02574d1C2635406"
+      startBlock: 45456425
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - EMPVerified
+        - CPOVerified
+        - OtherVerified
+      abis:
+        - name: OCN_Certificate_Verifier
+          file: ./abis/OCN_Certificate_Verifier.json
+      eventHandlers:
+        - event: EMPVerified(indexed address,string,string,string,string,string,string,address,string,string,string,string,string)
+          handler: handleEMPVerified
+        - event: CPOVerified(indexed address,string,string,address)
+          handler: handleCPOVerified
+        - event: OtherVerified(indexed address,string,string,address)
+          handler: handleOtherVerified
+      file: ./src/ocn-certificate-verifier.ts

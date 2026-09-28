@@ -19,6 +19,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 var minikubeHardhatURL = process.env.MINIKUBE_HARDHAT_HOST || "hardhat.default.svc.cluster.local";
+// When set (e.g. in Docker: http://anvil:8545), overrides host/port for minikube so the CLI can reach the chain
+var minikubeRpcUrl = process.env.OCN_REGISTRY_RPC_URL || process.env.RPC_URL;
 
 export const networks: Record<string, Network> = {
   ganache: {
@@ -37,6 +39,7 @@ export const networks: Record<string, Network> = {
       port: 8555,
       network_id: "1337",
       gas: 8000000,
+      ...(minikubeRpcUrl ? { url: minikubeRpcUrl } : {}),
     },
   },
   localhost: {

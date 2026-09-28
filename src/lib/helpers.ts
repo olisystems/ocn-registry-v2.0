@@ -1,7 +1,7 @@
 import path, { join, isAbsolute } from "path";
 import * as fs from 'fs/promises';
 import { Network } from "../types/network";
-import { CpoCertificate, EmpCertificate, JsonCertificate, SignResult } from "./types";
+import { CpoCertificate, EmpCertificate, JsonCertificate, OtherCertificate, SignResult } from "./types";
 import * as ethers from 'ethers';
 
 export const getOverrides = (networkFileName?: string): Partial<Network> => {
@@ -20,19 +20,36 @@ export const bigIntToString = (key: string, value: any): string => {
 
 export function encodeEmpCertificate(certificate: EmpCertificate) {
   return ethers.AbiCoder.defaultAbiCoder().encode(
-    ['tuple(string,string,string,string,string,address)'],
+    ['tuple(string,string,string,string,string,address,string,string,string,string,string,string)'],
     [[
       certificate.identifier,
       certificate.name,
       certificate.marktfunktion,
       certificate.lieferant,
       certificate.bilanzkreis,
-      certificate.owner
+      certificate.owner,
+      certificate.vatid,
+      certificate.billingAddress,
+      certificate.billingCity,
+      certificate.billingPostalCode,
+      certificate.billingCountry,
+      certificate.billingEmail
     ]]
   );
 }
 
 export function encodeCpoCertificate(certificate: CpoCertificate) {
+  return ethers.AbiCoder.defaultAbiCoder().encode(
+    ['tuple(string,string,address)'],
+    [[
+      certificate.identifier,
+      certificate.name,
+      certificate.owner
+    ]]
+  );
+}
+
+export function encodeOtherCertificate(certificate: OtherCertificate) {
   return ethers.AbiCoder.defaultAbiCoder().encode(
     ['tuple(string,string,address)'],
     [[

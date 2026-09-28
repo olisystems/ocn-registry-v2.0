@@ -8,7 +8,15 @@ import {
 } from '../../src/lib/helpers';
 
 // Emp information
-const encodedEmpCertificate = encodeEmpCertificate(TEST_EMP_CERTIFICATE.certificate);
+const encodedEmpCertificate = encodeEmpCertificate({
+  vatid: "",
+  billingAddress: "",
+  billingCity: "",
+  billingPostalCode: "",
+  billingCountry: "",
+  billingEmail: "",
+  ...TEST_EMP_CERTIFICATE.certificate,
+});
 const encodedEmpSignature = encodeCertificateSignature(TEST_EMP_CERTIFICATE.signature);
 
 // Cpo Information

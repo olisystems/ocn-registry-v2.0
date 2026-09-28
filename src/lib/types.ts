@@ -41,9 +41,21 @@ export interface EmpCertificate {
   lieferant: string;
   bilanzkreis: string;
   owner: string;
+  vatid: string;
+  billingAddress: string;
+  billingCity: string;
+  billingPostalCode: string;
+  billingCountry: string;
+  billingEmail: string;
 }
 
 export interface CpoCertificate {
+  identifier: string;
+  name: string;
+  owner: string;
+}
+
+export interface OtherCertificate {
   identifier: string;
   name: string;
   owner: string;
@@ -104,4 +116,5 @@ export enum Role {
   NSP,
   OTHER,
   SCSP,
+  HUB,
 }

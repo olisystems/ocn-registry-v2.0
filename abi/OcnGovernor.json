@@ -37,7 +37,7 @@
   },
   {
     "inputs": [],
-    "name": "FailedCall",
+    "name": "FailedInnerCall",
     "type": "error"
   },
   {
@@ -134,11 +134,6 @@
       }
     ],
     "name": "GovernorInvalidSignature",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "GovernorInvalidVoteParams",
     "type": "error"
   },
   {
@@ -257,6 +252,16 @@
   {
     "inputs": [],
     "name": "InvalidShortString",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "QueueEmpty",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "QueueFull",
     "type": "error"
   },
   {
@@ -1239,22 +1244,22 @@
     "outputs": [
       {
         "internalType": "address[]",
-        "name": "targets",
+        "name": "",
         "type": "address[]"
       },
       {
         "internalType": "uint256[]",
-        "name": "values",
+        "name": "",
         "type": "uint256[]"
       },
       {
         "internalType": "bytes[]",
-        "name": "calldatas",
+        "name": "",
         "type": "bytes[]"
       },
       {
         "internalType": "bytes32",
-        "name": "descriptionHash",
+        "name": "",
         "type": "bytes32"
       }
     ],
@@ -1273,27 +1278,27 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "proposalId",
+        "name": "",
         "type": "uint256"
       },
       {
         "internalType": "address[]",
-        "name": "targets",
+        "name": "",
         "type": "address[]"
       },
       {
         "internalType": "uint256[]",
-        "name": "values",
+        "name": "",
         "type": "uint256[]"
       },
       {
         "internalType": "bytes[]",
-        "name": "calldatas",
+        "name": "",
         "type": "bytes[]"
       },
       {
         "internalType": "bytes32",
-        "name": "descriptionHash",
+        "name": "",
         "type": "bytes32"
       }
     ],

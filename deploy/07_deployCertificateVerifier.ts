@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { deploymentsDefaultDir, deploymentsDestDir, networkExtraConfig } from "../helper-hardhat-config";
-import * as CertificateVerifierABI from "../test/certificates/CertificateVerifier.json";
+import * as CertificateVerifierABI from "../scripts/abis/CertificateVerifier.json";
 import { artifacts, ethers } from "hardhat";
 import copyDeployments from "../helper/copyDeploymentsToSrc";
 
@@ -18,7 +18,6 @@ const deployCertificateVerifier: DeployFunction = async function (hre: HardhatRu
     args: [],
     log: true,
     waitConfirmations: networkExtraConfig[network.name].blockConfirmations || 1,
-    deterministicDeployment: true,
     contract: {
       abi: CertificateVerifierABI.abi,
       bytecode: CertificateVerifierABI.bytecode,
