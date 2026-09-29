@@ -6,6 +6,7 @@ proposals.json
 
 # Local dev config (symlinked from transit-local-services)
 local.hardhat.config.ts
+local
 
 # Hardhat files
 /cache
